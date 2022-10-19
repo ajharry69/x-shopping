@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id "dagger.hilt.android.plugin"
+    id "kotlin-kapt"
+}
+
+apply from: "$rootDir/libraries/common/config.common.gradle"
+apply from: "$rootDir/libraries/data/source/local/dependencies.common.gradle"
+
+android {
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$rootDir/db-schemas/")
+            arg("room.incremental", "true")
+            arg("room.expandProjection", "true")
+        }
+    }
+    namespace 'co.ke.xently.shopping.libraries.data.source.local'
+}
+
+dependencies {
+    alphaImplementation 'androidx.security:security-crypto:1.1.0-alpha03'
+    betaImplementation 'androidx.security:security-crypto:1.1.0-alpha03'
+    releaseImplementation 'androidx.security:security-crypto:1.1.0-alpha03'
+    // Pinned to 1.1.0-alpha01 because of https://github.com/google/tink/issues/413
+    debugImplementation 'androidx.security:security-crypto:1.1.0-alpha01'
+    kapt "androidx.room:room-compiler:$room_version"
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+}

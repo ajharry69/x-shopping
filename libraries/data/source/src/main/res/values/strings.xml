@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="lib_error_connecting_to_server">Failed to connect to server.</string>
+    <string name="lib_error_server_connection_timeout">Connection to the server timeout.</string>
+
+</resources>

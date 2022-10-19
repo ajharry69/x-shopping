@@ -1,0 +1,24 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "Xently Shopping"
+include ':app'
+include ':libraries:common'
+include ':libraries:data:source'
+include ':libraries:data:source:local'
+include ':features'
+include ':features:customers'
+include ':features:users'
+include ':features:search'
+include ':libraries:data:source:remote'

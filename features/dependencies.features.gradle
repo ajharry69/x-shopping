@@ -1,0 +1,13 @@
+apply from: "$rootDir/libraries/data/source/local/dependencies.common.gradle"
+apply from: "$rootDir/features/dependencies.common.gradle"
+
+dependencies {
+    implementation project(path: ":features")
+    implementation project(path: ":libraries:data:source:local")
+    implementation project(path: ":libraries:data:source:remote")
+    // Transitive dependency needed when using calling
+    // `co.ke.xently.shopping.libraries.data.source.remote.Http.sendRequest(...)`
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.26.5-rc'
+}

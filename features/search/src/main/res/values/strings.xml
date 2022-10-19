@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fsearch_no_results">No results</string>
+    <string name="fsearch_hint">Search…</string>
+    <string name="fsearch_content_desc_nav_icon">Search - navigate back</string>
+    <string name="fsearch_content_desc_clear">Search - clear query</string>
+    <string name="fsearch_content_desc_voice_search">Search from speech</string>
+</resources>

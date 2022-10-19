@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fusers_sign_up">Sign up</string>
+    <string name="fusers_sign_in">Sign in</string>
+    <string name="fusers_input_field_label_name">Name</string>
+    <string name="fusers_sign_in_input_field_label_username">Email*</string>
+    <string name="fusers_input_field_label_password">Password*</string>
+    <string name="fusers_button_label_forgot_password">Forgot password?</string>
+    <string name="fusers_password_required">Password cannot be blank</string>
+    <string name="fusers_email_required">Email cannot be blank</string>
+    <string name="fusers_input_field_label_email">Email*</string>
+    <string name="fusers_verification_input_field_label_code">Verification code</string>
+    <string name="fusers_verification_code_required">Verification code cannot be blank</string>
+    <string name="fusers_verify">Verify</string>
+    <string name="fusers_verify_account">Verify account</string>
+    <string name="fusers_button_label_resend_verification_code">Resend code</string>
+    <string name="fusers_request_password_reset">Request password reset</string>
+    <string name="fusers_submit_request">Submit request</string>
+    <string name="fusers_new_password_required">New password cannot be blank.</string>
+    <string name="fusers_old_password_required">Old password cannot be blank.</string>
+    <string name="fusers_input_field_label_new_password">New password*</string>
+    <string name="fusers_input_field_label_old_password">Old password*</string>
+    <string name="fusers_reset_password">Reset password</string>
+    <string name="fusers_button_label_resend_verification_code_count_down">Resend in %1$ds…</string>
+    <string name="fusers_terms_and_conditions_prefix">By clicking</string>
+    <string name="fusers_terms_and_conditions_agree">you agree to the</string>
+    <string name="fusers_terms_and_conditions_terms_of_service">Terms of Service</string>
+    <string name="fusers_terms_and_conditions_privacy_policy">Privacy Policy</string>
+    <string name="fusers_email_invalid">Invalid email address</string>
+    <string name="fusers_dont_have_account_question_prefix">Don\'t have an account? Please </string>
+    <string name="fusers_or">or</string>
+</resources>

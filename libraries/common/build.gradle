@@ -1,0 +1,16 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id "dagger.hilt.android.plugin"
+    id "kotlin-kapt"
+}
+
+apply from: "$rootDir/libraries/common/config.common.gradle"
+apply from: "$rootDir/libraries/common/dependencies.common.gradle"
+android {
+    namespace 'co.ke.xently.shopping.libraries.common'
+}
+
+dependencies {
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+}

@@ -1,0 +1,30 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id "dagger.hilt.android.plugin"
+    id "kotlin-kapt"
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+}
+
+apply from: "$rootDir/libraries/common/config.common.gradle"
+apply from: "$rootDir/libraries/data/source/dependencies.common.gradle"
+android {
+    namespace 'co.ke.xently.shopping.libraries.data.source.remote'
+}
+
+dependencies {
+    implementation project(path: ":libraries:data:source")
+
+    implementation "com.squareup.retrofit2:retrofit:2.9.0"
+    implementation "com.squareup.retrofit2:converter-gson:2.9.0"
+    // https://square.github.io/okhttp/
+    implementation(platform('com.squareup.okhttp3:okhttp-bom:5.0.0-alpha.10'))
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation 'com.squareup.okio:okio:3.2.0'
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+}
+
+secrets {
+    defaultPropertiesFileName = 'defaults.libraries.data.source.remote.properties'
+}

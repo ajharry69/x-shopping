@@ -1,0 +1,10 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+apply from: "$rootDir/libraries/common/config.common.gradle"
+apply from: "$rootDir/libraries/data/source/dependencies.common.gradle"
+android {
+    namespace 'co.ke.xently.shopping.libraries.data.source'
+}

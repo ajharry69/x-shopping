@@ -1,0 +1,5 @@
+apply from: "$rootDir/libraries/data/source/dependencies.common.gradle"
+
+dependencies {
+    implementation project(path: ":libraries:data:source")
+}

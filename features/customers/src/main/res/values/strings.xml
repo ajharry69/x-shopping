@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="fc_detail_toolbar_title">%1$s customer</string>
+    <string name="fc_list_toolbar_title">Customers</string>
+    <string name="fc_detail_input_field_label_tax_pin">Tax PIN*</string>
+    <string name="fc_detail_input_field_label_name">Name*</string>
+    <string name="fc_detail_input_field_label_phone_number">Phone number</string>
+    <string name="fc_detail_input_field_label_exemption_number">Exemption number</string>
+    <string name="fc_detail_input_field_label_physical_address">Physical address</string>
+    <string name="fc_detail_success_adding_customer">Successfully added customer</string>
+    <string name="fc_list_success_removing_customer">Successfully removed customer</string>
+    <string name="fc_list_empty_list">
+        No customers found. Please, click on the (+) button below to add one.
+    </string>
+    <string name="fc_list_item_drop_down_menu_content_description">More options for \"%1$s\"</string>
+    <string name="fc_list_item_drop_down_menu_update">Update</string>
+    <string name="fc_list_item_drop_down_menu_delete">Delete</string>
+    <string name="fc_list_item_no_address">No address</string>
+    <string name="fc_error_duplicate_tax_pin">A customer with the same tax PIN already exists.</string>
+    <string name="fc_add">Add</string>
+    <string name="fc_update">Update</string>
+    <string name="fc_search_hint">Search customers…</string>
+</resources>

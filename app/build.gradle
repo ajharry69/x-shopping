@@ -1,0 +1,53 @@
+plugins {
+    id 'com.google.firebase.crashlytics'
+    id 'com.google.firebase.firebase-perf'
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id "dagger.hilt.android.plugin"
+    id "kotlin-kapt"
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+}
+
+apply from: "$rootDir/features/config.common.gradle"
+apply from: "$rootDir/features/dependencies.common.gradle"
+
+def localProperties = new Properties()
+try {
+    localProperties.load(new FileInputStream(rootProject.file("local.properties")))
+} catch (Exception ignored) {
+}
+
+android {
+    namespace 'co.ke.xently.shopping'
+    defaultConfig {
+        versionCode 9
+        versionName localProperties.get("versionName", "1.0")
+        applicationId "co.ke.xently.shopping"
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix ".debug"
+        }
+        alpha {
+            applicationIdSuffix ".alpha"
+        }
+        beta {
+            applicationIdSuffix ".beta"
+        }
+    }
+}
+
+dependencies {
+    implementation project(path: ":features")
+    implementation project(path: ":features:customers")
+    implementation project(path: ':features:users')
+    implementation project(path: ':libraries:data:source')
+
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+}
+
+secrets {
+    propertiesFileName 'features.properties'
+}
+
+apply plugin: 'com.google.gms.google-services'

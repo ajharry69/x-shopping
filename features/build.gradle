@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+}
+
+apply from: "$rootDir/features/config.common.gradle"
+apply from: "$rootDir/features/dependencies.common.gradle"
+android {
+    namespace 'co.ke.xently.shopping.features'
+}
+
+dependencies {
+    implementation project(path: ":libraries:common")
+    implementation project(path: ":libraries:data:source")
+    implementation project(path: ":libraries:data:source:local")
+    implementation project(path: ":libraries:data:source:remote")
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.26.5-rc'
+    implementation 'com.google.accompanist:accompanist-placeholder-material:0.26.5-rc'
+}
+
+secrets {
+    propertiesFileName 'features.properties'
+}
