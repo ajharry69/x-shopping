@@ -5,7 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,7 +20,6 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.features.utils.buildRoute
 import co.ke.xently.shopping.libraries.data.source.User
-import co.ke.xently.shopping.ui.dashboard.DashboardScreen
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -99,20 +98,8 @@ class MainActivity : FragmentActivity() {
                         }
                     }
 
-                    var showSignoutDialog by remember {
-                        mutableStateOf(false)
-                    }
-
-                    if (showSignoutDialog) {
-                        SignoutOpsDialog(
-                            onDismissRequest = {
-                                showSignoutDialog = false
-                            },
-                            onConfirmClick = viewModel::signOut,
-                        )
-                    }
-
                     NavHost(
+                        navController = navController,
                         shared = Shared(
                             user = user,
                             snackbarHostState = snackbarHostState,
@@ -141,17 +128,11 @@ class MainActivity : FragmentActivity() {
                                 }
                             },
                         ),
-                        showSignOutProgressbar = showProgressbar,
-                        navController = navController,
                         items = listOf(
                             DashboardScreen.Item(
-                                logo = Icons.Default.Groups,
-                                title = stringResource(R.string.dashboard_item_customers),
-                                onClick = {
-                                    navController.navigate(Routes.Customers.LIST.buildRoute()) {
-                                        launchSingleTop = true
-                                    }
-                                },
+                                logo = Icons.Default.Logout,
+                                onClick = viewModel::signOut,
+                                title = stringResource(R.string.dashboard_item_logout),
                             ),
                         ),
                         config = DashboardScreen.Config(
@@ -165,7 +146,7 @@ class MainActivity : FragmentActivity() {
                                     launchSingleTop = true
                                 }
                             },
-                            onPasswordResetContinuationDismissed = { viewModel.signOut(false) },
+                            onPasswordResetContinuationDismissed = viewModel::signOut,
                         ),
                     )
                 }

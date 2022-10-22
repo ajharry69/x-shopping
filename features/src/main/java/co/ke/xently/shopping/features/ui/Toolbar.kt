@@ -27,13 +27,7 @@ fun ToolbarWithProgressbar(
     actions: @Composable RowScope.() -> Unit = {},
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        SmallTopAppBar(
-            colors = colors,
-            actions = actions,
-            scrollBehavior = scrollBehavior,
-            navigationIcon = {
-                IconButton(onNavigationIconClicked, content = navigationIcon)
-            },
+        TopAppBar(
             title = {
                 if (subTitle.isNullOrBlank()) {
                     Text(title)
@@ -44,6 +38,12 @@ fun ToolbarWithProgressbar(
                     }
                 }
             },
+            navigationIcon = {
+                IconButton(onNavigationIconClicked, content = navigationIcon)
+            },
+            actions = actions,
+            colors = colors,
+            scrollBehavior = scrollBehavior,
         )
         if (showProgress) {
             val progressbarDescription = stringResource(R.string.content_description_progress_bar)

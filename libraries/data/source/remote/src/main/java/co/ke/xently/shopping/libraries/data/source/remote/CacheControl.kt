@@ -12,11 +12,11 @@ sealed class CacheControl(private val name: String) {
     companion object {
         fun getOrThrow(lookup: String): CacheControl {
             return when (lookup) {
-                CacheControl.NoCache.toString() -> {
-                    CacheControl.NoCache
+                NoCache.toString() -> {
+                    NoCache
                 }
-                CacheControl.OnlyIfCached.toString() -> {
-                    CacheControl.OnlyIfCached
+                OnlyIfCached.toString() -> {
+                    OnlyIfCached
                 }
                 else -> {
                     throw NotImplementedError()

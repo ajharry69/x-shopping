@@ -9,22 +9,14 @@
     <string name="retry">Retry</string>
     <string name="confirm_deletion_dialog_title">Confirm deletion!</string>
     <string name="confirm_deletion_dialog_message">Are you sure you want to delete \"%1$s\"?</string>
+    <string name="feature_field_required">%1$s cannot be blank</string>
 
     <!-- Content description -->
-    <string name="content_description_text_field">%1$s text field</string>
     <string name="content_description_move_back">Move back</string>
     <string name="content_description_progress_bar">Progress bar</string>
 
     <!-- Error messages -->
     <string name="error_message_generic_empty_list">No %1$s added, yet!</string>
-    <string name="error_message_generic">Sorry, an unexpected error was encountered.</string>
-    <string name="error_barcode_scanner_cancelled" translatable="false">Code scanner is cancelled.</string>
-    <string name="error_barcode_scanner_camera_permission_not_granted" translatable="false">Camera permission is not granted.</string>
-    <string name="error_barcode_scanner_app_name_unavailable" translatable="false">App name is not set.</string>
-    <string name="error_barcode_scanner_default_message" translatable="false">Failed to scan code: %1$s</string>
 
     <!-- Test tags -->
-    <string name="test_tag_text_field_error_text">Error caption %1$s</string>
-    <string name="test_tag_text_field_help_text">Help text %1$s</string>
-    <string name="test_tag_dropdown_menu_suggestions">%1$s suggestions</string>
 </resources>

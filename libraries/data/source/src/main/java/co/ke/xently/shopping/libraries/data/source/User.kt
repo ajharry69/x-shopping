@@ -44,14 +44,3 @@ data class User(
         )
     }
 }
-
-val UserEntity.asUIInstance
-    get() = User(
-        id = id,
-        name = name,
-        email = email,
-        isActive = isActive,
-        shopsCount = shopsCount,
-        isVerified = isVerified,
-        isPasswordResetRequested = isPasswordResetRequested,
-    )

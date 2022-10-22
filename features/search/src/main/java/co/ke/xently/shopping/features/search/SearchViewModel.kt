@@ -5,16 +5,19 @@ import androidx.lifecycle.viewModelScope
 import co.ke.xently.shopping.features.search.repositories.ISearchRepository
 import co.ke.xently.shopping.features.utils.ListState
 import co.ke.xently.shopping.features.utils.Query
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("MemberVisibilityCanBePrivate")
 abstract class SearchViewModel<T> constructor(
     private val repository: ISearchRepository<T>,
 ) : ViewModel() {
     private val query = MutableSharedFlow<Query>()
     fun search(query: Query) {
         viewModelScope.launch {
+            delay(250)
             this@SearchViewModel.query.emit(query)
         }
     }
@@ -28,7 +31,11 @@ abstract class SearchViewModel<T> constructor(
 
     val searchResults = searchState.mapLatest {
         (it as? ListState.Success)?.data.orEmpty()
-    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(replayExpiration = 5.seconds))
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = emptyList(),
+        started = SharingStarted.WhileSubscribed(replayExpiration = 5.seconds),
+    )
 
     init {
         viewModelScope.launch {
@@ -51,12 +58,15 @@ abstract class SearchViewModel<T> constructor(
     private val autoCompleteQuery = MutableSharedFlow<Query>()
     private val _searchAutoCompleteState = MutableSharedFlow<ListState<T>>()
 
-    @Suppress("MemberVisibilityCanBePrivate")
     val searchAutoCompleteState = _searchAutoCompleteState.asSharedFlow()
 
     val searchAutoCompleteResults = searchAutoCompleteState.mapLatest { state ->
         (state as? ListState.Success)?.data.orEmpty()
-    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(replayExpiration = 5.seconds))
+    }.stateIn(
+        scope = viewModelScope,
+        initialValue = emptyList(),
+        started = SharingStarted.WhileSubscribed(replayExpiration = 5.seconds),
+    )
 
     init {
         viewModelScope.launch {
@@ -78,6 +88,7 @@ abstract class SearchViewModel<T> constructor(
 
     fun autoCompleteSearch(query: Query) {
         viewModelScope.launch {
+            delay(250)
             this@SearchViewModel.autoCompleteQuery.emit(query)
         }
     }

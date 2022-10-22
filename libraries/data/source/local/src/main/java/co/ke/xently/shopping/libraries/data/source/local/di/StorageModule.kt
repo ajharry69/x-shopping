@@ -26,13 +26,15 @@ object StorageModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): Database {
-        return Room.databaseBuilder(context, Database::class.java, "${context.packageName}.pos.db")
+        return Room.databaseBuilder(context,
+            Database::class.java,
+            "${context.packageName}.shopping.db")
             .fallbackToDestructiveMigration()
             .apply {
                 if (BuildConfig.DEBUG) {
                     setQueryCallback(
-                        { query, args ->
-                            Timber.d("Query <${query}>. Args: <${args.joinToString()}>")
+                        { sqlQuery, bindArgs ->
+                            Timber.d("Query <${sqlQuery}>. Args: <${bindArgs.joinToString()}>")
                         },
                         Executors.newSingleThreadExecutor(),
                     )

@@ -96,64 +96,49 @@ internal object SignInScreen {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                var username by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+                val username = TextFieldConfig(
+                    labelId = R.string.fusers_sign_in_input_field_label_username,
+                    valueInputs = null,
+                    state = signInState,
+                    extraErrorChecks = {
+                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                    },
+                ) {
+                    (it.error as? SignInHttpException)?.email?.joinToString("\n")
                 }
-                val usernameError = remember(username, signInState) {
-                    if (username.text.isBlank()) {
-                        context.getString(R.string.fusers_email_required)
-                    } else if (!username.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
-                        context.getString(R.string.fusers_email_invalid)
-                    } else {
-                        (signInState as? State.Error)?.let {
-                            (it.error as? SignInHttpException)?.email?.joinToString("\n")
-                        } ?: ""
-                    }
-                }
-                val usernameHasError by remember(usernameError) {
-                    derivedStateOf {
-                        usernameError.isNotBlank()
-                    }
-                }
-                TextInputLayout(
+                TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = username,
-                    error = usernameError,
-                    isError = usernameHasError,
-                    onValueChange = { username = it },
-                    label = stringResource(R.string.fusers_sign_in_input_field_label_username),
+                    value = username.value,
+                    isError = username.hasError,
+                    onValueChange = username.onValueChange,
+                    label = { Text(username.label) },
                     keyboardOptions = DefaultKeyboardOptions.copy(
                         keyboardType = KeyboardType.Email,
                         capitalization = KeyboardCapitalization.None,
                     ),
+                    supportingText = {
+                        SupportingText(config = username)
+                    },
                 )
-                var password by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+
+                val password = TextFieldConfig(
+                    labelId = R.string.fusers_input_field_label_password,
+                    valueInputs = null,
+                    state = signInState,
+                ) {
+                    (it.error as? SignInHttpException)?.password?.joinToString("\n")
                 }
-                val passwordError = remember(password, signInState) {
-                    if (password.text.isBlank()) {
-                        context.getString(R.string.fusers_password_required)
-                    } else {
-                        (signInState as? State.Error)?.let {
-                            (it.error as? SignInHttpException)?.password?.joinToString("\n")
-                        } ?: ""
-                    }
-                }
-                val passwordHasError by remember(passwordError) {
-                    derivedStateOf {
-                        passwordError.isNotBlank()
-                    }
-                }
+
                 var isPasswordVisible by rememberSaveable {
                     mutableStateOf(false)
                 }
-                TextInputLayout(
+
+                TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = password,
-                    error = passwordError,
-                    isError = passwordHasError,
-                    onValueChange = { password = it },
-                    label = stringResource(R.string.fusers_input_field_label_password),
+                    value = password.value,
+                    isError = password.hasError,
+                    onValueChange = password.onValueChange,
+                    label = { Text(password.label) },
                     trailingIcon = {
                         PasswordVisibilityToggle(isVisible = isPasswordVisible) {
                             isPasswordVisible = !isPasswordVisible
@@ -170,6 +155,9 @@ internal object SignInScreen {
                         keyboardType = KeyboardType.Password,
                     ),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    supportingText = {
+                        SupportingText(config = password)
+                    },
                 )
                 Row(
                     modifier = Modifier
@@ -187,7 +175,7 @@ internal object SignInScreen {
                     )
                     val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                         derivedStateOf {
-                            requiredFields.all { it.text.isNotBlank() } && !showProgressBar
+                            requiredFields.all { !it.hasError } && !showProgressBar
                         }
                     }
                     Button(
@@ -197,8 +185,8 @@ internal object SignInScreen {
                             focusManager.clearFocus()
                             config.onSignIn(
                                 BasicAuth(
-                                    password = password.text,
-                                    username = username.text.trim(),
+                                    password = password.value.text,
+                                    username = username.value.text.trim(),
                                 )
                             )
                         },

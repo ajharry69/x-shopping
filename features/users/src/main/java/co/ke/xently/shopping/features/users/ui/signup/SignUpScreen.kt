@@ -99,90 +99,69 @@ internal object SignUpScreen {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                var name by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+                val name = TextFieldConfig(
+                    labelId = R.string.fusers_input_field_label_name,
+                    valueInputs = null,
+                    state = signUpState,
+                ) {
+                    (it.error as? SignUpHttpException)?.name?.joinToString("\n")
                 }
-                val nameError = remember(name, signUpState) {
-                    (signUpState as? State.Error)?.let {
-                        (it.error as? SignUpHttpException)?.name?.joinToString("\n")
-                    } ?: ""
-                }
-                val nameHasError by remember(nameError) {
-                    derivedStateOf {
-                        nameError.isNotBlank()
-                    }
-                }
-                TextInputLayout(
+                TextField(
                     modifier = Modifier
                         .fillMaxWidthHorizontalPadding()
                         .padding(top = 16.dp),
-                    value = name,
-                    error = nameError,
-                    isError = nameHasError,
-                    onValueChange = { name = it },
-                    label = stringResource(R.string.fusers_input_field_label_name),
+                    value = name.value,
+                    isError = name.hasError,
+                    onValueChange = name.onValueChange,
+                    label = { Text(name.label) },
                     keyboardOptions = DefaultKeyboardOptions.copy(capitalization = KeyboardCapitalization.Words),
+                    supportingText = {
+                        SupportingText(config = name)
+                    },
                 )
 
-                var email by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+                val email = TextFieldConfig(
+                    labelId = R.string.fusers_input_field_label_email,
+                    valueInputs = null,
+                    state = signUpState,
+                    extraErrorChecks = {
+                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                    },
+                ) {
+                    (it.error as? SignUpHttpException)?.email?.joinToString("\n")
                 }
-                val emailError = remember(email, signUpState) {
-                    if (email.text.isBlank()) {
-                        context.getString(R.string.fusers_email_required)
-                    } else if (!email.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
-                        context.getString(R.string.fusers_email_invalid)
-                    } else {
-                        (signUpState as? State.Error)?.let {
-                            (it.error as? SignUpHttpException)?.email?.joinToString("\n")
-                        } ?: ""
-                    }
-                }
-                val emailHasError by remember(emailError) {
-                    derivedStateOf {
-                        emailError.isNotBlank()
-                    }
-                }
-                TextInputLayout(
+
+                TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = email,
-                    error = emailError,
-                    isError = emailHasError,
-                    onValueChange = { email = it },
-                    label = stringResource(R.string.fusers_input_field_label_email),
+                    value = email.value,
+                    isError = email.hasError,
+                    onValueChange = email.onValueChange,
+                    label = { Text(email.label) },
                     keyboardOptions = DefaultKeyboardOptions.copy(
                         keyboardType = KeyboardType.Email,
                         capitalization = KeyboardCapitalization.None,
                     ),
+                    supportingText = {
+                        SupportingText(config = email)
+                    },
                 )
 
-                var password by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
-                }
-                val passwordError = remember(password, signUpState) {
-                    if (password.text.isBlank()) {
-                        context.getString(R.string.fusers_password_required)
-                    } else {
-                        (signUpState as? State.Error)?.let {
-                            (it.error as? SignUpHttpException)?.password?.joinToString("\n")
-                        } ?: ""
-                    }
-                }
-                val passwordHasError by remember(passwordError) {
-                    derivedStateOf {
-                        passwordError.isNotBlank()
-                    }
+                val password = TextFieldConfig(
+                    labelId = R.string.fusers_input_field_label_password,
+                    valueInputs = null,
+                    state = signUpState,
+                ) {
+                    (it.error as? SignUpHttpException)?.password?.joinToString("\n")
                 }
                 var isPasswordVisible by rememberSaveable {
                     mutableStateOf(false)
                 }
-                TextInputLayout(
+                TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = password,
-                    error = passwordError,
-                    isError = passwordHasError,
-                    onValueChange = { password = it },
-                    label = stringResource(R.string.fusers_input_field_label_password),
+                    value = password.value,
+                    isError = password.hasError,
+                    onValueChange = password.onValueChange,
+                    label = { Text(password.label) },
                     trailingIcon = {
                         PasswordVisibilityToggle(isVisible = isPasswordVisible) {
                             isPasswordVisible = !isPasswordVisible
@@ -199,6 +178,9 @@ internal object SignUpScreen {
                         keyboardType = KeyboardType.Password,
                     ),
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    supportingText = {
+                        SupportingText(config = password)
+                    },
                 )
                 val termsText = buildAnnotatedString {
                     append("${stringResource(R.string.fusers_terms_and_conditions_prefix)} ")
@@ -245,13 +227,10 @@ internal object SignUpScreen {
                             }
                         }
                 }
-                val requiredFields = arrayOf(
-                    email,
-                    password,
-                )
+                val requiredFields = arrayOf(name, email, password)
                 val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { it.text.isNotBlank() } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressBar
                     }
                 }
                 Button(
@@ -261,9 +240,9 @@ internal object SignUpScreen {
                         focusManager.clearFocus()
                         config.onSubmitDetails.invoke(
                             (user ?: User.DEFAULT_INSTANCE).copy(
-                                name = name.text.trim(),
-                                email = email.text.trim(),
-                                password = password.text.trim(),
+                                name = name.value.text.trim(),
+                                email = email.value.text.trim(),
+                                password = password.value.text.trim(),
                             )
                         )
                     },

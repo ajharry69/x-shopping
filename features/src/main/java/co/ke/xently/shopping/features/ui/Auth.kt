@@ -44,7 +44,7 @@ fun ErrorButton(
                 text = stringResource(R.string.common_signin_button_text).uppercase(locale),
             )
         }
-    } else if (error.cause != null && error.cause!!::class in retryError.retrials) {
+    } else if ((error::class in retryError.retrials) || (error.cause != null && error.cause!!::class in retryError.retrials)) {
         Button(modifier = modifier, onClick = { click.retryAble?.invoke(error) }) {
             Text(
                 style = MaterialTheme.typography.labelLarge,

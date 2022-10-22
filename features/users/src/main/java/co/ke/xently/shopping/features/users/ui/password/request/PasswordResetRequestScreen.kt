@@ -8,7 +8,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -16,12 +15,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.ke.xently.shopping.features.ui.*
+import co.ke.xently.shopping.features.ui.DefaultKeyboardOptions
+import co.ke.xently.shopping.features.ui.TextFieldConfig
+import co.ke.xently.shopping.features.ui.ToolbarWithProgressbar
+import co.ke.xently.shopping.features.ui.fillMaxWidthHorizontalPadding
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.repositories.exceptions.PasswordResetRequestHttpException
 import co.ke.xently.shopping.features.utils.Shared
@@ -96,35 +97,25 @@ internal object PasswordResetRequestScreen {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                var emailAddress by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+                val emailAddress = TextFieldConfig(
+                    labelId = R.string.fusers_input_field_label_email,
+                    valueInputs = null,
+                    state = passwordResetRequestState,
+                    extraErrorChecks = {
+                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                    },
+                ) {
+                    (it.error as? PasswordResetRequestHttpException)?.email?.joinToString("\n")
                 }
-                val emailAddressError = remember(emailAddress, passwordResetRequestState) {
-                    if (emailAddress.text.isBlank()) {
-                        context.getString(R.string.fusers_email_required)
-                    } else if (!emailAddress.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
-                        context.getString(R.string.fusers_email_invalid)
-                    } else {
-                        (passwordResetRequestState as? State.Error)?.let {
-                            (it.error as? PasswordResetRequestHttpException)?.email?.joinToString(
-                                "\n")
-                        } ?: ""
-                    }
-                }
-                val emailAddressHasError by remember(emailAddressError) {
-                    derivedStateOf {
-                        emailAddressError.isNotBlank()
-                    }
-                }
-                TextInputLayout(
+
+                TextField(
                     modifier = Modifier
                         .fillMaxWidthHorizontalPadding()
                         .padding(top = 16.dp),
-                    value = emailAddress,
-                    error = emailAddressError,
-                    isError = emailAddressHasError,
-                    onValueChange = { emailAddress = it },
-                    label = stringResource(R.string.fusers_input_field_label_email),
+                    value = emailAddress.value,
+                    isError = emailAddress.hasError,
+                    onValueChange = emailAddress.onValueChange,
+                    label = { Text(emailAddress.label) },
                     keyboardOptions = DefaultKeyboardOptions.copy(
                         imeAction = ImeAction.Done,
                         keyboardType = KeyboardType.Email,
@@ -135,7 +126,7 @@ internal object PasswordResetRequestScreen {
                 val requiredFields = arrayOf(emailAddress)
                 val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { it.text.isNotBlank() } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressBar
                     }
                 }
                 Button(
@@ -143,7 +134,7 @@ internal object PasswordResetRequestScreen {
                     enabled = enableSubmitButton,
                     onClick = {
                         focusManager.clearFocus()
-                        config.onPasswordResetRequest(emailAddress.text.trim())
+                        config.onPasswordResetRequest(emailAddress.value.text.trim())
                     },
                 ) {
                     Text(

@@ -1,11 +1,12 @@
 package co.ke.xently.shopping.libraries.data.source.remote
 
 import retrofit2.Response
+import kotlin.reflect.KClass
 
 object Http {
     @Suppress("UNCHECKED_CAST", "BlockingMethodInNonBlockingContext")
     suspend fun <T, E : HttpException> sendRequest(
-        errorClass: Class<E>,
+        errorClass: KClass<E>,
         request: suspend () -> Response<T>,
     ): Result<T> {
         val response = request.invoke() // Initiate actual network request call
@@ -28,10 +29,10 @@ object Http {
                     // The following is potentially blocking! Assume the consumer will call the
                     // suspend function from IO dispatcher.
                     errorBody!!.string(),
-                    errorClass
+                    errorClass.java,
                 )
             } catch (ex: IllegalStateException) {
-                HttpException(response.message())
+                HttpException(response.message(), statusCode = statusCode)
             }.apply {
                 if (this.statusCode == null) {
                     this.statusCode = statusCode
@@ -41,5 +42,5 @@ object Http {
     }
 
     suspend fun <T> sendRequest(request: suspend () -> Response<T>) =
-        sendRequest(errorClass = HttpException::class.java, request = request)
+        sendRequest(errorClass = HttpException::class, request = request)
 }
