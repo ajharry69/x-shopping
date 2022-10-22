@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c57d4c0da28bc617590ee9f2ec516992",
+    "identityHash": "a4bb991a021ac11f35c51f02a6222b61",
     "entities": [
       {
         "tableName": "users",
@@ -180,12 +180,193 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "shoppinglist",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shoppinglist_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, `unitQuantity` REAL NOT NULL, `purchaseQuantity` REAL NOT NULL, `dateAdded` INTEGER NOT NULL, PRIMARY KEY(`shoppinglist_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "shoppinglist_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unitQuantity",
+            "columnName": "unitQuantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "purchaseQuantity",
+            "columnName": "purchaseQuantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateAdded",
+            "columnName": "dateAdded",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "shoppinglist_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "shoppinglist_brands",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `shoppingListItemId` INTEGER NOT NULL, PRIMARY KEY(`name`, `shoppingListItemId`), FOREIGN KEY(`shoppingListItemId`) REFERENCES `shoppinglist`(`shoppinglist_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shoppingListItemId",
+            "columnName": "shoppingListItemId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name",
+            "shoppingListItemId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_shoppinglist_brands_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shoppinglist_brands_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_shoppinglist_brands_shoppingListItemId",
+            "unique": false,
+            "columnNames": [
+              "shoppingListItemId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shoppinglist_brands_shoppingListItemId` ON `${TABLE_NAME}` (`shoppingListItemId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "shoppinglist",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "shoppingListItemId"
+            ],
+            "referencedColumns": [
+              "shoppinglist_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "shoppinglist_attributes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `value` TEXT NOT NULL, `shoppingListItemId` INTEGER NOT NULL, PRIMARY KEY(`name`, `value`), FOREIGN KEY(`shoppingListItemId`) REFERENCES `shoppinglist`(`shoppinglist_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shoppingListItemId",
+            "columnName": "shoppingListItemId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name",
+            "value"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_shoppinglist_attributes_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shoppinglist_attributes_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_shoppinglist_attributes_value",
+            "unique": false,
+            "columnNames": [
+              "value"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shoppinglist_attributes_value` ON `${TABLE_NAME}` (`value`)"
+          },
+          {
+            "name": "index_shoppinglist_attributes_shoppingListItemId",
+            "unique": false,
+            "columnNames": [
+              "shoppingListItemId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shoppinglist_attributes_shoppingListItemId` ON `${TABLE_NAME}` (`shoppingListItemId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "shoppinglist",
+            "onDelete": "NO ACTION",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "shoppingListItemId"
+            ],
+            "referencedColumns": [
+              "shoppinglist_id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c57d4c0da28bc617590ee9f2ec516992')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a4bb991a021ac11f35c51f02a6222b61')"
     ]
   }
 }

@@ -2,7 +2,6 @@ package co.ke.xently.shopping.features.customers.repositories
 
 import co.ke.xently.shopping.features.Dependencies
 import co.ke.xently.shopping.libraries.data.source.Customer
-import co.ke.xently.shopping.libraries.data.source.asUIInstance
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn

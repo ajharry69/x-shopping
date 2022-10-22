@@ -25,6 +25,10 @@ dependencies {
     releaseImplementation 'androidx.security:security-crypto:1.1.0-alpha03'
     // Pinned to 1.1.0-alpha01 because of https://github.com/google/tink/issues/413
     debugImplementation 'androidx.security:security-crypto:1.1.0-alpha01'
+
+    implementation "androidx.paging:paging-runtime:$paging_version"
+    implementation "androidx.room:room-paging:$room_version"
+
     kapt "androidx.room:room-compiler:$room_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 }

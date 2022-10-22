@@ -35,13 +35,3 @@ data class Customer(
         )
     }
 }
-
-val CustomerEntity.asUIInstance
-    get() = Customer(
-        id = id,
-        name = name,
-        taxPin = taxPin,
-        physicalAddress = physicalAddress,
-        phoneNumber = phoneNumber,
-        exemptionNumber = exemptionNumber,
-    )

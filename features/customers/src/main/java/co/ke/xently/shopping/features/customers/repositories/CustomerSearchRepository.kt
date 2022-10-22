@@ -4,7 +4,6 @@ import co.ke.xently.shopping.features.Dependencies
 import co.ke.xently.shopping.features.search.repositories.ISearchRepository
 import co.ke.xently.shopping.features.utils.Query
 import co.ke.xently.shopping.libraries.data.source.Customer
-import co.ke.xently.shopping.libraries.data.source.asUIInstance
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

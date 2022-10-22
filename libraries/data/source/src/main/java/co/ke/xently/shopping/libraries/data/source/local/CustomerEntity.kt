@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import co.ke.xently.shopping.libraries.data.source.Customer
 
 @Entity(
     tableName = "customers",
@@ -23,4 +24,14 @@ data class CustomerEntity(
     val physicalAddress: String?,
     val phoneNumber: String?,
     val exemptionNumber: String,
-)
+) {
+    val asUIInstance
+        get() = Customer(
+            id = id,
+            name = name,
+            taxPin = taxPin,
+            physicalAddress = physicalAddress,
+            phoneNumber = phoneNumber,
+            exemptionNumber = exemptionNumber,
+        )
+}

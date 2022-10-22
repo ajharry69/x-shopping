@@ -5,7 +5,6 @@ import co.ke.xently.shopping.features.Dependencies
 import co.ke.xently.shopping.features.users.BasicAuth
 import co.ke.xently.shopping.features.users.repositories.exceptions.*
 import co.ke.xently.shopping.libraries.data.source.User
-import co.ke.xently.shopping.libraries.data.source.asUIInstance
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.retryCatch
 import co.ke.xently.shopping.libraries.data.source.remote.Http.sendRequest
 import co.ke.xently.shopping.libraries.data.source.utils.Retry

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import co.ke.xently.shopping.libraries.data.source.User
 
 @Entity(
     tableName = "users",
@@ -24,4 +25,15 @@ data class UserEntity(
     val isActive: Boolean,
     val isVerified: Boolean,
     val isPasswordResetRequested: Boolean,
-)
+) {
+    val asUIInstance
+        get() = User(
+            id = id,
+            name = name,
+            email = email,
+            isActive = isActive,
+            shopsCount = shopsCount,
+            isVerified = isVerified,
+            isPasswordResetRequested = isPasswordResetRequested,
+        )
+}
