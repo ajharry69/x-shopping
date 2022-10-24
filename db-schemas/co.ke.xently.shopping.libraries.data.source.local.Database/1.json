@@ -2,8 +2,46 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a4bb991a021ac11f35c51f02a6222b61",
+    "identityHash": "1d37399aebe10a05b204d50d7929a25b",
     "entities": [
+      {
+        "tableName": "remote_keys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`endpoint` TEXT NOT NULL, `prevPage` INTEGER, `nextPage` INTEGER, `totalItems` INTEGER NOT NULL, PRIMARY KEY(`endpoint`))",
+        "fields": [
+          {
+            "fieldPath": "endpoint",
+            "columnName": "endpoint",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prevPage",
+            "columnName": "prevPage",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "nextPage",
+            "columnName": "nextPage",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "totalItems",
+            "columnName": "totalItems",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "endpoint"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
       {
         "tableName": "users",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`users_id` INTEGER NOT NULL, `id` INTEGER NOT NULL, `name` TEXT NOT NULL, `email` TEXT NOT NULL, `shopsCount` INTEGER NOT NULL, `isActive` INTEGER NOT NULL, `isVerified` INTEGER NOT NULL, `isPasswordResetRequested` INTEGER NOT NULL, PRIMARY KEY(`users_id`))",
@@ -366,7 +404,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a4bb991a021ac11f35c51f02a6222b61')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1d37399aebe10a05b204d50d7929a25b')"
     ]
   }
 }

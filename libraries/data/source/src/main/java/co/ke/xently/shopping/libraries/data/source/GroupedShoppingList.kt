@@ -14,7 +14,7 @@ data class GroupedShoppingList(
             numberOfItems = -1,
             group = DEFAULT_LOCAL_DATE_FORMAT.format(Date()),
             shoppingList = List(Random.nextInt(1, 20)) {
-                ShoppingListItem.DEFAULT
+                ShoppingListItem.DEFAULT_INSTANCE
             },
         ).run {
             copy(numberOfItems = shoppingList.size)

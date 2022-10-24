@@ -22,6 +22,7 @@ android {
         jvmTarget = '1.8'
         useIR = true
         freeCompilerArgs += [
+                "-opt-in=androidx.paging.ExperimentalPagingApi",
                 "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
                 "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
                 "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",

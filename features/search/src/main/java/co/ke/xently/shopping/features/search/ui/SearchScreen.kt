@@ -36,7 +36,7 @@ abstract class SearchScreen<S, T>(@StringRes private val searchHint: Int = R.str
     sealed class SearchResponse<out T> {
         object InitialResults : SearchResponse<Nothing>()
         data class Suggestions<T>(val data: List<T>) : SearchResponse<List<T>>()
-        data class Results<T>(val data: List<T>) : SearchResponse<List<T>>()
+        data class Results<T>(val data: T) : SearchResponse<T>()
         object NoResults : SearchResponse<Nothing>()
     }
 

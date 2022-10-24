@@ -9,6 +9,15 @@ interface ShoppingListService {
     @POST("shopping-list/")
     suspend fun add(@Body item: ShoppingListItem): Response<ShoppingListItem>
 
+    @PUT("shopping-list/{id}/")
+    suspend fun update(
+        @Path("id") id: Long,
+        @Body item: ShoppingListItem,
+    ): Response<ShoppingListItem>
+
+    @DELETE("shopping-list/{id}/")
+    suspend fun remove(@Path("id") id: Long): Response<Unit>
+
     @GET("shopping-list/{id}/")
     suspend fun get(
         @Path("id") id: Long,

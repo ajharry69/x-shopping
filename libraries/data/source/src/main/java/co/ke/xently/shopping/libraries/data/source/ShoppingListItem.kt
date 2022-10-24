@@ -48,7 +48,7 @@ data class ShoppingListItem(
     }
 
     companion object {
-        val DEFAULT = ShoppingListItem(
+        val DEFAULT_INSTANCE = ShoppingListItem(
             id = -1L,
             name = "Gold crown milk",
             unit = "litres",

@@ -72,11 +72,6 @@ fun NavGraphBuilder.authenticationGraph(
                                     launchSingleTop = true
                                 }
                             }
-                            it.shopsCount == 0 -> {
-                                navController.navigate(Routes.BusinessRegistration.DETAIL.buildRoute()) {
-                                    launchSingleTop = true
-                                }
-                            }
                             !navController.popBackStack(Routes.Dashboard.toString(), false) -> {
                                 navController.navigateUp()
                             }

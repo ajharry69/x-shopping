@@ -15,6 +15,12 @@ interface ShoppingListDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun save(items: List<ShoppingListItemEntity>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveBrands(brands: List<ShoppingListItemEntity.Brand>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveAttributes(brands: List<ShoppingListItemEntity.Attribute>)
+
     @Transaction
     @Query("SELECT * FROM shoppinglist WHERE shoppinglist_id = :id")
     fun get(id: Long): Flow<ShoppingListItemEntity.WithRelated?>
@@ -37,6 +43,9 @@ interface ShoppingListDao {
 
     @Query("SELECT dateAdded AS `group`, COUNT(dateAdded) AS numberOfItems FROM shoppinglist GROUP BY dateAdded")
     fun getCountGroupedByDateAdded(): Flow<List<GroupedShoppingListCount>>
+
+    @Query("DELETE FROM shoppinglist WHERE shoppinglist_id = :id")
+    suspend fun delete(id: Long): Int
 
     @Query("DELETE FROM shoppinglist")
     suspend fun deleteAll(): Int

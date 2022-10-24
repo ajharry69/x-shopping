@@ -50,24 +50,6 @@ object Routes {
         }
     }
 
-    object Products {
-        const val LIST = "products/"
-        const val SEARCH = "products/search/"
-        const val DETAIL = "products/{id}/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-    }
-
-    object Taxes {
-        const val LIST = "taxes/"
-        const val SEARCH = "taxes/search/"
-        const val DETAIL = "taxes/{id}/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-    }
-
     object Customers {
         const val LIST = "customers/"
         const val SEARCH = "customers/search/"
@@ -77,57 +59,10 @@ object Routes {
         }
     }
 
-    object BusinessRegistration {
-        const val LIST = "business-registration/"
-        const val SEARCH = "business-registration/search/"
-        const val DETAIL = "business-registration/basic-info/"
-        const val TAX_DETAIL = "business-registration/tax-details/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-
-        object Deeplinks {
-            const val LIST = "$INTERNAL_DEEPLINK_SCHEME://business-registration/"
-        }
-    }
-
-    object Purchases {
-        const val LIST = "purchases/"
-        const val SEARCH = "purchases/search/"
-        const val DETAIL = "purchases/{id}/"
-        const val PRODUCTS = "purchases/products/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-    }
-
-    object Sales {
-        const val SEARCH = "sales/search/"
-        const val LIST = "sales/"
-        const val DETAIL = "sales/{id}/"
-        const val PAYMENT = "sales/{id}/payment/"
-        const val CONFIRMATION = "sales/{id}/confirmation/"
-        const val PRODUCTS = "sales/products/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-    }
-
-    object Reports {
-        const val LIST = "reports/"
-        const val SALES = "${LIST}sales/"
-        const val PURCHASE = "${LIST}purchase/"
-        const val STOCK = "${LIST}stock/"
-        const val SALES_RANK = "${LIST}sales-rank/"
-        const val PROFIT_MARGIN = "${LIST}profit-margin/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-    }
-
-    object HsCodes {
-        const val LIST = "hscodes/"
-        const val SEARCH = "hscodes/search/"
+    object ShoppingList {
+        const val LIST = "shoppinglist/"
+        const val SEARCH = "shoppinglist/search/"
+        const val DETAIL = "shoppinglist/{id}/"
         override fun toString(): String {
             return javaClass.name
         }
