@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.style.TextOverflow
 import co.ke.xently.shopping.R
 
@@ -58,14 +57,11 @@ internal object SignoutOpsDialog {
                         checked = removeBusinesses,
                         onCheckedChange = onCheckedChanged,
                     )
-                    val textColor by CheckboxDefaults.colors().borderColor(
-                        enabled = true,
-                        state = if (removeBusinesses) {
-                            ToggleableState.On
-                        } else {
-                            ToggleableState.Off
-                        },
-                    )
+                    val textColor = if (removeBusinesses) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    }
                     Column {
                         Text(
                             color = textColor,
