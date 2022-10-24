@@ -1,32 +1,21 @@
-package co.ke.xently.shopping.ui.dashboard
+package co.ke.xently.shopping.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import co.ke.xently.shopping.R
 import co.ke.xently.shopping.features.ui.XentlyPreview
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.libraries.data.source.User
-
-@XentlyPreview
-@Composable
-private fun DashboardScreenHeaderPreview() {
-    XentlyTheme {
-        DashboardScreen.Header(
-            userName = "John Doe",
-            showProgressbar = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.primary),
-        )
-    }
-}
+import kotlinx.coroutines.launch
 
 @XentlyPreview
 @Composable
@@ -74,9 +63,23 @@ private fun DashboardScreenPreview() {
                     title = stringResource(R.string.dashboard_item_logout),
                 ),
             ),
-            showProgressbar = false,
             snackbarHostState = null,
             config = DashboardScreen.Config(),
-        )
+        ) {
+            // TODO: replace content with actual content
+            val scope = rememberCoroutineScope()
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(text = if (it.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
+                Spacer(Modifier.height(20.dp))
+                Button(onClick = { scope.launch { it.open() } }) {
+                    Text("Click to open")
+                }
+            }
+        }
     }
 }

@@ -140,6 +140,9 @@ fun TextInputLayout(
     }
 }
 
+/**
+ * TODO: Replace with - https://developer.android.com/reference/kotlin/androidx/compose/material3/package-summary#ExposedDropdownMenuBox(kotlin.Boolean,kotlin.Function1,androidx.compose.ui.Modifier,kotlin.Function1)
+ */
 @Composable
 fun <T> AutoCompleteTextField(
     value: TextFieldValue,
@@ -224,33 +227,6 @@ fun <T> AutoCompleteTextField(
                     },
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun MultipleTextFieldRow(
-    modifier: Modifier = Modifier,
-    isError: Boolean = false,
-    error: String = "",
-    content: @Composable RowScope.(Modifier) -> Unit,
-) {
-    Column(modifier = modifier) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(VIEW_SPACE_HALVED),
-        ) {
-            content(Modifier.weight(1f))
-        }
-        if (isError) {
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, end = 12.dp),
-            )
         }
     }
 }

@@ -20,7 +20,6 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.features.utils.buildRoute
 import co.ke.xently.shopping.libraries.data.source.User
-import co.ke.xently.shopping.ui.dashboard.DashboardScreen
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch

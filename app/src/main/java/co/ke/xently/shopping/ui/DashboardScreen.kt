@@ -1,14 +1,10 @@
-package co.ke.xently.shopping.ui.dashboard
+package co.ke.xently.shopping.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.PointOfSale
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,12 +14,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.ke.xently.shopping.R
 import co.ke.xently.shopping.libraries.data.source.User
-import co.ke.xently.shopping.features.R as FeatureR
+import kotlinx.coroutines.launch
 
 object DashboardScreen {
     data class Config(
@@ -82,16 +77,36 @@ object DashboardScreen {
     operator fun invoke(
         modifier: Modifier,
         user: User?,
-        items: List<Item>,
-        showProgressbar: Boolean,
-        snackbarHostState: SnackbarHostState?,
         config: Config,
+        items: List<Item>,
+        snackbarHostState: SnackbarHostState?,
+        content: (@Composable (DrawerState) -> Unit),
     ) {
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+        val scope = rememberCoroutineScope()
+        val selectedItem = remember { mutableStateOf(items[0]) }
+
         val hostState = snackbarHostState ?: remember {
             SnackbarHostState()
         }
 
+        val userName: String = remember(user) {
+            user?.name?.ifBlank { null }
+                ?: "Anonymous"
+        }
+
+        val userEmail: String = remember(user) {
+            user?.email?.ifBlank { null }
+                ?: "anonymous@example.com"
+        }
+
         val context = LocalContext.current
+
+        BackHandler(enabled = drawerState.isOpen) {
+            scope.launch {
+                drawerState.close()
+            }
+        }
 
         LaunchedEffect(user) {
             if (user == null) {
@@ -124,83 +139,50 @@ object DashboardScreen {
             }
         }
 
-        val userName: String = remember(user) {
-            user?.name?.ifBlank { null }
-                ?: user?.email?.ifBlank { null }
-                ?: "Anonymous"
-        }
-
-        Scaffold(snackbarHost = { SnackbarHost(hostState = hostState) }) { values: PaddingValues ->
-            Column(modifier = modifier.padding(values)) {
-                val colorPrimary = MaterialTheme.colorScheme.primary
-                Header(
-                    userName = userName,
-                    showProgressbar = showProgressbar,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(colorPrimary),
-                )
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(128.dp),
-                    contentPadding = PaddingValues(8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    items(items) { item ->
-                        item(
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .size(128.dp),
+        DismissibleNavigationDrawer(
+            modifier = modifier,
+            drawerState = drawerState,
+            content = {
+                content(drawerState)
+            },
+            drawerContent = {
+                DismissibleDrawerSheet {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(176.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Column {
+                            Image(
+                                modifier = Modifier.size(100.dp),
+                                imageVector = Icons.Default.AccountCircle,
+                                contentDescription = stringResource(R.string.content_description_dashboard_user_profile_picture),
+                            )
+                            ListItem(
+                                headlineText = { Text(text = userName) },
+                                supportingText = { Text(text = userEmail) },
+                            )
+                        }
+                    }
+                    Spacer(Modifier.height(12.dp))
+                    items.forEach { item ->
+                        NavigationDrawerItem(
+                            icon = { Icon(item.logo, contentDescription = null) },
+                            label = { Text(item.title) },
+                            selected = item == selectedItem.value,
+                            onClick = {
+                                scope.launch {
+                                    drawerState.close()
+                                    item.onClick()
+                                }
+                                selectedItem.value = item
+                            },
+                            modifier = Modifier.padding(horizontal = 12.dp)
                         )
                     }
                 }
-            }
-        }
-    }
-
-    @Composable
-    internal fun Header(modifier: Modifier, userName: String, showProgressbar: Boolean) {
-        Column(modifier = modifier) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
-                Icon(
-                    modifier = Modifier.size(48.dp),
-                    imageVector = Icons.Default.PointOfSale,
-                    contentDescription = stringResource(R.string.app_logo),
-                )
-
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        fontWeight = FontWeight.Bold,
-                        text = stringResource(FeatureR.string.app_name),
-                        style = MaterialTheme.typography.headlineLarge,
-                    )
-                    Text(
-                        fontWeight = FontWeight.Bold,
-                        text = stringResource(R.string.app_tagline),
-                        style = MaterialTheme.typography.labelMedium,
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Image(
-                    modifier = Modifier.size(100.dp),
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = stringResource(R.string.content_description_dashboard_user_profile_picture),
-                )
-                Text(text = userName)
-                Spacer(modifier = Modifier.size(8.dp))
-            }
-            if (showProgressbar) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-        }
+            },
+        )
     }
 }

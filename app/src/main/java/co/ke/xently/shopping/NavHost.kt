@@ -1,16 +1,22 @@
 package co.ke.xently.shopping
 
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import co.ke.xently.shopping.features.customers.customersGraph
 import co.ke.xently.shopping.features.users.authenticationGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
-import co.ke.xently.shopping.ui.dashboard.DashboardScreen
+import co.ke.xently.shopping.ui.DashboardScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
+import kotlinx.coroutines.launch
 
 object NavHost {
     @Composable
@@ -27,13 +33,27 @@ object NavHost {
         ) {
             composable(route = Routes.Dashboard.toString()) {
                 DashboardScreen(
-                    modifier = Modifier.fillMaxSize(),
-                    user = shared.user,
                     items = items,
-                    showProgressbar = showSignOutProgressbar,
-                    snackbarHostState = shared.snackbarHostState,
                     config = config,
-                )
+                    user = shared.user,
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHostState = shared.snackbarHostState,
+                ) {
+                    // TODO: replace content with actual content
+                    val scope = rememberCoroutineScope()
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(text = if (it.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
+                        Spacer(Modifier.height(20.dp))
+                        Button(onClick = { scope.launch { it.open() } }) {
+                            Text("Click to open")
+                        }
+                    }
+                }
             }
             customersGraph(navController = navController, shared = shared)
             authenticationGraph(navController = navController, shared = shared)
