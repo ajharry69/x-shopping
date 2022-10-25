@@ -57,6 +57,71 @@ internal object ShoppingListItemListItem {
         val ungroupedNumberFormat = rememberNumberFormat {
             isGroupingUsed = true
         }
+
+        /*ListItem(
+            modifier = modifier,
+            headlineText = {
+                Text(
+                    text = shoppingListItem.name,
+                    modifier = Modifier.shimmerPlaceholder(showPlaceholder),
+                )
+            },
+            supportingText = {
+                Text(
+                    text = "${shoppingListItem.unitQuantity.let(ungroupedNumberFormat::format)} ${shoppingListItem.unit}",
+                    modifier = Modifier.shimmerPlaceholder(showPlaceholder),
+                )
+            },
+            trailingContent = {
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = shoppingListItem.purchaseQuantity.let(ungroupedNumberFormat::format),
+                        modifier = Modifier.shimmerPlaceholder(showPlaceholder),
+                    )
+                    if (trailingIcon == null) {
+                        Box {
+                            var showDropDownMenu by remember { mutableStateOf(false) }
+                            IconButton(onClick = { showDropDownMenu = !showPlaceholder }) {
+                                Icon(
+                                    imageVector = if (showDropDownMenu) {
+                                        Icons.Default.KeyboardArrowDown
+                                    } else {
+                                        Icons.Default.KeyboardArrowRight
+                                    },
+                                    contentDescription = stringResource(
+                                        R.string.feature_shoppinglist_list_item_drop_down_menu_content_description,
+                                        shoppingListItem.name,
+                                    ),
+                                    modifier = Modifier.shimmerPlaceholder(showPlaceholder),
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showDropDownMenu,
+                                onDismissRequest = { showDropDownMenu = false },
+                            ) {
+                                for (menuItem in menuItems) {
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            menuItem.onClick(shoppingListItem)
+                                            showDropDownMenu = false
+                                        },
+                                        text = {
+                                            Text(stringResource(menuItem.label))
+                                        },
+                                    )
+                                }
+                            }
+                        }
+                    } else {
+                        trailingIcon.invoke()
+                    }
+                }
+            },
+        )*/
+
         ListItemSurface(modifier = modifier) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -64,21 +129,21 @@ internal object ShoppingListItemListItem {
             ) {
                 Text(
                     text = shoppingListItem.name,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .wrapContentWidth()
                         .shimmerPlaceholder(showPlaceholder),
                 )
                 Text(
-                    text = "${shoppingListItem.unitQuantity} ${shoppingListItem.unit}",
+                    text = "${shoppingListItem.unitQuantity.let(ungroupedNumberFormat::format)} ${shoppingListItem.unit}",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.shimmerPlaceholder(showPlaceholder),
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = ungroupedNumberFormat.format(shoppingListItem.purchaseQuantity),
-                    style = MaterialTheme.typography.headlineSmall,
+                    text = shoppingListItem.purchaseQuantity.let(ungroupedNumberFormat::format),
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.shimmerPlaceholder(showPlaceholder),
                 )
                 if (trailingIcon == null) {

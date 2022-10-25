@@ -1,15 +1,15 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.list
 
 import androidx.annotation.VisibleForTesting
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,13 +35,13 @@ internal object ShoppingListItemListScreen {
         config: ShoppingListItemSearchScreen.Config,
         viewModel: ShoppingListItemListViewModel = hiltViewModel(),
     ) {
-        val listState = viewModel.listState.collectAsLazyPagingItems()
+        val items = viewModel.listState.collectAsLazyPagingItems()
         val removeState by viewModel.removeState.collectAsState(State.Success(null))
 
         ShoppingListItemListScreen(
             config = config,
             modifier = modifier,
-            listState = listState,
+            items = items,
             removeState = removeState,
             isRefreshing = false,
             menuItems = menuItems + ShoppingListItemListItem.MenuItem.deleteMenuItem(
@@ -56,7 +56,7 @@ internal object ShoppingListItemListScreen {
     @VisibleForTesting
     operator fun invoke(
         modifier: Modifier,
-        listState: LazyPagingItems<ShoppingListItem>,
+        items: LazyPagingItems<ShoppingListItem>,
         removeState: State<Any>,
         isRefreshing: Boolean,
         menuItems: Set<ShoppingListItemListItem.MenuItem>,
@@ -83,6 +83,8 @@ internal object ShoppingListItemListScreen {
             )
         }*/
 
+        val listState = rememberLazyListState()
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -102,16 +104,24 @@ internal object ShoppingListItemListScreen {
                 }
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = config.onFabClick) {
-                    Icon(
-                        Icons.Default.Add,
-                        stringRes(R.string.feature_shoppinglist_detail_toolbar_title,
-                            R.string.feature_shoppinglist_add),
-                    )
+                val showFab by remember(listState) {
+                    derivedStateOf {
+                        !listState.isScrollInProgress
+                    }
+                }
+                AnimatedVisibility(visible = showFab) {
+                    FloatingActionButton(onClick = config.onFabClick) {
+                        Icon(
+                            Icons.Default.Add,
+                            stringRes(R.string.feature_shoppinglist_detail_toolbar_title,
+                                R.string.feature_shoppinglist_add),
+                        )
+                    }
                 }
             },
         ) { values: PaddingValues ->
             Content(
+                items = items,
                 config = config,
                 menuItems = menuItems,
                 listState = listState,

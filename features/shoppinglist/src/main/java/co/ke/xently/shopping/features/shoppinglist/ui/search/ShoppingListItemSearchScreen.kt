@@ -3,10 +3,7 @@ package co.ke.xently.shopping.features.shoppinglist.ui.search
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,7 +18,7 @@ import co.ke.xently.shopping.features.search.ui.SearchScreen
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
-import co.ke.xently.shopping.features.ui.*
+import co.ke.xently.shopping.features.ui.ShowRemovalMessage
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
@@ -53,13 +50,14 @@ internal object ShoppingListItemSearchScreen :
         modifier: Modifier,
         isRefreshing: Boolean,
         config: Config,
-        listState: LazyPagingItems<ShoppingListItem>,
+        items: LazyPagingItems<ShoppingListItem>,
         menuItems: Set<ShoppingListItemListItem.MenuItem>,
+        listState: LazyListState = rememberLazyListState(),
     ) {
         PagedDataScreen(
             modifier = modifier,
-            listState = rememberLazyListState(),
-            items = listState,
+            listState = listState,
+            items = items,
             key = { it.id },
             snackbarHostState = config.shared.snackbarHostState,
             placeholder = { ShoppingListItem.DEFAULT_INSTANCE },
@@ -111,7 +109,7 @@ internal object ShoppingListItemSearchScreen :
                     Content(
                         config = config,
                         isRefreshing = false,
-                        listState = listState,
+                        items = listState,
                         menuItems = menuItems,
                         modifier = modifier.padding(values),
                     )
