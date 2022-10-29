@@ -1,5 +1,6 @@
 package co.ke.xently.shopping.features
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,11 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
 import co.ke.xently.shopping.features.ui.*
+import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.getErrorMessage
 import co.ke.xently.shopping.libraries.data.source.utils.RetryError
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -41,61 +43,62 @@ object PagedDataScreen {
         },
         noinline itemContent: @Composable (LazyItemScope.(T) -> Unit),
     ) {
-        items.loadState.refresh
-        when (val refresh = items.loadState.refresh) {
-            is LoadState.Loading -> {
-                FullscreenLoading(
-                    modifier = modifier,
-                    placeholder = placeholder,
-                    placeholderContent = itemContent,
-                    numberOfPlaceholders = numberOfPlaceholders,
-                )
-            }
-            is LoadState.Error -> {
-                FullscreenError(
-                    modifier = modifier,
-                    error = refresh.error,
-                    preErrorContent = preErrorContent,
-                    postErrorContent = postErrorContent,
-                )
-            }
-            is LoadState.NotLoading -> {
-                if (items.itemCount == 0) {
-                    FullscreenEmptyList<T>(modifier, emptyListMessage)
-                } else {
-                    val refreshState = rememberSwipeRefreshState(
-                        isRefreshing = items.loadState.mediator?.refresh == LoadState.Loading,
-                    )
-                    SwipeRefresh(
+        val context = LocalContext.current
+        AnimatedContent(targetState = items.loadState.refresh) { refresh ->
+            when (refresh) {
+                is LoadState.Loading -> {
+                    FullscreenLoading(
                         modifier = modifier,
-                        state = refreshState,
-                        onRefresh = items::refresh,
-                    ) {
-                        LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                            items(items, key = key) { item ->
-                                if (item == null) {
-                                    if (placeholder != null) {
-                                        itemContent(placeholder.invoke())
-                                    }
-                                } else {
-                                    itemContent(item)
-                                }
-                            }
-                            item {
-                                when (val loadState = items.loadState.append) {
-                                    is LoadState.Loading -> {
-                                        CircularProgressIndicator(modifier = Modifier
-                                            .fillMaxWidth()
-                                            .wrapContentWidth(Alignment.CenterHorizontally))
-                                    }
-                                    is LoadState.Error -> {
-                                        val message = (loadState.error.localizedMessage
-                                            ?: stringResource(R.string.error_message_generic))
-                                        LaunchedEffect(message) {
-                                            snackbarHostState.showSnackbar(message)
+                        placeholder = placeholder,
+                        placeholderContent = itemContent,
+                        numberOfPlaceholders = numberOfPlaceholders,
+                    )
+                }
+                is LoadState.Error -> {
+                    FullscreenError(
+                        modifier = modifier,
+                        error = refresh.error,
+                        preErrorContent = preErrorContent,
+                        postErrorContent = postErrorContent,
+                    )
+                }
+                is LoadState.NotLoading -> {
+                    if (items.itemCount == 0) {
+                        FullscreenEmptyList<T>(modifier, emptyListMessage)
+                    } else {
+                        val refreshState = rememberSwipeRefreshState(
+                            isRefreshing = items.loadState.mediator?.refresh == LoadState.Loading,
+                        )
+                        SwipeRefresh(
+                            modifier = modifier,
+                            state = refreshState,
+                            onRefresh = items::refresh,
+                        ) {
+                            LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+                                items(items, key = key) { item ->
+                                    if (item == null) {
+                                        if (placeholder != null) {
+                                            itemContent(placeholder.invoke())
                                         }
+                                    } else {
+                                        itemContent(item)
                                     }
-                                    is LoadState.NotLoading -> Unit
+                                }
+                                item {
+                                    when (val loadState = items.loadState.append) {
+                                        is LoadState.Loading -> {
+                                            CircularProgressIndicator(modifier = Modifier
+                                                .fillMaxWidth()
+                                                .wrapContentWidth(Alignment.CenterHorizontally))
+                                        }
+                                        is LoadState.Error -> {
+                                            val message = loadState.error.getErrorMessage(context)
+                                            LaunchedEffect(message) {
+                                                snackbarHostState.showSnackbar(message)
+                                            }
+                                        }
+                                        is LoadState.NotLoading -> Unit
+                                    }
                                 }
                             }
                         }

@@ -42,6 +42,7 @@ interface ShoppingListService {
         @Query("by") groupBy: String,
         @Header("Cache-Control")
         cacheControl: String = "only-if-cached",
+        @Query("page") page: Int = 1,
     ): Response<Map<String, List<ShoppingListItem>>>
 
     /*@GET("shopping-list/recommendations/")

@@ -20,4 +20,15 @@
     <string name="feature_shoppinglist_add">Add</string>
     <string name="feature_shoppinglist_update">Update</string>
     <string name="feature_shoppinglist_search_hint">Search shopping list…</string>
+    <string name="feature_shoppinglist_group_button_see_all">SEE ALL</string>
+    <string name="feature_shoppinglist_content_description_open_drawer">Open navigation drawer</string>
+
+    <plurals name="feature_shoppinglist_group_items_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+    <plurals name="feature_shoppinglist_default_measurement_unit">
+        <item quantity="one">piece</item>
+        <item quantity="other">pieces</item>
+    </plurals>
 </resources>

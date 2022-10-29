@@ -17,7 +17,7 @@ import co.ke.xently.shopping.features.ui.rememberNumberFormat
 import co.ke.xently.shopping.features.ui.shimmerPlaceholder
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
-internal object ShoppingListItemListItem {
+object ShoppingListItemListItem {
     data class MenuItem(
         @StringRes
         val label: Int,
@@ -37,17 +37,10 @@ internal object ShoppingListItemListItem {
         override fun hashCode(): Int {
             return label
         }
-
-        companion object {
-            fun deleteMenuItem(onDeleteClick: (ShoppingListItem) -> Unit) = MenuItem(
-                onClick = onDeleteClick,
-                label = R.string.feature_shoppinglist_list_item_drop_down_menu_delete,
-            )
-        }
     }
 
     @Composable
-    operator fun invoke(
+    internal operator fun invoke(
         modifier: Modifier,
         shoppingListItem: ShoppingListItem,
         showPlaceholder: Boolean,

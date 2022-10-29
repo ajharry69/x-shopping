@@ -10,12 +10,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import co.ke.xently.shopping.features.R
+import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.getErrorMessage
 import co.ke.xently.shopping.libraries.data.source.utils.RetryError
 
 @Composable
@@ -29,19 +31,20 @@ fun FullscreenError(
         ErrorButton(it, retryError = retryError, click = click)
     },
 ) {
+    val context = LocalContext.current
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(VIEW_SPACE),
+                .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             preErrorContent(error)
             Text(
                 textAlign = TextAlign.Center,
-                text = error.localizedMessage ?: stringResource(R.string.error_message_generic),
+                text = error.getErrorMessage(context = context),
             )
             postErrorContent(error)
         }
@@ -93,7 +96,7 @@ inline fun <reified T : Any> FullscreenEmptyList(
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Text(
-            modifier = Modifier.padding(VIEW_SPACE),
+            modifier = Modifier.padding(16.dp),
             textAlign = TextAlign.Center,
             text = error ?: stringResource(
                 R.string.error_message_generic_empty_list,

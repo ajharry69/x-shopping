@@ -3,7 +3,6 @@ package co.ke.xently.shopping.features.shoppinglist.ui.detail
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -145,6 +143,7 @@ internal object ShoppingListItemDetailScreen {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                val groupedNumberFormat = rememberNumberFormat()
                 val unGroupedNumberFormat = rememberNumberFormat {
                     isGroupingUsed = false
                 }
@@ -169,13 +168,6 @@ internal object ShoppingListItemDetailScreen {
                 ) {
                     mutableStateOf(TextFieldValue(shoppingListItem?.unit ?: ""))
                 }
-                TextInputLayout(
-                    modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = unit,
-                    onValueChange = { unit = it },
-                    label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_measurement_unit),
-                    keyboardOptions = DefaultKeyboardOptions.copy(capitalization = KeyboardCapitalization.None),
-                )
 
                 var unitQuantity by rememberSaveable(
                     shoppingListItem?.unitQuantity,
@@ -184,8 +176,34 @@ internal object ShoppingListItemDetailScreen {
                     mutableStateOf(TextFieldValue(shoppingListItem?.unitQuantity?.let(
                         unGroupedNumberFormat::format) ?: ""))
                 }
+
+                val helpText by remember(name, unit, unitQuantity) {
+                    derivedStateOf {
+                        (unitQuantity.text.trim().toFloatOrNull() ?: 1f).let {
+                            "${it.let(groupedNumberFormat::format)} ${
+                                unit.text.ifBlank {
+                                    context.resources.getQuantityString(
+                                        R.plurals.feature_shoppinglist_default_measurement_unit,
+                                        it.toInt(),
+                                    )
+                                }
+                            } of ${name.text.ifBlank { "-" }}"
+                        }.trim()
+                    }
+                }
+
                 TextInputLayout(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
+                    value = unit,
+                    helpText = helpText,
+                    onValueChange = { unit = it },
+                    label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_measurement_unit),
+                    keyboardOptions = DefaultKeyboardOptions.copy(capitalization = KeyboardCapitalization.None),
+                )
+
+                TextInputLayout(
+                    modifier = Modifier.fillMaxWidthHorizontalPadding(),
+                    helpText = helpText,
                     value = unitQuantity,
                     onValueChange = { unitQuantity = it },
                     label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_measurement_unit_quantity),
@@ -255,9 +273,9 @@ internal object ShoppingListItemDetailScreen {
                             ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
                             name = name.text.trim(),
                             unit = unit.text.trim().uppercase(),
-                            unitQuantity = unitQuantity.text.trim().toFloatOrNull() ?: 0f,
-                            purchaseQuantity = purchaseQuantity.text.trim().toFloatOrNull() ?: 0f,
-//                            physicalAddress = physicalAddress.text.trim(),
+                            unitQuantity = unitQuantity.text.trim().ifBlank { "1" }.toFloat(),
+                            purchaseQuantity = purchaseQuantity.text.trim().ifBlank { "1" }
+                                .toFloat(),
                         ))
                     },
                 ) {

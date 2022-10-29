@@ -31,7 +31,7 @@ object Http {
                     errorClass
                 )
             } catch (ex: IllegalStateException) {
-                HttpException(response.message())
+                HttpException(response.message(), statusCode = statusCode)
             }.apply {
                 if (this.statusCode == null) {
                     this.statusCode = statusCode

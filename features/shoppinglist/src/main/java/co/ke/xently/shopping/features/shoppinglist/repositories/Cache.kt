@@ -41,7 +41,9 @@ internal suspend fun List<ShoppingListItem>.saveLocally(
                     attr.copy(value = it)
                 }
             }.map {
-                ShoppingListItemEntity.Attribute(name = it.name, value = it.value, shoppingListItemId = item.id)
+                ShoppingListItemEntity.Attribute(name = it.name,
+                    value = it.value,
+                    shoppingListItemId = item.id)
             }
         }
     }

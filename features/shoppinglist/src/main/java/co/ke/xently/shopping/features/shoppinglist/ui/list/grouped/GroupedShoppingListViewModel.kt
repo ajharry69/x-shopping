@@ -1,51 +1,62 @@
-package co.ke.xently.shopping.features.shoppinglist.ui
+package co.ke.xently.shopping.features.shoppinglist.ui.list.grouped
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.shoppinglist.repositories.IShoppingListRepository
-import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGroup
 import co.ke.xently.shopping.features.utils.State
-import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class ShoppingListItemListViewModel @Inject constructor(
+class GroupedShoppingListViewModel @Inject constructor(
     repository: IShoppingListRepository,
 ) : ViewModel() {
     data class Request(
         val config: PagingConfig = PagingConfig(30),
-        val group: ShoppingListGroup? = null,
+        val groupBy: GroupBy = GroupBy.DateAdded,
     )
 
     private val request = MutableSharedFlow<Request>()
-    private val _listState = MutableStateFlow<PagingData<ShoppingListItem>>(PagingData.empty())
-    internal val listState = _listState.asStateFlow()
+
+    private val _groupedShoppingList =
+        MutableStateFlow<PagingData<GroupedShoppingList>>(PagingData.empty())
+    internal val groupedShoppingList = _groupedShoppingList.asStateFlow()
+
+    private val _groupedShoppingListCount = MutableStateFlow<Map<Any, Int>>(emptyMap())
+    internal val groupedShoppingListCount = _groupedShoppingListCount.asStateFlow()
 
     init {
         viewModelScope.launch {
             request.collectLatest {
-                repository.get(it.config, it.group)
+                repository.get(config = it.config, groupBy = it.groupBy)
                     .cachedIn(viewModelScope)
-                    .collectLatest(_listState::emit)
+                    .collectLatest(_groupedShoppingList::emit)
+            }
+        }
+        viewModelScope.launch {
+            request.collectLatest {
+                repository.getCount(it.groupBy)
+                    .collectLatest(_groupedShoppingListCount::emit)
             }
         }
     }
 
-    fun fetchShoppingList(request: Request) {
+    internal fun fetchGroupedShoppingList(request: Request) {
         viewModelScope.launch {
-            this@ShoppingListItemListViewModel.request.emit(request)
+            this@GroupedShoppingListViewModel.request.emit(request)
         }
     }
 
     private val removeId = MutableSharedFlow<Long>()
     private val _removeState = MutableSharedFlow<State<Any>>()
-    val removeState = _removeState.asSharedFlow()
+    internal val removeState = _removeState.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -65,9 +76,9 @@ internal class ShoppingListItemListViewModel @Inject constructor(
         }
     }
 
-    fun delete(id: Long) {
+    internal fun delete(id: Long) {
         viewModelScope.launch {
-            this@ShoppingListItemListViewModel.removeId.emit(id)
+            this@GroupedShoppingListViewModel.removeId.emit(id)
         }
     }
 }

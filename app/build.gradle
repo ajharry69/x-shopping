@@ -40,6 +40,7 @@ android {
 dependencies {
     implementation project(path: ":features")
     implementation project(path: ":features:customers")
+    implementation project(path: ":features:shoppinglist")
     implementation project(path: ':features:users')
     implementation project(path: ':libraries:data:source')
 

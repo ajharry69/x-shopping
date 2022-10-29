@@ -5,16 +5,12 @@ import androidx.paging.PagingData
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
-import co.ke.xently.shopping.libraries.data.source.remote.CacheControl
 import kotlinx.coroutines.flow.Flow
 
 interface IShoppingListRepository {
     fun save(shoppingListItem: ShoppingListItem): Flow<Result<ShoppingListItem>>
 
-    fun get(
-        groupBy: GroupBy,
-        cacheControl: CacheControl,
-    ): Flow<Result<List<GroupedShoppingList>>>
+    fun get(config: PagingConfig, groupBy: GroupBy): Flow<PagingData<GroupedShoppingList>>
 
     fun remove(id: Long): Flow<Result<Unit>>
 

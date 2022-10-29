@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shoppinglist.ui.list
+package co.ke.xently.shopping.features.shoppinglist.ui.list.grouped
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.AnimatedVisibility
@@ -7,56 +7,65 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import co.ke.xently.shopping.features.PagedDataScreen
+import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.shoppinglist.R
-import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGroup
-import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel
-import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel.Request
+import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListViewModel.Request
+import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
-import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSearchScreen
-import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSearchScreen.Content
 import co.ke.xently.shopping.features.ui.ConfirmableDelete
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
 import co.ke.xently.shopping.features.ui.ToolbarWithProgressbar
 import co.ke.xently.shopping.features.ui.stringRes
+import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
+import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
-internal object ShoppingListItemListScreen {
+object GroupedShoppingListScreen {
+    data class Config(
+        val shared: Shared = Shared(),
+        val onFabClick: () -> Unit = {},
+        val onRefresh: () -> Unit = {},
+        val onSearchClick: () -> Unit = {},
+        val onRetryClicked: (Throwable) -> Unit = {},
+        val config: GroupedShoppingListItemCard.Config = GroupedShoppingListItemCard.Config(),
+    )
+
     @Composable
     operator fun invoke(
         modifier: Modifier,
-        group: ShoppingListGroup?,
+        config: Config,
         menuItems: Set<ShoppingListItemListItem.MenuItem>,
-        config: ShoppingListItemSearchScreen.Config,
-        viewModel: ShoppingListItemListViewModel = hiltViewModel(),
+        groupMenuItems: Set<GroupedShoppingListItemCard.MenuItem>,
+        viewModel: GroupedShoppingListViewModel = hiltViewModel(),
     ) {
-        val items = viewModel.listState.collectAsLazyPagingItems()
+        val items = viewModel.groupedShoppingList.collectAsLazyPagingItems()
+        val groupedShoppingListCount by viewModel.groupedShoppingListCount.collectAsState()
         val removeState by viewModel.removeState.collectAsState(State.Success(null))
 
-        LaunchedEffect(group) {
-            viewModel.fetchShoppingList(Request(group = group))
+        LaunchedEffect(true) {
+            viewModel.fetchGroupedShoppingList(Request())
         }
-        val isRefreshing by remember(items) {
-            derivedStateOf {
-                items.loadState.refresh == LoadState.Loading
-            }
-        }
-        ShoppingListItemListScreen(
-            config = config,
+
+        GroupedShoppingListScreen(
             modifier = modifier,
             items = items,
-            group = group,
-            isRefreshing = isRefreshing,
+            config = config,
             removeState = removeState,
+            groupBy = GroupBy.DateAdded,
+            groupMenuItems = groupMenuItems,
+            groupCount = groupedShoppingListCount,
             menuItems = menuItems + ShoppingListItemListItem.MenuItem(
                 onClick = ConfirmableDelete {
                     viewModel.delete(it.id)
@@ -70,14 +79,14 @@ internal object ShoppingListItemListScreen {
     @VisibleForTesting
     operator fun invoke(
         modifier: Modifier,
-        items: LazyPagingItems<ShoppingListItem>,
+        config: Config,
+        groupBy: GroupBy,
         removeState: State<Any>,
-        isRefreshing: Boolean,
-        group: ShoppingListGroup?,
+        groupCount: Map<Any, Int>,
+        items: LazyPagingItems<GroupedShoppingList>,
         menuItems: Set<ShoppingListItemListItem.MenuItem>,
-        config: ShoppingListItemSearchScreen.Config,
+        groupMenuItems: Set<GroupedShoppingListItemCard.MenuItem>,
     ) {
-
         ShowRemovalMessage(
             removeState = removeState,
             hostState = config.shared.snackbarHostState,
@@ -93,8 +102,13 @@ internal object ShoppingListItemListScreen {
             topBar = {
                 ToolbarWithProgressbar(
                     title = stringResource(R.string.feature_shoppinglist_list_toolbar_title),
-                    subTitle = group?.group?.toString(),
                     showProgress = removeState is State.Loading,
+                    navigationIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = stringResource(R.string.feature_shoppinglist_content_description_open_drawer),
+                        )
+                    },
                     onNavigationIconClicked = config.shared.onNavigationIconClicked,
                 ) {
                     IconButton(onClick = config.onSearchClick) {
@@ -122,15 +136,31 @@ internal object ShoppingListItemListScreen {
                 }
             },
         ) { values: PaddingValues ->
-
-            Content(
-                items = items,
-                config = config,
-                menuItems = menuItems,
-                listState = listState,
-                isRefreshing = isRefreshing,
+            PagedDataScreen(
                 modifier = modifier.padding(values),
-            )
+                listState = listState,
+                items = items,
+                key = { it.group },
+                snackbarHostState = config.shared.snackbarHostState,
+                placeholder = { GroupedShoppingList.DEFAULT },
+                emptyListMessage = stringResource(R.string.feature_shoppinglist_list_empty_list),
+            ) { groupList ->
+                val showPlaceholder by remember(groupList.shoppingList) {
+                    derivedStateOf {
+                        groupList.shoppingList.any { it.id == ShoppingListItem.DEFAULT_INSTANCE.id }
+                    }
+                }
+                GroupedShoppingListItemCard(
+                    groupBy = groupBy,
+                    groupList = groupList,
+                    menuItems = menuItems,
+                    listCount = groupCount,
+                    config = config.config,
+                    groupMenuItems = groupMenuItems,
+                    showPlaceholder = showPlaceholder,
+                    modifier = Modifier.padding(bottom = 16.dp),
+                )
+            }
         }
     }
 }

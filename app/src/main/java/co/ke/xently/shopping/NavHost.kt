@@ -1,28 +1,31 @@
 package co.ke.xently.shopping
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import co.ke.xently.shopping.features.customers.customersGraph
+import co.ke.xently.shopping.features.shoppinglist.shoppingListGraph
+import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListScreen
+import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
+import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
 import co.ke.xently.shopping.features.users.authenticationGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
+import co.ke.xently.shopping.features.utils.buildRoute
+import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import co.ke.xently.shopping.ui.DashboardScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import kotlinx.coroutines.launch
 
-object NavHost {
+internal object NavHost {
     @Composable
     operator fun invoke(
         shared: Shared,
-        showSignOutProgressbar: Boolean,
         navController: NavHostController,
         items: List<DashboardScreen.Item>,
         config: DashboardScreen.Config,
@@ -41,21 +44,56 @@ object NavHost {
                 ) {
                     // TODO: replace content with actual content
                     val scope = rememberCoroutineScope()
-                    Column(
+
+                    GroupedShoppingListScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(text = if (it.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
-                        Spacer(Modifier.height(20.dp))
-                        Button(onClick = { scope.launch { it.open() } }) {
-                            Text("Click to open")
-                        }
-                    }
+                        config = GroupedShoppingListScreen.Config(
+                            shared = shared.copy(
+                                onNavigationIconClicked = {
+                                    scope.launch {
+                                        if (it.isOpen) {
+                                            it.close()
+                                        } else if (it.isClosed) {
+                                            it.open()
+                                        }
+                                    }
+                                },
+                            ),
+                            config = GroupedShoppingListItemCard.Config(
+                                onSeeAllClicked = {
+                                    navController.navigate(
+                                        Routes.ShoppingList.LIST.buildRoute(
+                                            "group" to it.group,
+                                            "groupBy" to it.groupBy,
+                                        )
+                                    )
+                                }
+                            ),
+                            onFabClick = {
+                                navController.navigate(
+                                    Routes.ShoppingList.DETAIL.buildRoute(
+                                        "id" to ShoppingListItem.DEFAULT_INSTANCE.id,
+                                    ),
+                                )
+                            },
+                        ),
+                        menuItems = setOf(
+                            ShoppingListItemListItem.MenuItem(R.string.recommend) {
+                                // TODO: Implement recommendation...
+                            },
+                        ),
+                        groupMenuItems = setOf(
+                            GroupedShoppingListItemCard.MenuItem(R.string.recommend) {
+                                // TODO: Implement recommendation...
+                            },
+                        ),
+                    )
                 }
             }
             customersGraph(navController = navController, shared = shared)
+            shoppingListGraph(navController = navController, shared = shared)
             authenticationGraph(navController = navController, shared = shared)
         }
     }

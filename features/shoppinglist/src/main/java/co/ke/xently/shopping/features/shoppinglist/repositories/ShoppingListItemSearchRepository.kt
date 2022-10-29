@@ -5,8 +5,6 @@ import co.ke.xently.shopping.features.search.repositories.ISearchRepository
 import co.ke.xently.shopping.features.utils.Query
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 

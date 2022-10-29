@@ -3,12 +3,9 @@ package co.ke.xently.shopping.features.shoppinglist.repositories
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.map
-import androidx.room.withTransaction
 import co.ke.xently.shopping.features.Dependencies
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
-import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
-import co.ke.xently.shopping.libraries.data.source.remote.CacheControl
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.retryCatch
 import co.ke.xently.shopping.libraries.data.source.remote.Http.sendRequest
 import co.ke.xently.shopping.libraries.data.source.utils.DateFormat
@@ -39,35 +36,12 @@ internal class ShoppingListRepository @Inject constructor(
         }.flowOn(dependencies.dispatcher.io)
     }
 
-    override fun get(groupBy: GroupBy, cacheControl: CacheControl) = Retry().run {
-        flow {
-            emit(
-                sendRequest {
-                    dependencies.service.shoppingList.get(
-                        groupBy = groupBy.name.lowercase(),
-                        cacheControl = cacheControl.toString(),
-                    )
-                },
-            )
-        }.retryCatch(this).map { result ->
-            result.map {
-                dependencies.database.withTransaction {
-                    if (cacheControl is CacheControl.NoCache) {
-                        // Signifies refresh
-                        dependencies.database.shoppingListDao.deleteAll()
-                    }
-                    it.map { entry ->
-                        entry.value.saveLocally(dependencies)
-                        GroupedShoppingList(
-                            group = entry.key,
-                            shoppingList = entry.value,
-                            numberOfItems = entry.value.size,
-                        )
-                    }
-                }
-            }
-        }.flowOn(dependencies.dispatcher.io)
-    }
+    override fun get(config: PagingConfig, groupBy: GroupBy) = Pager(
+        config = config,
+        pagingSourceFactory = {
+            GroupedShoppingListPagingSource(groupBy, dependencies)
+        },
+    ).flow
 
     override fun getCount(groupBy: GroupBy) = when (groupBy) {
         GroupBy.DateAdded -> dependencies.database.shoppingListDao.getCountGroupedByDateAdded()

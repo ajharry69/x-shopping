@@ -52,9 +52,9 @@ internal class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun signOut(removeBusinesses: Boolean) {
+    fun signOut() {
         viewModelScope.launch {
-            signOut.emit(removeBusinesses)
+            signOut.emit(true)
         }
     }
 }

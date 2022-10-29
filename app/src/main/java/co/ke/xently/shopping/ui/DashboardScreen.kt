@@ -20,7 +20,7 @@ import co.ke.xently.shopping.R
 import co.ke.xently.shopping.libraries.data.source.User
 import kotlinx.coroutines.launch
 
-object DashboardScreen {
+internal object DashboardScreen {
     data class Config(
         val onVerifyAccountRequested: () -> Unit = {},
         val onPasswordResetContinuationRequested: () -> Unit = {},
@@ -146,7 +146,7 @@ object DashboardScreen {
                 content(drawerState)
             },
             drawerContent = {
-                DismissibleDrawerSheet {
+                DismissibleDrawerSheet(drawerTonalElevation = 10.dp) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()

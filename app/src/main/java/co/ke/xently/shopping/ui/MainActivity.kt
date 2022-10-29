@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -98,20 +99,8 @@ class MainActivity : FragmentActivity() {
                         }
                     }
 
-                    var showSignoutDialog by remember {
-                        mutableStateOf(false)
-                    }
-
-                    if (showSignoutDialog) {
-                        SignoutOpsDialog(
-                            onDismissRequest = {
-                                showSignoutDialog = false
-                            },
-                            onConfirmClick = viewModel::signOut,
-                        )
-                    }
-
                     NavHost(
+                        navController = navController,
                         shared = Shared(
                             user = user,
                             snackbarHostState = snackbarHostState,
@@ -140,8 +129,6 @@ class MainActivity : FragmentActivity() {
                                 }
                             },
                         ),
-                        showSignOutProgressbar = showProgressbar,
-                        navController = navController,
                         items = listOf(
                             DashboardScreen.Item(
                                 logo = Icons.Default.Groups,
@@ -151,6 +138,11 @@ class MainActivity : FragmentActivity() {
                                         launchSingleTop = true
                                     }
                                 },
+                            ),
+                            DashboardScreen.Item(
+                                logo = Icons.Default.Logout,
+                                onClick = viewModel::signOut,
+                                title = stringResource(R.string.dashboard_item_logout),
                             ),
                         ),
                         config = DashboardScreen.Config(
@@ -164,7 +156,7 @@ class MainActivity : FragmentActivity() {
                                     launchSingleTop = true
                                 }
                             },
-                            onPasswordResetContinuationDismissed = { viewModel.signOut(false) },
+                            onPasswordResetContinuationDismissed = viewModel::signOut,
                         ),
                     )
                 }
