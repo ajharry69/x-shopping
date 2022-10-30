@@ -30,12 +30,8 @@ data class TextFieldResource<Value>(
 
             val label = stringResource(labelId)
 
-            val defaultTextFieldValue: TextFieldValue = remember {
-                TextFieldValue(valueInputs?.let(defaultValue) ?: "")
-            }
-
             var value by rememberSaveable(valueInputs, stateSaver = Savers.TEXT_FIELD_VALUE) {
-                mutableStateOf(defaultTextFieldValue)
+                mutableStateOf(TextFieldValue(valueInputs?.let(defaultValue) ?: ""))
             }
 
             val isFieldRequired by remember(label) {
@@ -44,11 +40,15 @@ data class TextFieldResource<Value>(
                 }
             }
 
-            val error = rememberSaveable(label, value, state) {
+            var usableState by remember(state) {
+                mutableStateOf(state)
+            }
+
+            val error = rememberSaveable(label, value, usableState) {
                 if (isFieldRequired && value.text.isBlank()) {
                     context.getString(R.string.feature_field_required, label.trimEnd { it == '*' })
                 } else {
-                    (state as? State.Error)?.let(errorMessage) ?: ""
+                    (usableState as? State.Error)?.let(errorMessage) ?: ""
                 }
             }
 
@@ -60,7 +60,7 @@ data class TextFieldResource<Value>(
 
             LaunchedEffect(shouldResetField.toString()) {
                 if (shouldResetField) {
-                    value = defaultTextFieldValue
+                    value = TextFieldValue(valueInputs?.let(defaultValue) ?: "")
                 }
             }
 
@@ -71,6 +71,7 @@ data class TextFieldResource<Value>(
                 hasError = hasError,
                 onValueChange = {
                     value = it
+                    usableState = State.Success(null)
                 },
             )
         }

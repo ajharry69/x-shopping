@@ -248,10 +248,10 @@ internal object ShoppingListItemDetailScreen {
                     keyboardOptions = DefaultKeyboardOptions.copy(keyboardType = KeyboardType.Decimal),
                 )
 
-                val requiredFields = arrayOf(name.value, unit.value)
+                val requiredFields = arrayOf(name, unit, unitQuantity, purchaseQuantity)
                 val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { it.text.isNotBlank() } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressBar
                     }
                 }
                 Button(
