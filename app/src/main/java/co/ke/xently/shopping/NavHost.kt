@@ -83,6 +83,14 @@ internal object NavHost {
                             ShoppingListItemListItem.MenuItem(R.string.recommend) {
                                 // TODO: Implement recommendation...
                             },
+                            ShoppingListItemListItem.MenuItem(
+                                label = R.string.update,
+                                onClick = {
+                                    navController.navigate(Routes.ShoppingList.DETAIL.buildRoute("id" to it.id)) {
+                                        launchSingleTop = true
+                                    }
+                                },
+                            ),
                         ),
                         groupMenuItems = setOf(
                             GroupedShoppingListItemCard.MenuItem(R.string.recommend) {

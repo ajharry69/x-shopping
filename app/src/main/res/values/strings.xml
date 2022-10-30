@@ -18,4 +18,5 @@
     <!-- this is a pre-text that'll be concatenated by other texts -->
     <!-- this is a pre-text that'll be concatenated by other texts -->
     <string name="recommend">Recommend</string>
+    <string name="update">Update</string>
 </resources>
