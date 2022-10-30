@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.map
 import co.ke.xently.shopping.features.Dependencies
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
+import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.retryCatch
 import co.ke.xently.shopping.libraries.data.source.remote.Http.sendRequest
@@ -20,7 +21,7 @@ internal class ShoppingListRepository @Inject constructor(
 ) : IShoppingListRepository {
     override fun save(shoppingListItem: ShoppingListItem) = Retry().run {
         flow {
-            emit(sendRequest {
+            emit(sendRequest(ShoppingListItemHttpException::class) {
                 dependencies.service.shoppingList.run {
                     if (shoppingListItem.id == ShoppingListItem.DEFAULT_INSTANCE.id) {
                         add(shoppingListItem)

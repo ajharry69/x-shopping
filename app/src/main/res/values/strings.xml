@@ -1,6 +1,4 @@
 <resources>
-    <string name="app_tagline">Solution to your business needs</string>
-    <string name="app_logo">Logo</string>
     <string name="dashboard_item_purchase">Purchase</string>
     <string name="dashboard_item_products">Products</string>
     <string name="dashboard_item_sales">Sales</string>
@@ -19,8 +17,5 @@
     <string name="continue_password_reset">Continue</string>
     <!-- this is a pre-text that'll be concatenated by other texts -->
     <!-- this is a pre-text that'll be concatenated by other texts -->
-    <string name="clear_businesses_side_effect">All data may be cleared in the process.</string>
-    <string name="table_name_display_businesses">Remove businesses.</string>
-    <string name="confirm_signout_dialog_title">Confirm logout!</string>
     <string name="recommend">Recommend</string>
 </resources>

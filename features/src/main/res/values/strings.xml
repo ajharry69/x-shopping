@@ -9,6 +9,7 @@
     <string name="retry">Retry</string>
     <string name="confirm_deletion_dialog_title">Confirm deletion!</string>
     <string name="confirm_deletion_dialog_message">Are you sure you want to delete \"%1$s\"?</string>
+    <string name="feature_field_required">%1$s cannot be blank</string>
 
     <!-- Content description -->
     <string name="content_description_text_field">%1$s text field</string>

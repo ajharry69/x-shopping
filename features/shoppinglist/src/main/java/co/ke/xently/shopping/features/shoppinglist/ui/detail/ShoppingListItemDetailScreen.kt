@@ -6,17 +6,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.ke.xently.shopping.features.TextFieldResource.Companion.compileResource
 import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
@@ -148,117 +147,108 @@ internal object ShoppingListItemDetailScreen {
                     isGroupingUsed = false
                 }
 
-                var name by rememberSaveable(shoppingListItem?.name,
-                    stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue(shoppingListItem?.name ?: ""))
+                val name = compileResource(
+                    labelId = R.string.feature_shoppinglist_detail_input_field_label_name,
+                    valueInputs = shoppingListItem?.name,
+                    state = saveState,
+                    shouldResetField = shouldResetFields,
+                ) {
+                    (it.error as? ShoppingListItemHttpException)?.name?.joinToString("\n")
                 }
                 TextInputLayout(
                     modifier = Modifier
                         .fillMaxWidthHorizontalPadding()
                         .padding(top = 16.dp),
-                    value = name,
-                    onValueChange = { name = it },
-                    label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_name),
+                    value = name.value,
+                    error = name.error,
+                    label = name.label,
+                    isError = name.hasError,
+                    onValueChange = name.onValueChange,
                     keyboardOptions = DefaultKeyboardOptions.copy(capitalization = KeyboardCapitalization.Words),
                 )
 
-                var unit by rememberSaveable(
-                    shoppingListItem?.unit,
-                    stateSaver = Savers.TEXT_FIELD_VALUE,
+                val unit = compileResource(
+                    labelId = R.string.feature_shoppinglist_detail_input_field_label_measurement_unit,
+                    valueInputs = shoppingListItem?.unit,
+                    state = saveState,
+                    shouldResetField = shouldResetFields,
                 ) {
-                    mutableStateOf(TextFieldValue(shoppingListItem?.unit ?: ""))
+                    (it.error as? ShoppingListItemHttpException)?.unit?.joinToString("\n")
                 }
 
-                var unitQuantity by rememberSaveable(
-                    shoppingListItem?.unitQuantity,
-                    stateSaver = Savers.TEXT_FIELD_VALUE,
+                val unitQuantity = compileResource(
+                    labelId = R.string.feature_shoppinglist_detail_input_field_label_measurement_unit_quantity,
+                    valueInputs = shoppingListItem?.unitQuantity,
+                    state = saveState,
+                    shouldResetField = shouldResetFields,
+                    defaultValue = unGroupedNumberFormat::format,
                 ) {
-                    mutableStateOf(TextFieldValue(shoppingListItem?.unitQuantity?.let(
-                        unGroupedNumberFormat::format) ?: ""))
+                    (it.error as? ShoppingListItemHttpException)?.unitQuantity?.joinToString("\n")
                 }
 
-                val helpText by remember(name, unit, unitQuantity) {
+                val helpText by remember(name.value, unit.value, unitQuantity.value) {
                     derivedStateOf {
-                        (unitQuantity.text.trim().toFloatOrNull() ?: 1f).let {
+                        (unitQuantity.value.text.trim().toFloatOrNull()
+                            ?: 1f).let {
                             "${it.let(groupedNumberFormat::format)} ${
-                                unit.text.ifBlank {
+                                unit.value.text.ifBlank {
                                     context.resources.getQuantityString(
                                         R.plurals.feature_shoppinglist_default_measurement_unit,
                                         it.toInt(),
                                     )
                                 }
-                            } of ${name.text.ifBlank { "-" }}"
+                            } of ${name.value.text.ifBlank { "-" }}"
                         }.trim()
                     }
                 }
 
                 TextInputLayout(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = unit,
                     helpText = helpText,
-                    onValueChange = { unit = it },
-                    label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_measurement_unit),
+                    value = unit.value,
+                    error = unit.error,
+                    label = unit.label,
+                    isError = unit.hasError,
+                    onValueChange = unit.onValueChange,
                     keyboardOptions = DefaultKeyboardOptions.copy(capitalization = KeyboardCapitalization.None),
                 )
 
                 TextInputLayout(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
                     helpText = helpText,
-                    value = unitQuantity,
-                    onValueChange = { unitQuantity = it },
-                    label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_measurement_unit_quantity),
+                    value = unitQuantity.value,
+                    error = unitQuantity.error,
+                    label = unitQuantity.label,
+                    isError = unitQuantity.hasError,
+                    onValueChange = unitQuantity.onValueChange,
                     keyboardOptions = DefaultKeyboardOptions.copy(keyboardType = KeyboardType.Decimal),
                 )
 
-                var purchaseQuantity by rememberSaveable(
-                    shoppingListItem?.purchaseQuantity,
-                    stateSaver = Savers.TEXT_FIELD_VALUE,
+                val purchaseQuantity = compileResource(
+                    labelId = R.string.feature_shoppinglist_detail_input_field_label_purchase_quantity,
+                    valueInputs = shoppingListItem?.purchaseQuantity,
+                    state = saveState,
+                    shouldResetField = shouldResetFields,
+                    defaultValue = {
+                        it.takeIf { quantity ->
+                            quantity != ShoppingListItem.DEFAULT_INSTANCE.purchaseQuantity
+                        }?.let(unGroupedNumberFormat::format)
+                    },
                 ) {
-                    val value =
-                        if (shoppingListItem != null && shoppingListItem!!.purchaseQuantity != ShoppingListItem.DEFAULT_INSTANCE.purchaseQuantity) {
-                            shoppingListItem!!.purchaseQuantity.let(unGroupedNumberFormat::format)
-                        } else {
-                            ""
-                        }
-                    mutableStateOf(TextFieldValue(value))
+                    (it.error as? ShoppingListItemHttpException)?.purchaseQuantity?.joinToString("\n")
                 }
+
                 TextInputLayout(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = purchaseQuantity,
-                    onValueChange = { purchaseQuantity = it },
-                    label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_purchase_quantity),
+                    value = purchaseQuantity.value,
+                    error = purchaseQuantity.error,
+                    label = purchaseQuantity.label,
+                    isError = purchaseQuantity.hasError,
+                    onValueChange = purchaseQuantity.onValueChange,
                     keyboardOptions = DefaultKeyboardOptions.copy(keyboardType = KeyboardType.Decimal),
                 )
 
-                /*var physicalAddress by rememberSaveable(
-                    shoppingListItem?.physicalAddress,
-                    stateSaver = Savers.TEXT_FIELD_VALUE,
-                ) {
-                    mutableStateOf(TextFieldValue(shoppingListItem?.physicalAddress ?: ""))
-                }
-                TextInputLayout(
-                    modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    maxLines = 4,
-                    singleLine = false,
-                    value = physicalAddress,
-                    onValueChange = { physicalAddress = it },
-                    label = stringResource(R.string.feature_shoppinglist_detail_input_field_label_physical_address),
-                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
-                    keyboardOptions = DefaultKeyboardOptions.copy(imeAction = ImeAction.Done),
-                )*/
-                LaunchedEffect(shouldResetFields) {
-                    if (shouldResetFields) {
-                        unit = TextFieldValue()
-                        name = TextFieldValue()
-                        unitQuantity = TextFieldValue()
-                        purchaseQuantity = TextFieldValue()
-//                        physicalAddress = TextFieldValue()
-                    }
-                }
-                val requiredFields = arrayOf(
-                    name,
-                    unit,
-                )
+                val requiredFields = arrayOf(name.value, unit.value)
                 val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                     derivedStateOf {
                         requiredFields.all { it.text.isNotBlank() } && !showProgressBar
@@ -271,10 +261,11 @@ internal object ShoppingListItemDetailScreen {
                         focusManager.clearFocus()
                         config.onSubmitDetails.invoke((shoppingListItem
                             ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
-                            name = name.text.trim(),
-                            unit = unit.text.trim().uppercase(),
-                            unitQuantity = unitQuantity.text.trim().ifBlank { "1" }.toFloat(),
-                            purchaseQuantity = purchaseQuantity.text.trim().ifBlank { "1" }
+                            name = name.value.text.trim(),
+                            unit = unit.value.text.trim().uppercase(),
+                            unitQuantity = unitQuantity.value.text.trim()
+                                .ifBlank { "1" }.toFloat(),
+                            purchaseQuantity = purchaseQuantity.value.text.trim().ifBlank { "1" }
                                 .toFloat(),
                         ))
                     },

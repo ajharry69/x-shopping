@@ -6,7 +6,6 @@
     <string name="feature_shoppinglist_detail_input_field_label_name">Name*</string>
     <string name="feature_shoppinglist_detail_input_field_label_measurement_unit_quantity">Unit quantity</string>
     <string name="feature_shoppinglist_detail_input_field_label_purchase_quantity">Purchase quantity</string>
-    <string name="feature_shoppinglist_detail_input_field_label_physical_address">Physical address</string>
     <string name="feature_shoppinglist_detail_success_adding_item">Successfully added shopping list item</string>
     <string name="feature_shoppinglist_list_success_removing_item">Successfully removed shopping list item</string>
     <string name="feature_shoppinglist_list_empty_list">
@@ -15,7 +14,6 @@
     <string name="feature_shoppinglist_list_item_drop_down_menu_content_description">More options for \"%1$s\"</string>
     <string name="feature_shoppinglist_list_item_drop_down_menu_update">Update</string>
     <string name="feature_shoppinglist_list_item_drop_down_menu_delete">Delete</string>
-    <string name="feature_shoppinglist_list_item_no_address">No address</string>
     <string name="feature_shoppinglist_error_duplicate_tax_pin">A shopping list item with the same tax PIN already exists.</string>
     <string name="feature_shoppinglist_add">Add</string>
     <string name="feature_shoppinglist_update">Update</string>

@@ -46,7 +46,7 @@ internal class UserRepository @Inject constructor(
     override fun signIn(basicAuth: BasicAuth) = Retry().run {
         flow {
             emit(
-                sendRequest(SignInHttpException::class.java) {
+                sendRequest(SignInHttpException::class) {
                     val basicAuthData = Credentials.basic(basicAuth.username, basicAuth.password)
                     dependencies.service.account.signIn(basicAuthData)
                 },
@@ -84,7 +84,7 @@ internal class UserRepository @Inject constructor(
     override fun signUp(user: User) = Retry().run {
         flow {
             emit(
-                sendRequest(SignUpHttpException::class.java) {
+                sendRequest(SignUpHttpException::class) {
                     dependencies.service.account.signUp(user)
                 },
             )
@@ -94,7 +94,7 @@ internal class UserRepository @Inject constructor(
     override fun resetPassword(resetPassword: User.ResetPassword) = Retry().run {
         flow {
             emit(
-                sendRequest(PasswordResetHttpException::class.java) {
+                sendRequest(PasswordResetHttpException::class) {
                     dependencies.service.account.resetPassword(
                         dependencies.database.userDao.getCurrentlyActiveUserID(),
                         resetPassword,
@@ -107,7 +107,7 @@ internal class UserRepository @Inject constructor(
     override fun requestTemporaryPassword(email: String) = Retry().run {
         flow {
             emit(
-                sendRequest(PasswordResetRequestHttpException::class.java) {
+                sendRequest(PasswordResetRequestHttpException::class) {
                     dependencies.service.account.requestTemporaryPassword(mapOf("email" to email))
                 },
             )
@@ -128,7 +128,7 @@ internal class UserRepository @Inject constructor(
     override fun verifyAccount(code: String) = Retry().run {
         flow {
             emit(
-                sendRequest(VerificationHttpException::class.java) {
+                sendRequest(VerificationHttpException::class) {
                     dependencies.service.account.verify(
                         dependencies.database.userDao.getCurrentlyActiveUserID(),
                         mapOf("code" to code),

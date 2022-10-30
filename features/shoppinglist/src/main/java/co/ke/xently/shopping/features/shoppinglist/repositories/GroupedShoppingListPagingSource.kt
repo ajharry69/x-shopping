@@ -22,10 +22,6 @@ internal class GroupedShoppingListPagingSource(
             // Start refresh at page 1 if undefined.
             val nextPageNumber = params.key ?: 1
 
-            if (params.key == null) {
-                dependencies.cache.evictAll()
-            }
-
             val data = sendRequest {
                 dependencies.service.shoppingList.get(
                     groupBy.name.lowercase(),
