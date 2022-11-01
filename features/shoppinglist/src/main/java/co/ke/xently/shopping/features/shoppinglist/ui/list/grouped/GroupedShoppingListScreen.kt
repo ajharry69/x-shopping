@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import co.ke.xently.shopping.features.PagedDataScreen
+import co.ke.xently.shopping.features.ui.PagedDataScreen
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListViewModel.Request

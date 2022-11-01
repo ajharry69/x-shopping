@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import co.ke.xently.shopping.features.PagedDataScreen
+import co.ke.xently.shopping.features.ui.PagedDataScreen
 import co.ke.xently.shopping.features.search.ui.SearchScreen
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel

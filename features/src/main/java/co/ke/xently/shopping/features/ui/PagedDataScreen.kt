@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features
+package co.ke.xently.shopping.features.ui
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.ColumnScope
@@ -18,7 +18,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.items
-import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.getErrorMessage
 import co.ke.xently.shopping.libraries.data.source.utils.RetryError
 import com.google.accompanist.swiperefresh.SwipeRefresh
