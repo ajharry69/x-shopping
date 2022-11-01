@@ -1,12 +1,4 @@
 <resources>
-    <string name="dashboard_item_purchase">Purchase</string>
-    <string name="dashboard_item_products">Products</string>
-    <string name="dashboard_item_sales">Sales</string>
-    <string name="dashboard_item_hs_codes">HS Codes</string>
-    <string name="dashboard_item_taxes">Taxes</string>
-    <string name="dashboard_item_customers">Customers</string>
-    <string name="dashboard_item_reports">Reports</string>
-    <string name="dashboard_item_settings">Settings</string>
     <string name="dashboard_item_logout">Logout</string>
     <string name="content_description_dashboard_user_profile_picture">Profile picture of current user</string>
     <string name="sign_in">Sign in</string>

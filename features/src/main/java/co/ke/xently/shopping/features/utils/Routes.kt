@@ -50,15 +50,6 @@ object Routes {
         }
     }
 
-    object Customers {
-        const val LIST = "customers/"
-        const val SEARCH = "customers/search/"
-        const val DETAIL = "customers/{id}/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-    }
-
     object ShoppingList {
         const val LIST = "shoppinglist/?group={group}&groupBy={groupBy}"
         const val SEARCH = "shoppinglist/search/?group={group}&groupBy={groupBy}"

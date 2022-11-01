@@ -7,7 +7,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import co.ke.xently.shopping.features.customers.customersGraph
 import co.ke.xently.shopping.features.shoppinglist.shoppingListGraph
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListScreen
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
@@ -100,7 +99,6 @@ internal object NavHost {
                     )
                 }
             }
-            customersGraph(navController = navController, shared = shared)
             shoppingListGraph(navController = navController, shared = shared)
             authenticationGraph(navController = navController, shared = shared)
         }

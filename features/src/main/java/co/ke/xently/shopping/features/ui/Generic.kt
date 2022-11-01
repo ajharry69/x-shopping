@@ -1,11 +1,16 @@
 package co.ke.xently.shopping.features.ui
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
@@ -18,6 +23,24 @@ import java.util.*
 val VIEW_SPACE = 16.dp
 
 val VIEW_SPACE_HALVED = VIEW_SPACE / 2
+
+val DefaultKeyboardOptions = KeyboardOptions.Default.copy(
+    imeAction = ImeAction.Next,
+    capitalization = KeyboardCapitalization.Sentences,
+)
+
+@Composable
+fun labelAsRequired(@StringRes id: Int, positionAtStart: Boolean = false): String {
+    return buildString {
+        if (positionAtStart) {
+            append('*')
+            stringResource(id)
+        } else {
+            stringResource(id)
+            append('*')
+        }
+    }
+}
 
 fun Modifier.fillMaxWidthHorizontalPadding(padding: Dp = 16.dp) = fillMaxWidth()
     .padding(horizontal = padding)

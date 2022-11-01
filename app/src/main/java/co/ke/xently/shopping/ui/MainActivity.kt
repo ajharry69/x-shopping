@@ -5,7 +5,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -130,15 +129,6 @@ class MainActivity : FragmentActivity() {
                             },
                         ),
                         items = listOf(
-                            DashboardScreen.Item(
-                                logo = Icons.Default.Groups,
-                                title = stringResource(R.string.dashboard_item_customers),
-                                onClick = {
-                                    navController.navigate(Routes.Customers.LIST.buildRoute()) {
-                                        launchSingleTop = true
-                                    }
-                                },
-                            ),
                             DashboardScreen.Item(
                                 logo = Icons.Default.Logout,
                                 onClick = viewModel::signOut,

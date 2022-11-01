@@ -9,9 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import co.ke.xently.shopping.R
 import co.ke.xently.shopping.features.ui.XentlyPreview
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.libraries.data.source.User
@@ -28,39 +26,39 @@ private fun DashboardScreenPreview() {
                 DashboardScreen.Item(
                     enabled = false,
                     logo = Icons.Default.Widgets,
-                    title = stringResource(R.string.dashboard_item_products),
+                    title = "Products",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.ShoppingCart,
-                    title = stringResource(R.string.dashboard_item_purchase),
+                    title = "Purchase",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.ShoppingBasket,
-                    title = stringResource(R.string.dashboard_item_sales),
+                    title = "Sales",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.Groups,
-                    title = stringResource(R.string.dashboard_item_customers),
+                    title = "Customers",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.Assessment,
-                    title = stringResource(R.string.dashboard_item_reports),
+                    title = "Reports",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.AccountBalance,
-                    title = stringResource(R.string.dashboard_item_taxes),
+                    title = "Taxes",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.QrCode,
-                    title = stringResource(R.string.dashboard_item_hs_codes),
+                    title = "Hs Codes",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.Settings,
-                    title = stringResource(R.string.dashboard_item_settings),
+                    title = "Settings",
                 ),
                 DashboardScreen.Item(
                     logo = Icons.Default.Logout,
-                    title = stringResource(R.string.dashboard_item_logout),
+                    title = "Logout",
                 ),
             ),
             snackbarHostState = null,

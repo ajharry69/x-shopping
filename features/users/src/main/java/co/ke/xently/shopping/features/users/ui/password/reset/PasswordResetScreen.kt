@@ -12,13 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
-import co.ke.xently.shopping.features.ui.TextInputLayout.DefaultKeyboardOptions
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.repositories.exceptions.PasswordResetHttpException
 import co.ke.xently.shopping.features.utils.Shared
@@ -95,36 +97,25 @@ internal object PasswordResetScreen {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                var oldPassword by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+                val oldPassword = TextFieldConfig(
+                    labelId = R.string.fusers_input_field_label_old_password,
+                    valueInputs = null,
+                    state = passwordResetState,
+                ) {
+                    (it.error as? PasswordResetHttpException)?.oldPassword?.joinToString("\n")
                 }
-                val oldPasswordError = remember(oldPassword, passwordResetState) {
-                    if (oldPassword.text.isBlank()) {
-                        context.getString(R.string.fusers_old_password_required)
-                    } else {
-                        (passwordResetState as? State.Error)?.let {
-                            (it.error as? PasswordResetHttpException)?.oldPassword?.joinToString(
-                                "\n")
-                        } ?: ""
-                    }
-                }
-                val oldPasswordHasError by remember(oldPasswordError) {
-                    derivedStateOf {
-                        oldPasswordError.isNotBlank()
-                    }
-                }
+
                 var isOldPasswordVisible by rememberSaveable {
                     mutableStateOf(false)
                 }
-                TextInputLayout(
+                TextField(
                     modifier = Modifier
                         .fillMaxWidthHorizontalPadding()
                         .padding(top = 16.dp),
-                    value = oldPassword,
-                    error = oldPasswordError,
-                    isError = oldPasswordHasError,
-                    onValueChange = { oldPassword = it },
-                    label = stringResource(R.string.fusers_input_field_label_old_password),
+                    value = oldPassword.value,
+                    isError = oldPassword.hasError,
+                    onValueChange = oldPassword.onValueChange,
+                    label = { Text(oldPassword.label) },
                     trailingIcon = {
                         PasswordVisibilityToggle(isVisible = isOldPasswordVisible) {
                             isOldPasswordVisible = !isOldPasswordVisible
@@ -140,35 +131,28 @@ internal object PasswordResetScreen {
                         imeAction = ImeAction.Next,
                         keyboardType = KeyboardType.Password,
                     ),
+                    supportingText = {
+                        SupportingText(oldPassword)
+                    },
                 )
-                var newPassword by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+
+                val newPassword = TextFieldConfig(
+                    labelId = R.string.fusers_input_field_label_new_password,
+                    valueInputs = null,
+                    state = passwordResetState,
+                ) {
+                    (it.error as? PasswordResetHttpException)?.newPassword?.joinToString("\n")
                 }
-                val newPasswordError = remember(newPassword, passwordResetState) {
-                    if (newPassword.text.isBlank()) {
-                        context.getString(R.string.fusers_new_password_required)
-                    } else {
-                        (passwordResetState as? State.Error)?.let {
-                            (it.error as? PasswordResetHttpException)?.newPassword?.joinToString(
-                                "\n")
-                        } ?: ""
-                    }
-                }
-                val newPasswordHasError by remember(newPasswordError) {
-                    derivedStateOf {
-                        newPasswordError.isNotBlank()
-                    }
-                }
+
                 var isNewPasswordVisible by rememberSaveable {
                     mutableStateOf(false)
                 }
-                TextInputLayout(
+                TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    value = newPassword,
-                    error = newPasswordError,
-                    isError = newPasswordHasError,
-                    onValueChange = { newPassword = it },
-                    label = stringResource(R.string.fusers_input_field_label_new_password),
+                    value = newPassword.value,
+                    isError = newPassword.hasError,
+                    onValueChange = newPassword.onValueChange,
+                    label = { Text(newPassword.label) },
                     trailingIcon = {
                         PasswordVisibilityToggle(isVisible = isNewPasswordVisible) {
                             isNewPasswordVisible = !isNewPasswordVisible
@@ -189,7 +173,7 @@ internal object PasswordResetScreen {
                 val requiredFields = arrayOf(oldPassword, newPassword)
                 val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { it.text.isNotBlank() } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressBar
                     }
                 }
                 Button(
@@ -199,8 +183,8 @@ internal object PasswordResetScreen {
                         focusManager.clearFocus()
                         val resetPassword = User.ResetPassword(
                             isChange = isChange,
-                            oldPassword = oldPassword.text.trim(),
-                            newPassword = newPassword.text.trim(),
+                            oldPassword = oldPassword.value.text.trim(),
+                            newPassword = newPassword.value.text.trim(),
                         )
                         config.onPasswordReset(resetPassword)
                     },

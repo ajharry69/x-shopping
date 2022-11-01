@@ -8,65 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
-import co.ke.xently.shopping.features.ui.TextInputLayout.InputFieldResource
-import co.ke.xently.shopping.features.ui.TextInputLayout.supportingText
 
 object AutoCompleteTextView {
-    @Composable
-    operator fun <T> invoke(
-        modifier: Modifier,
-        suggestions: Iterable<T>,
-        resource: InputFieldResource<TextFieldValue>,
-        helpText: String? = null,
-        onSuggestionSelected: ((T) -> Unit)? = null,
-        onMeasurementUnitQueryChange: (String) -> Unit,
-        expectedNumberOfCharacters: Int? = null,
-        suggestionText: (@Composable (T) -> Unit)? = null,
-    ) {
-        var isError by remember(resource.hasError) {
-            mutableStateOf(resource.hasError)
-        }
-        AutoCompleteTextView(
-            modifier = modifier,
-            suggestions = suggestions,
-            suggestionText = suggestionText,
-            onSuggestionSelected = {
-                if (onSuggestionSelected == null) {
-                    val text = it.toString()
-                    resource.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
-                } else {
-                    onSuggestionSelected(it)
-                }
-            },
-        ) { expanded ->
-            TextField(
-                singleLine = true,
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
-                value = resource.value,
-                isError = isError,
-                label = { Text(resource.label) },
-                onValueChange = {
-                    resource.onValueChange(it)
-                    onMeasurementUnitQueryChange(it.text)
-                },
-                keyboardOptions = TextInputLayout.DefaultKeyboardOptions.copy(imeAction = ImeAction.Search),
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                supportingText = {
-                    isError = supportingText(
-                        hasError = resource.hasError,
-                        error = resource.error,
-                        helpText = helpText,
-                        currentNumberOfCharacters = resource.value.text.length,
-                        expectedNumberOfCharacters = expectedNumberOfCharacters,
-                    )
-                }
-            )
-        }
-    }
-
     @Composable
     private operator fun <T> invoke(
         modifier: Modifier,
@@ -115,6 +58,51 @@ object AutoCompleteTextView {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    operator fun <T> invoke(
+        modifier: Modifier,
+        suggestions: Iterable<T>,
+        resource: TextFieldConfig<TextFieldValue>,
+        helpText: String? = null,
+        onSuggestionSelected: ((T) -> Unit)? = null,
+        onMeasurementUnitQueryChange: (String) -> Unit,
+        suggestionText: @Composable ((T) -> Unit)? = null,
+    ) {
+        AutoCompleteTextView(
+            modifier = modifier,
+            suggestions = suggestions,
+            suggestionText = suggestionText,
+            onSuggestionSelected = {
+                if (onSuggestionSelected == null) {
+                    val text = it.toString()
+                    resource.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
+                } else {
+                    onSuggestionSelected(it)
+                }
+            },
+        ) { expanded ->
+            TextField(
+                singleLine = true,
+                modifier = Modifier
+                    .menuAnchor()
+                    .fillMaxWidth(),
+                value = resource.value,
+                isError = resource.hasError,
+                label = { Text(resource.label) },
+                onValueChange = {
+                    resource.onValueChange(it)
+                    onMeasurementUnitQueryChange(it.text)
+                },
+                keyboardOptions = DefaultKeyboardOptions.copy(imeAction = ImeAction.Search),
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                supportingText = {
+                    SupportingText(config = resource, helpText = helpText)
+                },
+            )
         }
     }
 }

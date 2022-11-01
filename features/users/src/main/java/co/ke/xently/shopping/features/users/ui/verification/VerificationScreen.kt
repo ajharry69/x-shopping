@@ -13,15 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
-import co.ke.xently.shopping.features.ui.TextInputLayout.DefaultKeyboardOptions
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.repositories.exceptions.VerificationHttpException
 import co.ke.xently.shopping.features.utils.Shared
@@ -116,54 +115,32 @@ internal object VerificationScreen {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                var verificationCode by rememberSaveable(stateSaver = Savers.TEXT_FIELD_VALUE) {
-                    mutableStateOf(TextFieldValue())
+                val verificationCode = TextFieldConfig<Nothing>(
+                    labelId = R.string.fusers_verification_input_field_label_code,
+                    state = verificationState,
+                ) {
+                    (it.error as? VerificationHttpException)?.code?.joinToString("\n")
                 }
-                val verificationCodeError = remember(verificationCode, verificationState) {
-                    if (verificationCode.text.isBlank()) {
-                        context.getString(R.string.fusers_verification_code_required)
-                    } else {
-                        (verificationState as? State.Error)?.let {
-                            (it.error as? VerificationHttpException)?.code?.joinToString("\n")
-                        } ?: ""
-                    }
-                }
-                val verificationCodeHasError by remember(verificationCodeError) {
-                    derivedStateOf {
-                        verificationCodeError.isNotBlank()
-                    }
-                }
-                TextInputLayout(
+
+                TextField(
                     modifier = Modifier
                         .fillMaxWidthHorizontalPadding()
                         .padding(top = 16.dp),
                     textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center).merge(
                         MaterialTheme.typography.headlineSmall,
                     ),
-                    value = verificationCode,
-                    error = verificationCodeError,
-                    isError = verificationCodeHasError,
-                    onValueChange = { verificationCode = it },
-                    label = stringResource(R.string.fusers_verification_input_field_label_code),
+                    value = verificationCode.value,
+                    isError = verificationCode.hasError,
+                    onValueChange = verificationCode.onValueChange,
+                    label = { Text(verificationCode.label) },
                     keyboardOptions = DefaultKeyboardOptions.copy(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done,
                     ),
-                    visualTransformation = { text ->
-                        TransformedText(
-                            AnnotatedString(
-                                text.text.let {
-                                    if (it.length > 5) {
-                                        it.slice(0..5)
-                                    } else {
-                                        it
-                                    }
-                                }.toCharArray().joinToString("-"),
-                            ),
-                            OffsetMapping.Identity,
-                        )
-                    },
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                    supportingText = {
+                        SupportingText(config = verificationCode)
+                    },
                 )
                 Row(
                     modifier = Modifier
@@ -217,7 +194,7 @@ internal object VerificationScreen {
                     val requiredFields = arrayOf(verificationCode)
                     val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                         derivedStateOf {
-                            requiredFields.all { it.text.isNotBlank() } && !showProgressBar
+                            requiredFields.all { !it.hasError } && !showProgressBar
                         }
                     }
                     Button(
@@ -225,12 +202,11 @@ internal object VerificationScreen {
                         modifier = Modifier.weight(1f),
                         onClick = {
                             focusManager.clearFocus()
-                            config.onVerification(verificationCode.text.trim())
+                            config.onVerification(verificationCode.value.text.trim())
                         },
                     ) {
                         Text(
-                            text = stringResource(R.string.fusers_verify).toUpperCase(
-                                Locale.current),
+                            text = stringResource(R.string.fusers_verify).toUpperCase(Locale.current),
                             style = MaterialTheme.typography.labelLarge,
                         )
                     }

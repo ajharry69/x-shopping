@@ -21,8 +21,6 @@ import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
 import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
-import co.ke.xently.shopping.features.ui.TextInputLayout.DefaultKeyboardOptions
-import co.ke.xently.shopping.features.ui.TextInputLayout.InputFieldResource.Companion.compileResource
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
@@ -156,7 +154,7 @@ internal object ShoppingListItemDetailScreen {
                     isGroupingUsed = false
                 }
 
-                val name = compileResource(
+                val name = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_name,
                     valueInputs = shoppingListItem?.name,
                     state = saveState,
@@ -164,19 +162,23 @@ internal object ShoppingListItemDetailScreen {
                 ) {
                     (it.error as? ShoppingListItemHttpException)?.name?.joinToString("\n")
                 }
-                TextInputLayout(
+                TextField(
                     modifier = Modifier
                         .fillMaxWidthHorizontalPadding()
                         .padding(top = 16.dp),
                     value = name.value,
-                    error = name.error,
-                    label = name.label,
                     isError = name.hasError,
                     onValueChange = name.onValueChange,
+                    label = {
+                        Text(name.label)
+                    },
+                    supportingText = {
+                        SupportingText(config = name)
+                    },
                     keyboardOptions = DefaultKeyboardOptions.copy(capitalization = KeyboardCapitalization.Words),
                 )
 
-                val unit = compileResource(
+                val unit = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_measurement_unit,
                     valueInputs = shoppingListItem?.unit,
                     state = saveState,
@@ -185,7 +187,7 @@ internal object ShoppingListItemDetailScreen {
                     (it.error as? ShoppingListItemHttpException)?.unit?.joinToString("\n")
                 }
 
-                val unitQuantity = compileResource(
+                val unitQuantity = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_measurement_unit_quantity,
                     valueInputs = shoppingListItem?.unitQuantity,
                     state = saveState,
@@ -212,10 +214,9 @@ internal object ShoppingListItemDetailScreen {
 
                 AutoCompleteTextView(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
+                    suggestions = measurementUnitSuggestions,
                     resource = unit,
                     helpText = helpText,
-                    suggestions = measurementUnitSuggestions,
-                    onMeasurementUnitQueryChange = onMeasurementUnitQueryChange,
                     onSuggestionSelected = {
                         val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             it.subtype
@@ -224,6 +225,7 @@ internal object ShoppingListItemDetailScreen {
                         }
                         unit.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
                     },
+                    onMeasurementUnitQueryChange = onMeasurementUnitQueryChange,
                 ) {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                         Text(it.toString())
@@ -239,18 +241,21 @@ internal object ShoppingListItemDetailScreen {
                     }
                 }
 
-                TextInputLayout(
+                TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
-                    helpText = helpText,
                     value = unitQuantity.value,
-                    error = unitQuantity.error,
-                    label = unitQuantity.label,
+                    label = {
+                        Text(unitQuantity.label)
+                    },
                     isError = unitQuantity.hasError,
                     onValueChange = unitQuantity.onValueChange,
                     keyboardOptions = DefaultKeyboardOptions.copy(keyboardType = KeyboardType.Decimal),
+                    supportingText = {
+                        SupportingText(config = unitQuantity, helpText = helpText)
+                    },
                 )
 
-                val purchaseQuantity = compileResource(
+                val purchaseQuantity = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_purchase_quantity,
                     valueInputs = shoppingListItem?.purchaseQuantity,
                     state = saveState,
@@ -264,14 +269,16 @@ internal object ShoppingListItemDetailScreen {
                     (it.error as? ShoppingListItemHttpException)?.purchaseQuantity?.joinToString("\n")
                 }
 
-                TextInputLayout(
+                TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
                     value = purchaseQuantity.value,
-                    error = purchaseQuantity.error,
-                    label = purchaseQuantity.label,
+                    label = { Text(purchaseQuantity.label) },
                     isError = purchaseQuantity.hasError,
                     onValueChange = purchaseQuantity.onValueChange,
                     keyboardOptions = DefaultKeyboardOptions.copy(keyboardType = KeyboardType.Decimal),
+                    supportingText = {
+                        SupportingText(config = purchaseQuantity)
+                    },
                 )
 
                 val requiredFields = arrayOf(name, unit, unitQuantity, purchaseQuantity)
