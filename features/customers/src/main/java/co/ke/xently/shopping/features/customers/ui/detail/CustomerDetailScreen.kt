@@ -21,7 +21,9 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.customers.R
+import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
+import co.ke.xently.shopping.features.ui.TextInputLayout.DefaultKeyboardOptions
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.Customer

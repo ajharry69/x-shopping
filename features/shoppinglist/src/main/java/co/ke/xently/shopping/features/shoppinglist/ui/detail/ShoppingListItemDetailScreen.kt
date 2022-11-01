@@ -1,5 +1,7 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.detail
 
+import android.icu.util.MeasureUnit
+import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -9,14 +11,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.ke.xently.shopping.features.TextFieldResource.Companion.compileResource
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
+import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
+import co.ke.xently.shopping.features.ui.TextInputLayout.DefaultKeyboardOptions
+import co.ke.xently.shopping.features.ui.TextInputLayout.InputFieldResource.Companion.compileResource
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
@@ -35,7 +41,8 @@ internal object ShoppingListItemDetailScreen {
         config: Config,
         viewModel: ShoppingListItemDetailScreenViewModel = hiltViewModel(),
     ) {
-        val detailState: State<ShoppingListItem> by viewModel.detailState.collectAsState()
+        val detailState by viewModel.detailState.collectAsState()
+        val measurementUnitSuggestions by viewModel.measurementUnitSuggestions.collectAsState()
         val saveState by viewModel.saveState.collectAsState(State.Success(null))
         LaunchedEffect(id) {
             viewModel.get(id)
@@ -44,9 +51,9 @@ internal object ShoppingListItemDetailScreen {
             modifier = modifier,
             saveState = saveState,
             detailState = detailState,
-            config = config.copy(
-                onSubmitDetails = viewModel::save,
-            ),
+            config = config.copy(onSubmitDetails = viewModel::save),
+            measurementUnitSuggestions = measurementUnitSuggestions,
+            onMeasurementUnitQueryChange = viewModel::setMeasurementUnitQuery,
         )
     }
 
@@ -58,6 +65,8 @@ internal object ShoppingListItemDetailScreen {
         modifier: Modifier,
         saveState: State<String>,
         detailState: State<ShoppingListItem>,
+        measurementUnitSuggestions: List<MeasureUnit>,
+        onMeasurementUnitQueryChange: (String) -> Unit = {},
     ) {
         val shoppingListItem by remember(detailState) {
             derivedStateOf {
@@ -188,8 +197,7 @@ internal object ShoppingListItemDetailScreen {
 
                 val helpText by remember(name.value, unit.value, unitQuantity.value) {
                     derivedStateOf {
-                        (unitQuantity.value.text.trim().toFloatOrNull()
-                            ?: 1f).let {
+                        unitQuantity.value.text.trim().toFloatOrNull()?.let {
                             "${it.let(groupedNumberFormat::format)} ${
                                 unit.value.text.ifBlank {
                                     context.resources.getQuantityString(
@@ -198,20 +206,38 @@ internal object ShoppingListItemDetailScreen {
                                     )
                                 }
                             } of ${name.value.text.ifBlank { "-" }}"
-                        }.trim()
+                        }?.trim()
                     }
                 }
 
-                TextInputLayout(
+                AutoCompleteTextView(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
+                    resource = unit,
                     helpText = helpText,
-                    value = unit.value,
-                    error = unit.error,
-                    label = unit.label,
-                    isError = unit.hasError,
-                    onValueChange = unit.onValueChange,
-                    keyboardOptions = DefaultKeyboardOptions.copy(capitalization = KeyboardCapitalization.None),
-                )
+                    suggestions = measurementUnitSuggestions,
+                    onMeasurementUnitQueryChange = onMeasurementUnitQueryChange,
+                    onSuggestionSelected = {
+                        val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            it.subtype
+                        } else {
+                            it.toString()
+                        }
+                        unit.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
+                    },
+                ) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+                        Text(it.toString())
+                    } else {
+                        ListItem(
+                            headlineText = {
+                                Text(it.type)
+                            },
+                            supportingText = {
+                                Text(it.subtype)
+                            },
+                        )
+                    }
+                }
 
                 TextInputLayout(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
@@ -262,9 +288,8 @@ internal object ShoppingListItemDetailScreen {
                         config.onSubmitDetails.invoke((shoppingListItem
                             ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
                             name = name.value.text.trim(),
-                            unit = unit.value.text.trim().uppercase(),
-                            unitQuantity = unitQuantity.value.text.trim()
-                                .ifBlank { "1" }.toFloat(),
+                            unit = unit.value.text.trim(),
+                            unitQuantity = unitQuantity.value.text.trim().ifBlank { "1" }.toFloat(),
                             purchaseQuantity = purchaseQuantity.value.text.trim().ifBlank { "1" }
                                 .toFloat(),
                         ))

@@ -20,7 +20,7 @@ import co.ke.xently.shopping.features.customers.ui.search.CustomerSearchScreen.C
 import co.ke.xently.shopping.features.ui.ConfirmableDelete
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
 import co.ke.xently.shopping.features.ui.ToolbarWithProgressbar
-import co.ke.xently.shopping.features.ui.stringRes
+import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.utils.ListState
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.Customer

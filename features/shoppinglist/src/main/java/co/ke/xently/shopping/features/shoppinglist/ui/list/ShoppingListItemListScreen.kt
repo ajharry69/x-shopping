@@ -1,7 +1,6 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.list
 
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -23,10 +22,10 @@ import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewMo
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
 import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSearchScreen
 import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSearchScreen.Content
+import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.ConfirmableDelete
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
 import co.ke.xently.shopping.features.ui.ToolbarWithProgressbar
-import co.ke.xently.shopping.features.ui.stringRes
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
@@ -106,19 +105,12 @@ internal object ShoppingListItemListScreen {
                 }
             },
             floatingActionButton = {
-                val showFab by remember(listState) {
-                    derivedStateOf {
-                        !listState.isScrollInProgress
-                    }
-                }
-                AnimatedVisibility(visible = showFab) {
-                    FloatingActionButton(onClick = config.onFabClick) {
-                        Icon(
-                            Icons.Default.Add,
-                            stringRes(R.string.feature_shoppinglist_detail_toolbar_title,
-                                R.string.feature_shoppinglist_add),
-                        )
-                    }
+                FloatingActionButton(onClick = config.onFabClick) {
+                    Icon(
+                        Icons.Default.Add,
+                        stringRes(R.string.feature_shoppinglist_detail_toolbar_title,
+                            R.string.feature_shoppinglist_add),
+                    )
                 }
             },
         ) { values: PaddingValues ->

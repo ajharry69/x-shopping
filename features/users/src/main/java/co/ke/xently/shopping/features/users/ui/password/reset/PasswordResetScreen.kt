@@ -18,6 +18,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
+import co.ke.xently.shopping.features.ui.TextInputLayout.DefaultKeyboardOptions
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.repositories.exceptions.PasswordResetHttpException
 import co.ke.xently.shopping.features.utils.Shared
