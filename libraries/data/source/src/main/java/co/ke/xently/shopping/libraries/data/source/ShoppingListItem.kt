@@ -10,7 +10,7 @@ data class ShoppingListItem(
     val unitQuantity: Float,
     val purchaseQuantity: Float,
     val dateAdded: Date,
-    val brands: List<AbstractBrand>,
+    val brands: List<Brand>,
     val attributes: List<Attribute>,
 ) {
     val asEntity
@@ -26,7 +26,7 @@ data class ShoppingListItem(
     data class Attribute(
         override val name: String,
         override val value: String,
-        val values: List<String>,
+        val values: List<String>? = emptyList(),
     ) : AbstractAttribute() {
         override fun toString() = "${name}:${value}"
     }

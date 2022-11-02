@@ -51,6 +51,7 @@ data class ShoppingListItemEntity(
         foreignKeys = [
             ForeignKey(
                 entity = ShoppingListItemEntity::class,
+                onDelete = ForeignKey.CASCADE,
                 parentColumns = ["shoppinglist_id"],
                 childColumns = ["shoppingListItemId"],
             ),
@@ -72,6 +73,7 @@ data class ShoppingListItemEntity(
         foreignKeys = [
             ForeignKey(
                 entity = ShoppingListItemEntity::class,
+                onDelete = ForeignKey.CASCADE,
                 parentColumns = ["shoppinglist_id"],
                 childColumns = ["shoppingListItemId"],
             ),

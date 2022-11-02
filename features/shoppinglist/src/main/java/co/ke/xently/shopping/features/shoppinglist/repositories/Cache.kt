@@ -37,13 +37,15 @@ internal suspend fun List<ShoppingListItem>.saveLocally(
     val attributes = withContext(dependencies.dispatcher.computation) {
         flatMap { item ->
             item.attributes.flatMap { attr ->
-                attr.values.mapTo(mutableListOf(attr)) {
+                (attr.values ?: emptyList()).mapTo(mutableListOf(attr)) {
                     attr.copy(value = it)
                 }
             }.map {
-                ShoppingListItemEntity.Attribute(name = it.name,
+                ShoppingListItemEntity.Attribute(
+                    name = it.name,
                     value = it.value,
-                    shoppingListItemId = item.id)
+                    shoppingListItemId = item.id,
+                )
             }
         }
     }

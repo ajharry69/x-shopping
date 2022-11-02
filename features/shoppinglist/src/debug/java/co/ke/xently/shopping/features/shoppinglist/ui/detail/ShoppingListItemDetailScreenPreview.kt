@@ -19,6 +19,7 @@ private fun ShoppingListItemDetailScreen() {
             saveState = State.Success(null),
             config = ShoppingListItemDetailScreen.Config(),
             brandSuggestions = emptyList(),
+            attributeSuggestions = emptyList(),
             measurementUnitSuggestions = emptyList(),
         )
     }

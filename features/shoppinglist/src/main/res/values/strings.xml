@@ -21,6 +21,10 @@
     <string name="feature_shoppinglist_group_button_see_all">SEE ALL</string>
     <string name="feature_shoppinglist_content_description_open_drawer">Open navigation drawer</string>
     <string name="feature_shoppinglist_detail_input_field_label_brand">Brand</string>
+    <string name="feature_shoppinglist_detail_input_field_label_attribute_name">Attr name</string>
+    <string name="feature_shoppinglist_detail_input_field_label_attribute_value">Attr value</string>
+    <string name="feature_shoppinglist_error_requires_attr_name">Requires attribute name</string>
+    <string name="feature_shoppinglist_error_requires_attr_value">Requires attribute value</string>
 
     <plurals name="feature_shoppinglist_group_items_count">
         <item quantity="one">%d item</item>

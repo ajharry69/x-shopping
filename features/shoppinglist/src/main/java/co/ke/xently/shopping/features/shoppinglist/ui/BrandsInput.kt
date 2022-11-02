@@ -33,19 +33,19 @@ data class BrandsInput(
 ) {
     companion object {
         @Composable
-        operator fun invoke(
+        operator fun <T: AbstractBrand> invoke(
             state: State<*>,
             shouldResetFields: Boolean,
-            defaultBrands: List<AbstractBrand>?,
+            default: List<AbstractBrand>?,
             suggestions: List<AbstractBrand>,
             onQueryChange: (String) -> Unit,
             errorMessage: (State.Error) -> String?,
-            createBrandFromName: (String) -> AbstractBrand,
+            create: (AbstractBrand) -> T,
         ): BrandsInput {
             var brandBeingEdited by remember {
                 mutableStateOf<Pair<Int, AbstractBrand>?>(null)
             }
-            val brandConfig = TextFieldConfig(
+            val config = TextFieldConfig(
                 labelId = R.string.feature_shoppinglist_detail_input_field_label_brand,
                 state = state,
                 valueInputs = brandBeingEdited?.second?.name,
@@ -53,8 +53,8 @@ data class BrandsInput(
                 errorMessage = errorMessage,
             )
 
-            val selectedBrands = remember(defaultBrands, shouldResetFields) {
-                mutableStateListOf(*(defaultBrands ?: emptyList()).toTypedArray())
+            val selectedBrands = remember(default, shouldResetFields) {
+                mutableStateListOf(*(default ?: emptyList()).toTypedArray())
             }
 
             val onSuggestionSelected: (AbstractBrand) -> Unit = { brand ->
@@ -65,7 +65,7 @@ data class BrandsInput(
                         selectedBrands[it.first] = brand
                     }
                 }
-                brandConfig.onValueChange(TextFieldValue())
+                config.onValueChange(TextFieldValue())
                 brandBeingEdited = null
             }
 
@@ -76,18 +76,26 @@ data class BrandsInput(
                 AutoCompleteTextView(
                     modifier = Modifier.fillMaxWidth(),
                     suggestions = suggestions,
-                    config = brandConfig,
+                    config = config,
                     onQueryChange = onQueryChange,
                     onSuggestionSelected = onSuggestionSelected,
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = {
-                        val brandName = brandConfig.value.text.trim().takeIf(String::isNotBlank)
+                        val brandName = config.value.text.trim().takeIf(String::isNotBlank)
                             ?: return@KeyboardActions
-                        onSuggestionSelected(createBrandFromName(brandName))
+                        val brand = object : AbstractBrand() {
+                            override val name: String
+                                get() = brandName
+                        }
+                        onSuggestionSelected(create(brand))
                     }),
                     emptySuggestionsTrailingIcon = {
                         IconButton(onClick = {
-                            onSuggestionSelected(createBrandFromName(brandConfig.value.text.trim()))
+                            val brand = object : AbstractBrand() {
+                                override val name: String
+                                    get() = config.value.text.trim()
+                            }
+                            onSuggestionSelected(create(brand))
                         }) {
                             Icon(Icons.Default.Done, contentDescription = null)
                         }
@@ -126,7 +134,7 @@ data class BrandsInput(
                     }
                 }
             }
-            return BrandsInput(brandConfig, selectedBrands)
+            return BrandsInput(config, selectedBrands)
         }
     }
 }

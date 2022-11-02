@@ -21,11 +21,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
+import co.ke.xently.shopping.features.shoppinglist.ui.AttributesInput
 import co.ke.xently.shopping.features.shoppinglist.ui.BrandsInput
 import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
+import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
 import co.ke.xently.shopping.libraries.data.source.AbstractBrand
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
@@ -45,6 +47,7 @@ internal object ShoppingListItemDetailScreen {
     ) {
         val detailState by viewModel.detailState.collectAsState()
         val brandSuggestions by viewModel.brandSuggestions.collectAsState()
+        val attributeSuggestions by viewModel.attributeSuggestions.collectAsState()
         val measurementUnitSuggestions by viewModel.measurementUnitSuggestions.collectAsState()
         val saveState by viewModel.saveState.collectAsState(State.Success(null))
         LaunchedEffect(id) {
@@ -56,7 +59,9 @@ internal object ShoppingListItemDetailScreen {
             detailState = detailState,
             config = config.copy(onSubmitDetails = viewModel::save),
             brandSuggestions = brandSuggestions,
+            attributeSuggestions = attributeSuggestions,
             onBrandQueryChange = viewModel::setBrandQuery,
+            onAttributeQueryChange = viewModel::setAttributeQuery,
             measurementUnitSuggestions = measurementUnitSuggestions,
             onMeasurementUnitQueryChange = viewModel::setMeasurementUnitQuery,
         )
@@ -71,8 +76,10 @@ internal object ShoppingListItemDetailScreen {
         saveState: State<String>,
         detailState: State<ShoppingListItem>,
         brandSuggestions: List<AbstractBrand>,
+        attributeSuggestions: List<AbstractAttribute>,
         measurementUnitSuggestions: List<MeasureUnit>,
         onBrandQueryChange: (String) -> Unit = {},
+        onAttributeQueryChange: (String) -> Unit = {},
         onMeasurementUnitQueryChange: (String) -> Unit = {},
     ) {
         val shoppingListItem by remember(detailState) {
@@ -293,19 +300,41 @@ internal object ShoppingListItemDetailScreen {
                 val (brandConfig, selectedBrands) = BrandsInput(
                     state = saveState,
                     shouldResetFields = shouldResetFields,
-                    defaultBrands = shoppingListItem?.brands,
+                    default = shoppingListItem?.brands,
                     suggestions = brandSuggestions,
                     onQueryChange = onBrandQueryChange,
-                    createBrandFromName = {
-                        ShoppingListItem.Brand(it)
+                    create = {
+                        ShoppingListItem.Brand(it.name)
                     },
                     errorMessage = {
                         (it.error as? ShoppingListItemHttpException)?.brands?.joinToString("\n")
                     },
                 )
 
-                val requiredFields =
-                    arrayOf(name, unit, brandConfig, unitQuantity, purchaseQuantity)
+                val (attributeNameConfig, attributeValueConfig, selectedAttributes) = AttributesInput(
+                    snackbarState = config.shared.snackbarHostState,
+                    state = saveState,
+                    shouldResetFields = shouldResetFields,
+                    default = shoppingListItem?.attributes,
+                    suggestions = attributeSuggestions,
+                    onQueryChange = onAttributeQueryChange,
+                    create = {
+                        ShoppingListItem.Attribute(it.name, it.value, emptyList())
+                    },
+                    errorMessage = {
+                        (it.error as? ShoppingListItemHttpException)?.attributes?.joinToString("\n")
+                    },
+                )
+
+                val requiredFields = arrayOf(
+                    name,
+                    unit,
+                    brandConfig,
+                    attributeNameConfig,
+                    attributeValueConfig,
+                    unitQuantity,
+                    purchaseQuantity,
+                )
                 val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                     derivedStateOf {
                         requiredFields.all { !it.hasError } && !showProgressBar
@@ -318,7 +347,20 @@ internal object ShoppingListItemDetailScreen {
                         focusManager.clearFocus()
                         config.onSubmitDetails.invoke((shoppingListItem
                             ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
-                            brands = selectedBrands,
+                            brands = selectedBrands.map {
+                                if (it is ShoppingListItem.Brand) {
+                                    it
+                                } else {
+                                    ShoppingListItem.Brand(name = it.name)
+                                }
+                            },
+                            attributes = selectedAttributes.map {
+                                if (it is ShoppingListItem.Attribute) {
+                                    it
+                                } else {
+                                    ShoppingListItem.Attribute(name = it.name, value = it.value)
+                                }
+                            },
                             name = name.value.text.trim(),
                             unit = unit.value.text.trim(),
                             unitQuantity = unitQuantity.value.text.trim().ifBlank { "1" }.toFloat(),
