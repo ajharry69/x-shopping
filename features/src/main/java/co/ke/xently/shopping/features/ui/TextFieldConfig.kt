@@ -6,6 +6,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import co.ke.xently.shopping.features.R
 import co.ke.xently.shopping.features.utils.State
@@ -126,7 +127,7 @@ class TextFieldConfig<Value> private constructor(
             errorMessage = errorMessage,
             defaultValue = defaultValue,
             generateDefaultValue = {
-                TextFieldValue(it)
+                TextFieldValue(it, selection = TextRange(it.length))
             },
             blankLookupValue = {
                 it.text

@@ -7,8 +7,9 @@ internal class ShoppingListItemHttpException(
     val unit: List<String> = emptyList(),
     val unitQuantity: List<String> = emptyList(),
     val purchaseQuantity: List<String> = emptyList(),
+    val brands: List<String> = emptyList(),
 ) : HttpException() {
     override fun hasFieldErrors(): Boolean {
-        return arrayOf(name, unit, unitQuantity, purchaseQuantity).any { it.isNotEmpty() }
+        return arrayOf(name, unit, unitQuantity, purchaseQuantity, brands).any { it.isNotEmpty() }
     }
 }

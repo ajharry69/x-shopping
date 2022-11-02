@@ -15,14 +15,18 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
+import co.ke.xently.shopping.features.shoppinglist.ui.BrandsInput
 import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
+import co.ke.xently.shopping.libraries.data.source.AbstractBrand
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
 internal object ShoppingListItemDetailScreen {
@@ -40,6 +44,7 @@ internal object ShoppingListItemDetailScreen {
         viewModel: ShoppingListItemDetailScreenViewModel = hiltViewModel(),
     ) {
         val detailState by viewModel.detailState.collectAsState()
+        val brandSuggestions by viewModel.brandSuggestions.collectAsState()
         val measurementUnitSuggestions by viewModel.measurementUnitSuggestions.collectAsState()
         val saveState by viewModel.saveState.collectAsState(State.Success(null))
         LaunchedEffect(id) {
@@ -50,6 +55,8 @@ internal object ShoppingListItemDetailScreen {
             saveState = saveState,
             detailState = detailState,
             config = config.copy(onSubmitDetails = viewModel::save),
+            brandSuggestions = brandSuggestions,
+            onBrandQueryChange = viewModel::setBrandQuery,
             measurementUnitSuggestions = measurementUnitSuggestions,
             onMeasurementUnitQueryChange = viewModel::setMeasurementUnitQuery,
         )
@@ -63,7 +70,9 @@ internal object ShoppingListItemDetailScreen {
         modifier: Modifier,
         saveState: State<String>,
         detailState: State<ShoppingListItem>,
+        brandSuggestions: List<AbstractBrand>,
         measurementUnitSuggestions: List<MeasureUnit>,
+        onBrandQueryChange: (String) -> Unit = {},
         onMeasurementUnitQueryChange: (String) -> Unit = {},
     ) {
         val shoppingListItem by remember(detailState) {
@@ -215,7 +224,7 @@ internal object ShoppingListItemDetailScreen {
                 AutoCompleteTextView(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
                     suggestions = measurementUnitSuggestions,
-                    resource = unit,
+                    config = unit,
                     helpText = helpText,
                     onSuggestionSelected = {
                         val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -225,7 +234,7 @@ internal object ShoppingListItemDetailScreen {
                         }
                         unit.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
                     },
-                    onMeasurementUnitQueryChange = onMeasurementUnitQueryChange,
+                    onQueryChange = onMeasurementUnitQueryChange,
                 ) {
                     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
                         Text(it.toString())
@@ -281,7 +290,22 @@ internal object ShoppingListItemDetailScreen {
                     },
                 )
 
-                val requiredFields = arrayOf(name, unit, unitQuantity, purchaseQuantity)
+                val (brandConfig, selectedBrands) = BrandsInput(
+                    state = saveState,
+                    shouldResetFields = shouldResetFields,
+                    defaultBrands = shoppingListItem?.brands,
+                    suggestions = brandSuggestions,
+                    onQueryChange = onBrandQueryChange,
+                    createBrandFromName = {
+                        ShoppingListItem.Brand(it)
+                    },
+                    errorMessage = {
+                        (it.error as? ShoppingListItemHttpException)?.brands?.joinToString("\n")
+                    },
+                )
+
+                val requiredFields =
+                    arrayOf(name, unit, brandConfig, unitQuantity, purchaseQuantity)
                 val enableSubmitButton by remember(showProgressBar, *requiredFields) {
                     derivedStateOf {
                         requiredFields.all { !it.hasError } && !showProgressBar
@@ -294,6 +318,7 @@ internal object ShoppingListItemDetailScreen {
                         focusManager.clearFocus()
                         config.onSubmitDetails.invoke((shoppingListItem
                             ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
+                            brands = selectedBrands,
                             name = name.value.text.trim(),
                             unit = unit.value.text.trim(),
                             unitQuantity = unitQuantity.value.text.trim().ifBlank { "1" }.toFloat(),
@@ -303,7 +328,7 @@ internal object ShoppingListItemDetailScreen {
                     },
                 ) {
                     Text(
-                        text = toolbarTitle.uppercase(),
+                        text = toolbarTitle.toUpperCase(Locale.current),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }

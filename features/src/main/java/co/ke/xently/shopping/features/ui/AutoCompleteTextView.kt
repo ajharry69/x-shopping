@@ -1,6 +1,9 @@
 package co.ke.xently.shopping.features.ui
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -65,10 +68,13 @@ object AutoCompleteTextView {
     operator fun <T> invoke(
         modifier: Modifier,
         suggestions: Iterable<T>,
-        resource: TextFieldConfig<TextFieldValue>,
+        config: TextFieldConfig<TextFieldValue>,
         helpText: String? = null,
         onSuggestionSelected: ((T) -> Unit)? = null,
-        onMeasurementUnitQueryChange: (String) -> Unit,
+        onQueryChange: (String) -> Unit,
+        keyboardOptions: KeyboardOptions? = null,
+        keyboardActions: KeyboardActions? = null,
+        emptySuggestionsTrailingIcon: @Composable (() -> Unit)? = null,
         suggestionText: @Composable ((T) -> Unit)? = null,
     ) {
         AutoCompleteTextView(
@@ -78,7 +84,7 @@ object AutoCompleteTextView {
             onSuggestionSelected = {
                 if (onSuggestionSelected == null) {
                     val text = it.toString()
-                    resource.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
+                    config.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
                 } else {
                     onSuggestionSelected(it)
                 }
@@ -89,19 +95,38 @@ object AutoCompleteTextView {
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth(),
-                value = resource.value,
-                isError = resource.hasError,
-                label = { Text(resource.label) },
+                value = config.value,
+                isError = config.hasError,
+                label = {
+                    Text(config.label)
+                },
                 onValueChange = {
-                    resource.onValueChange(it)
-                    onMeasurementUnitQueryChange(it.text)
+                    config.onValueChange(it)
+                    onQueryChange(it.text)
                 },
-                keyboardOptions = DefaultKeyboardOptions.copy(imeAction = ImeAction.Search),
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
                 supportingText = {
-                    SupportingText(config = resource, helpText = helpText)
+                    SupportingText(config = config, helpText = helpText)
                 },
+                trailingIcon = {
+                    val showAlternativeTrailingIcon by remember(suggestions, config.value) {
+                        derivedStateOf {
+                            suggestions.firstOrNull() == null
+                                    && config.value.text.isNotBlank()
+                                    && emptySuggestionsTrailingIcon != null
+                        }
+                    }
+                    AnimatedContent(targetState = showAlternativeTrailingIcon) {
+                        if (showAlternativeTrailingIcon) {
+                            emptySuggestionsTrailingIcon!!()
+                        } else {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        }
+                    }
+                },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                keyboardActions = keyboardActions ?: KeyboardActions.Default,
+                keyboardOptions = keyboardOptions
+                    ?: DefaultKeyboardOptions.copy(imeAction = ImeAction.Search),
             )
         }
     }

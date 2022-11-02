@@ -10,7 +10,7 @@ data class ShoppingListItem(
     val unitQuantity: Float,
     val purchaseQuantity: Float,
     val dateAdded: Date,
-    val brands: List<Brand>,
+    val brands: List<AbstractBrand>,
     val attributes: List<Attribute>,
 ) {
     val asEntity
