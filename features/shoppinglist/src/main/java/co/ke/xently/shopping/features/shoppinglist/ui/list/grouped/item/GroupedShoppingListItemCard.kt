@@ -60,7 +60,7 @@ object GroupedShoppingListItemCard {
                     ) {
                         Text(
                             text = groupList.group,
-                            style = MaterialTheme.typography.headlineMedium,
+                            style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.shimmerPlaceholder(showPlaceholder),
                         )
                         Text(
@@ -105,7 +105,7 @@ object GroupedShoppingListItemCard {
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                     thickness = 1.dp,
                     modifier = Modifier
-                        .padding(end = 16.dp, start = 16.dp)
+                        .padding(horizontal = 16.dp)
                         .shimmerPlaceholder(showPlaceholder),
                 )
                 Column {
