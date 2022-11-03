@@ -117,27 +117,6 @@ internal class ShoppingListItemDetailScreenViewModel @Inject constructor(
         }
     }
 
-    private val brandQuery = MutableSharedFlow<String>()
-    private val _brandSuggestions = MutableStateFlow(emptyList<AbstractBrand>())
-    val brandSuggestions = _brandSuggestions.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            brandQuery.collectLatest { query ->
-                flow {
-                    emit(emptyList<AbstractBrand>())
-                }.flowOn(dispatcher.computation).collectLatest(_brandSuggestions::emit)
-            }
-        }
-    }
-
-    fun setBrandQuery(query: String) {
-        viewModelScope.launch {
-            delay(500)
-            brandQuery.emit(query)
-        }
-    }
-
     private val attributeQuery = MutableSharedFlow<String>()
     private val _attributeSuggestions = MutableStateFlow(emptyList<AbstractAttribute>())
     val attributeSuggestions = _attributeSuggestions.asStateFlow()

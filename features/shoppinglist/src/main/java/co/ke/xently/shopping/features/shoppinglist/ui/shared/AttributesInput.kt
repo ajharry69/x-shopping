@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shoppinglist.ui
+package co.ke.xently.shopping.features.shoppinglist.ui.shared
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement

@@ -5,7 +5,7 @@ package co.ke.xently.shopping.features.utils
  */
 data class Query(
     val value: String,
-    val size: Int = -1,
+    val size: Int = Int.MAX_VALUE,
     val filters: Map<String, Any> = emptyMap(),
 ) {
     override fun toString(): String {

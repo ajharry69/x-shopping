@@ -21,10 +21,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
-import co.ke.xently.shopping.features.shoppinglist.ui.AttributesInput
-import co.ke.xently.shopping.features.shoppinglist.ui.BrandsInput
+import co.ke.xently.shopping.features.shoppinglist.ui.shared.AttributesInput
+import co.ke.xently.shopping.features.shoppinglist.ui.shared.BrandSearchViewModel
+import co.ke.xently.shopping.features.shoppinglist.ui.shared.BrandsInput
 import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
+import co.ke.xently.shopping.features.utils.Query
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
@@ -44,9 +46,10 @@ internal object ShoppingListItemDetailScreen {
         modifier: Modifier,
         config: Config,
         viewModel: ShoppingListItemDetailScreenViewModel = hiltViewModel(),
+        brandSearchViewModel: BrandSearchViewModel = hiltViewModel(),
     ) {
         val detailState by viewModel.detailState.collectAsState()
-        val brandSuggestions by viewModel.brandSuggestions.collectAsState()
+        val brandSuggestions by brandSearchViewModel.searchAutoCompleteResults.collectAsState()
         val attributeSuggestions by viewModel.attributeSuggestions.collectAsState()
         val measurementUnitSuggestions by viewModel.measurementUnitSuggestions.collectAsState()
         val saveState by viewModel.saveState.collectAsState(State.Success(null))
@@ -60,7 +63,10 @@ internal object ShoppingListItemDetailScreen {
             config = config.copy(onSubmitDetails = viewModel::save),
             brandSuggestions = brandSuggestions,
             attributeSuggestions = attributeSuggestions,
-            onBrandQueryChange = viewModel::setBrandQuery,
+            onBrandQueryChange = {
+                brandSearchViewModel.autoCompleteSearch(Query(it,
+                    filters = mapOf("uniqueByName" to true)))
+            },
             onAttributeQueryChange = viewModel::setAttributeQuery,
             measurementUnitSuggestions = measurementUnitSuggestions,
             onMeasurementUnitQueryChange = viewModel::setMeasurementUnitQuery,
