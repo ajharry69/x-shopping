@@ -20,6 +20,7 @@ private fun ShoppingListItemDetailScreen() {
             config = ShoppingListItemDetailScreen.Config(),
             brandSuggestions = emptyList(),
             attributeSuggestions = emptyList(),
+            attributeNameSuggestions = emptyList(),
             measurementUnitSuggestions = emptyList(),
         )
     }

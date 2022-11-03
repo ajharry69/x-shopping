@@ -39,7 +39,9 @@ data class AttributesInput(
             shouldResetFields: Boolean,
             default: List<AbstractAttribute>?,
             suggestions: List<AbstractAttribute>,
-            onQueryChange: (String) -> Unit,
+            nameSuggestions: List<String>,
+            onAttributeNameQueryChange: (String) -> Unit,
+            onAttributeValueQueryChange: (String, String) -> Unit,
             errorMessage: (State.Error) -> String?,
             create: (AbstractAttribute) -> T,
         ): AttributesInput {
@@ -81,11 +83,9 @@ data class AttributesInput(
             }
 
             val onImeActionClicked: () -> Unit = {
-                val attributeName =
-                    nameConfig.value.text.trim().takeIf(String::isNotBlank)
+                val attributeName = nameConfig.value.text.trim().takeIf(String::isNotBlank)
 
-                val attributeValue =
-                    valueConfig.value.text.trim().takeIf(String::isNotBlank)
+                val attributeValue = valueConfig.value.text.trim().takeIf(String::isNotBlank)
 
                 if (attributeName == null) {
                     scope.launch {
@@ -122,10 +122,9 @@ data class AttributesInput(
                 ) {
                     AutoCompleteTextView(
                         modifier = Modifier.weight(1f),
-                        suggestions = suggestions,
+                        suggestions = nameSuggestions,
                         config = nameConfig,
-                        onQueryChange = onQueryChange,
-                        onSuggestionSelected = onSuggestionSelected,
+                        onQueryChange = onAttributeNameQueryChange,
                         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {
                             onImeActionClicked()
@@ -140,7 +139,9 @@ data class AttributesInput(
                         modifier = Modifier.weight(1f),
                         suggestions = suggestions,
                         config = valueConfig,
-                        onQueryChange = onQueryChange,
+                        onQueryChange = {
+                            onAttributeValueQueryChange(nameConfig.value.text, it)
+                        },
                         onSuggestionSelected = onSuggestionSelected,
                         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
                         keyboardActions = KeyboardActions(onDone = {

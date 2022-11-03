@@ -47,6 +47,12 @@ interface ShoppingListDao {
     @Query("SELECT DISTINCT(name), * FROM shoppinglist_brands WHERE LOWER(name) LIKE LOWER(:query)")
     fun getBrandsUniqueByName(query: String): Flow<List<ShoppingListItemEntity.Brand>>
 
+    @Query("SELECT * FROM shoppinglist_attributes WHERE LOWER(name) = LOWER(:name) AND LOWER(value) LIKE LOWER(:value)")
+    fun getAttributes(name: String, value: String): Flow<List<ShoppingListItemEntity.Attribute>>
+
+    @Query("SELECT DISTINCT(name) FROM shoppinglist_attributes WHERE LOWER(name) LIKE LOWER(:query)")
+    fun getUniqueAttributeNames(query: String): Flow<List<String>>
+
     @Query("SELECT dateAdded AS `group`, COUNT(dateAdded) AS numberOfItems FROM shoppinglist GROUP BY dateAdded")
     fun getCountGroupedByDateAdded(): Flow<List<GroupedShoppingListCount>>
 

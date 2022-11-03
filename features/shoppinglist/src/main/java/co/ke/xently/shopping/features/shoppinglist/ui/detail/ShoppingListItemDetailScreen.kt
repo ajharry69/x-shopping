@@ -21,9 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
-import co.ke.xently.shopping.features.shoppinglist.ui.shared.AttributesInput
-import co.ke.xently.shopping.features.shoppinglist.ui.shared.BrandSearchViewModel
-import co.ke.xently.shopping.features.shoppinglist.ui.shared.BrandsInput
+import co.ke.xently.shopping.features.shoppinglist.ui.shared.*
 import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Query
@@ -47,10 +45,13 @@ internal object ShoppingListItemDetailScreen {
         config: Config,
         viewModel: ShoppingListItemDetailScreenViewModel = hiltViewModel(),
         brandSearchViewModel: BrandSearchViewModel = hiltViewModel(),
+        attributeSearchViewModel: AttributeSearchViewModel = hiltViewModel(),
+        attributeNameSearchViewModel: AttributeNameSearchViewModel = hiltViewModel(),
     ) {
         val detailState by viewModel.detailState.collectAsState()
         val brandSuggestions by brandSearchViewModel.searchAutoCompleteResults.collectAsState()
-        val attributeSuggestions by viewModel.attributeSuggestions.collectAsState()
+        val attributeSuggestions by attributeSearchViewModel.searchAutoCompleteResults.collectAsState()
+        val attributeNameSuggestions by attributeNameSearchViewModel.searchAutoCompleteResults.collectAsState()
         val measurementUnitSuggestions by viewModel.measurementUnitSuggestions.collectAsState()
         val saveState by viewModel.saveState.collectAsState(State.Success(null))
         LaunchedEffect(id) {
@@ -63,11 +64,22 @@ internal object ShoppingListItemDetailScreen {
             config = config.copy(onSubmitDetails = viewModel::save),
             brandSuggestions = brandSuggestions,
             attributeSuggestions = attributeSuggestions,
+            attributeNameSuggestions = attributeNameSuggestions,
             onBrandQueryChange = {
-                brandSearchViewModel.autoCompleteSearch(Query(it,
-                    filters = mapOf("uniqueByName" to true)))
+                val query = Query(
+                    value = it,
+                    filters = mapOf("uniqueByName" to true),
+                )
+                brandSearchViewModel.autoCompleteSearch(query)
             },
-            onAttributeQueryChange = viewModel::setAttributeQuery,
+            onAttributeValueQueryChange = { name, value ->
+                val query = Query(
+                    value = value,
+                    filters = mapOf("name" to name),
+                )
+                attributeSearchViewModel.autoCompleteSearch(query)
+            },
+            onAttributeNameQueryChange = attributeNameSearchViewModel::autoCompleteSearch,
             measurementUnitSuggestions = measurementUnitSuggestions,
             onMeasurementUnitQueryChange = viewModel::setMeasurementUnitQuery,
         )
@@ -83,9 +95,11 @@ internal object ShoppingListItemDetailScreen {
         detailState: State<ShoppingListItem>,
         brandSuggestions: List<AbstractBrand>,
         attributeSuggestions: List<AbstractAttribute>,
+        attributeNameSuggestions: List<String>,
         measurementUnitSuggestions: List<MeasureUnit>,
         onBrandQueryChange: (String) -> Unit = {},
-        onAttributeQueryChange: (String) -> Unit = {},
+        onAttributeNameQueryChange: (String) -> Unit = {},
+        onAttributeValueQueryChange: (String, String) -> Unit = { _, _ -> },
         onMeasurementUnitQueryChange: (String) -> Unit = {},
     ) {
         val shoppingListItem by remember(detailState) {
@@ -323,7 +337,9 @@ internal object ShoppingListItemDetailScreen {
                     shouldResetFields = shouldResetFields,
                     default = shoppingListItem?.attributes,
                     suggestions = attributeSuggestions,
-                    onQueryChange = onAttributeQueryChange,
+                    nameSuggestions = attributeNameSuggestions,
+                    onAttributeNameQueryChange = onAttributeNameQueryChange,
+                    onAttributeValueQueryChange = onAttributeValueQueryChange,
                     create = {
                         ShoppingListItem.Attribute(it.name, it.value, emptyList())
                     },

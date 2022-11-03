@@ -8,8 +8,6 @@ import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.IShoppingListRepository
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.common.Dispatcher
-import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
-import co.ke.xently.shopping.libraries.data.source.AbstractBrand
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -114,27 +112,6 @@ internal class ShoppingListItemDetailScreenViewModel @Inject constructor(
         viewModelScope.launch {
             delay(500)
             measurementUnitQuery.emit(query)
-        }
-    }
-
-    private val attributeQuery = MutableSharedFlow<String>()
-    private val _attributeSuggestions = MutableStateFlow(emptyList<AbstractAttribute>())
-    val attributeSuggestions = _attributeSuggestions.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            attributeQuery.collectLatest { query ->
-                flow {
-                    emit(emptyList<AbstractAttribute>())
-                }.flowOn(dispatcher.computation).collectLatest(_attributeSuggestions::emit)
-            }
-        }
-    }
-
-    fun setAttributeQuery(query: String) {
-        viewModelScope.launch {
-            delay(500)
-            attributeQuery.emit(query)
         }
     }
 }
