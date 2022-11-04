@@ -1,7 +1,5 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.detail
 
-import android.icu.util.MeasureUnit
-import android.os.Build
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -11,10 +9,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
@@ -47,12 +43,13 @@ internal object ShoppingListItemDetailScreen {
         brandSearchViewModel: BrandSearchViewModel = hiltViewModel(),
         attributeSearchViewModel: AttributeSearchViewModel = hiltViewModel(),
         attributeNameSearchViewModel: AttributeNameSearchViewModel = hiltViewModel(),
+        measurementUnitSearchViewModel: MeasurementUnitSearchViewModel = hiltViewModel(),
     ) {
         val detailState by viewModel.detailState.collectAsState()
         val brandSuggestions by brandSearchViewModel.searchAutoCompleteResults.collectAsState()
         val attributeSuggestions by attributeSearchViewModel.searchAutoCompleteResults.collectAsState()
         val attributeNameSuggestions by attributeNameSearchViewModel.searchAutoCompleteResults.collectAsState()
-        val measurementUnitSuggestions by viewModel.measurementUnitSuggestions.collectAsState()
+        val measurementUnitSuggestions by measurementUnitSearchViewModel.searchAutoCompleteResults.collectAsState()
         val saveState by viewModel.saveState.collectAsState(State.Success(null))
         LaunchedEffect(id) {
             viewModel.get(id)
@@ -65,6 +62,7 @@ internal object ShoppingListItemDetailScreen {
             brandSuggestions = brandSuggestions,
             attributeSuggestions = attributeSuggestions,
             attributeNameSuggestions = attributeNameSuggestions,
+            measurementUnitSuggestions = measurementUnitSuggestions,
             onBrandQueryChange = {
                 val query = Query(
                     value = it,
@@ -80,8 +78,7 @@ internal object ShoppingListItemDetailScreen {
                 attributeSearchViewModel.autoCompleteSearch(query)
             },
             onAttributeNameQueryChange = attributeNameSearchViewModel::autoCompleteSearch,
-            measurementUnitSuggestions = measurementUnitSuggestions,
-            onMeasurementUnitQueryChange = viewModel::setMeasurementUnitQuery,
+            onMeasurementUnitQueryChange = measurementUnitSearchViewModel::autoCompleteSearch,
         )
     }
 
@@ -96,7 +93,7 @@ internal object ShoppingListItemDetailScreen {
         brandSuggestions: List<AbstractBrand>,
         attributeSuggestions: List<AbstractAttribute>,
         attributeNameSuggestions: List<String>,
-        measurementUnitSuggestions: List<MeasureUnit>,
+        measurementUnitSuggestions: List<String>,
         onBrandQueryChange: (String) -> Unit = {},
         onAttributeNameQueryChange: (String) -> Unit = {},
         onAttributeValueQueryChange: (String, String) -> Unit = { _, _ -> },
@@ -253,29 +250,8 @@ internal object ShoppingListItemDetailScreen {
                     suggestions = measurementUnitSuggestions,
                     config = unit,
                     helpText = helpText,
-                    onSuggestionSelected = {
-                        val text = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            it.subtype
-                        } else {
-                            it.toString()
-                        }
-                        unit.onValueChange(TextFieldValue(text, selection = TextRange(text.length)))
-                    },
                     onQueryChange = onMeasurementUnitQueryChange,
-                ) {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-                        Text(it.toString())
-                    } else {
-                        ListItem(
-                            headlineText = {
-                                Text(it.type)
-                            },
-                            supportingText = {
-                                Text(it.subtype)
-                            },
-                        )
-                    }
-                }
+                )
 
                 TextField(
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),

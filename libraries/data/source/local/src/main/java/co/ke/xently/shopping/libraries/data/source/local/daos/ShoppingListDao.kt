@@ -53,6 +53,9 @@ interface ShoppingListDao {
     @Query("SELECT DISTINCT(name) FROM shoppinglist_attributes WHERE LOWER(name) LIKE LOWER(:query)")
     fun getUniqueAttributeNames(query: String): Flow<List<String>>
 
+    @Query("SELECT DISTINCT(unit) FROM shoppinglist WHERE LOWER(unit) LIKE LOWER(:query)")
+    fun getUniqueMeasurementUnits(query: String): Flow<List<String>>
+
     @Query("SELECT dateAdded AS `group`, COUNT(dateAdded) AS numberOfItems FROM shoppinglist GROUP BY dateAdded")
     fun getCountGroupedByDateAdded(): Flow<List<GroupedShoppingListCount>>
 

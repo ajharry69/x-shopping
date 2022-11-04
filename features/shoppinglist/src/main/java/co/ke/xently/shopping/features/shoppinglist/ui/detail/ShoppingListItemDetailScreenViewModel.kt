@@ -1,23 +1,18 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.detail
 
-import android.icu.util.MeasureUnit
-import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.IShoppingListRepository
 import co.ke.xently.shopping.features.utils.State
-import co.ke.xently.shopping.libraries.common.Dispatcher
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class ShoppingListItemDetailScreenViewModel @Inject constructor(
-    private val dispatcher: Dispatcher,
     private val repository: IShoppingListRepository,
 ) : ViewModel() {
     companion object {
@@ -80,38 +75,4 @@ internal class ShoppingListItemDetailScreenViewModel @Inject constructor(
     }.onStart {
         emit(State.Loading)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), State.Success(null))
-
-    private val measurementUnitQuery = MutableSharedFlow<String>()
-    private val _measurementUnitSuggestions = MutableStateFlow(emptyList<MeasureUnit>())
-    val measurementUnitSuggestions = _measurementUnitSuggestions.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            measurementUnitQuery.collectLatest { query ->
-                flow {
-                    val units = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        MeasureUnit.getAvailable().flatMap {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                it.splitToSingleUnits()
-                            } else {
-                                listOf(it)
-                            }
-                        }.filter {
-                            it.toString().contains(query, ignoreCase = true)
-                        }
-                    } else {
-                        emptyList()
-                    }
-                    emit(units)
-                }.flowOn(dispatcher.computation).collectLatest(_measurementUnitSuggestions::emit)
-            }
-        }
-    }
-
-    fun setMeasurementUnitQuery(query: String) {
-        viewModelScope.launch {
-            delay(500)
-            measurementUnitQuery.emit(query)
-        }
-    }
 }
