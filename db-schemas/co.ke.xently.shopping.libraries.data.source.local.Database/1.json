@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0825c48408ed7457d205a43a2927e8a7",
+    "identityHash": "e1da492f4fb002b0ebd12ea341344837",
     "entities": [
       {
         "tableName": "remote_keys",
@@ -128,6 +128,60 @@
             ],
             "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_users_email` ON `${TABLE_NAME}` (`email`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "shops",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shops_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `taxPin` TEXT NOT NULL, `shops_latitude` REAL NOT NULL, `shops_longitude` REAL NOT NULL, PRIMARY KEY(`shops_id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "shops_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "taxPin",
+            "columnName": "taxPin",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coordinates.latitude",
+            "columnName": "shops_latitude",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coordinates.longitude",
+            "columnName": "shops_longitude",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "shops_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_shops_taxPin",
+            "unique": true,
+            "columnNames": [
+              "taxPin"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_shops_taxPin` ON `${TABLE_NAME}` (`taxPin`)"
           }
         ],
         "foreignKeys": []
@@ -317,7 +371,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0825c48408ed7457d205a43a2927e8a7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e1da492f4fb002b0ebd12ea341344837')"
     ]
   }
 }

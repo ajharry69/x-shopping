@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_shops_detail_toolbar_title">%1$s shop</string>
+    <string name="feature_shops_detail_input_field_label_name">Name*</string>
+    <string name="feature_shops_detail_input_field_label_tax_pin">Tax PIN*</string>
+    <string name="feature_shops_detail_success_adding_item">Successfully added shop</string>
+    <string name="feature_shops_add">Add</string>
+    <string name="feature_shops_update">Update</string>
+</resources>
