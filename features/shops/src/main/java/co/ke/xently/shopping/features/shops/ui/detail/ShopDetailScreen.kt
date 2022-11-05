@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.shop.R
 import co.ke.xently.shopping.features.shops.repositories.exceptions.ShopHttpException
-import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
@@ -56,77 +55,37 @@ internal object ShopDetailScreen {
         state: State<Shop>,
         saveState: State<String>,
     ) {
-        val shop by remember(state) {
-            derivedStateOf {
-                (state as? State.Success)?.data
-            }
-        }
-        val toolbarTitle = stringRes(
-            R.string.feature_shops_detail_toolbar_title,
-            if (shop == null) {
-                R.string.feature_shops_add
-            } else {
-                R.string.feature_shops_update
-            },
-        )
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
-        val showProgressBar by remember(state, saveState) {
-            derivedStateOf {
-                state is State.Loading || saveState is State.Loading
-            }
-        }
 
-        val saveStateData by remember(saveState) {
-            derivedStateOf {
-                (saveState as? State.Success)?.data
-            }
-        }
-
-        val shouldResetFields by remember(saveStateData, shop) {
-            derivedStateOf {
-                saveStateData != null && shop == null
-            }
-        }
-
-        LaunchedEffect(saveState, shop) {
-            if (saveState is State.Success) {
-                if (saveState.data == null) {
-                    return@LaunchedEffect
-                }
-                if (shop == null) {
-                    config.shared.snackbarHostState.showSnackbar(
-                        duration = SnackbarDuration.Short,
-                        message = context.getString(R.string.feature_shops_detail_success_adding_item),
-                    )
-                } else {
-                    config.onUpdateSuccess.invoke()
-                }
-            } else if (saveState is State.Error) {
+        val detailScreen = DetailScreen(
+            state = state,
+            saveState = saveState,
+            snackbarHostState = config.shared.snackbarHostState,
+            onUpdateSuccess = config.onUpdateSuccess,
+            onAddSuccess = {
                 config.shared.snackbarHostState.showSnackbar(
-                    duration = SnackbarDuration.Long,
-                    message = saveState.getMessage(context),
+                    duration = SnackbarDuration.Short,
+                    message = context.getString(R.string.feature_shops_add_success),
                 )
-            }
-        }
+            },
+        )
+        val (shop, shouldResetFields, showProgressIndicator) = detailScreen
 
-        LaunchedEffect(state) {
-            if (state is State.Error) {
-                val message = state.getMessage(context)
-                config.shared.snackbarHostState.showSnackbar(
-                    message = message,
-                    duration = SnackbarDuration.Long,
-                )
-            }
-        }
+        val appBarTitle = detailScreen.title(R.string.feature_shops_detail_toolbar_title)
 
         Scaffold(
             topBar = {
-                ToolbarWithProgressbar(
-                    title = toolbarTitle,
-                    showProgress = showProgressBar,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                )
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = {
+                            Text(appBarTitle)
+                        },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -186,13 +145,10 @@ internal object ShopDetailScreen {
                     },
                 )
 
-                val requiredFields = arrayOf(
-                    name,
-                    taxPin,
-                )
-                val enableSubmitButton by remember(showProgressBar, *requiredFields) {
+                val requiredFields = arrayOf(name, taxPin)
+                val enableSubmitButton by remember(showProgressIndicator, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { !it.hasError } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressIndicator
                     }
                 }
                 Button(
@@ -208,7 +164,7 @@ internal object ShopDetailScreen {
                     },
                 ) {
                     Text(
-                        text = toolbarTitle.toUpperCase(Locale.current),
+                        text = appBarTitle.toUpperCase(Locale.current),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }

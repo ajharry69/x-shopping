@@ -17,6 +17,8 @@
 
     <!-- Error messages -->
     <string name="error_message_generic_empty_list">No %1$s added, yet!</string>
+    <string name="feature_update">Update</string>
+    <string name="feature_add">Add</string>
 
     <!-- Test tags -->
 </resources>
