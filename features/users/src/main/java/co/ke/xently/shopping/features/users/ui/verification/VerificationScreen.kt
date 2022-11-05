@@ -72,7 +72,7 @@ internal object VerificationScreen {
     ) {
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
-        val showProgressBar by remember(verificationState, resendVerificationCodeState) {
+        val showProgressIndicator by remember(verificationState, resendVerificationCodeState) {
             derivedStateOf {
                 verificationState is State.Loading
                         || resendVerificationCodeState is State.Loading
@@ -98,11 +98,14 @@ internal object VerificationScreen {
         }
         Scaffold(
             topBar = {
-                ToolbarWithProgressbar(
-                    title = stringResource(R.string.fusers_verify_account),
-                    showProgress = showProgressBar,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                )
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.fusers_verify_account)) },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -192,9 +195,9 @@ internal object VerificationScreen {
                     }
 
                     val requiredFields = arrayOf(verificationCode)
-                    val enableSubmitButton by remember(showProgressBar, *requiredFields) {
+                    val enableSubmitButton by remember(showProgressIndicator, *requiredFields) {
                         derivedStateOf {
-                            requiredFields.all { !it.hasError } && !showProgressBar
+                            requiredFields.all { !it.hasError } && !showProgressIndicator
                         }
                     }
                     Button(

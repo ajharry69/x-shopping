@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import co.ke.xently.shopping.features.ui.PagedDataScreen
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListViewModel.Request
@@ -25,8 +24,9 @@ import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedS
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
 import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.ConfirmableDelete
+import co.ke.xently.shopping.features.ui.PagedDataScreen
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
-import co.ke.xently.shopping.features.ui.ToolbarWithProgressbar
+import co.ke.xently.shopping.features.ui.TopAppBarWithProgressIndicator
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
@@ -93,6 +93,12 @@ object GroupedShoppingListScreen {
             successMessage = R.string.feature_shoppinglist_list_success_removing_item,
         )
 
+        val showProgressIndicator by remember(removeState) {
+            derivedStateOf {
+                removeState is State.Loading
+            }
+        }
+
         val listState = rememberLazyListState()
 
         Scaffold(
@@ -100,23 +106,28 @@ object GroupedShoppingListScreen {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
             },
             topBar = {
-                ToolbarWithProgressbar(
-                    title = stringResource(R.string.feature_shoppinglist_list_toolbar_title),
-                    showProgress = removeState is State.Loading,
-                    navigationIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = stringResource(R.string.feature_shoppinglist_content_description_open_drawer),
-                        )
-                    },
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                ) {
-                    IconButton(onClick = config.onSearchClick) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(R.string.feature_shoppinglist_search_hint),
-                        )
-                    }
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = {
+                            Text(stringResource(co.ke.xently.shopping.features.R.string.app_name))
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = config.shared.onNavigationIconClicked) {
+                                Icon(
+                                    imageVector = Icons.Default.Menu,
+                                    contentDescription = stringResource(R.string.feature_shoppinglist_content_description_open_drawer),
+                                )
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = config.onSearchClick) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = stringResource(R.string.feature_shoppinglist_search_hint),
+                                )
+                            }
+                        },
+                    )
                 }
             },
             floatingActionButton = {
