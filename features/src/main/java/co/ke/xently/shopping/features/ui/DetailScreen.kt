@@ -72,6 +72,7 @@ data class DetailScreen<T>(
                     }
                 } else if (saveState is State.Error) {
                     snackbarHostState.showSnackbar(
+                        withDismissAction = true,
                         duration = SnackbarDuration.Long,
                         message = saveState.getMessage(context),
                     )
@@ -83,6 +84,7 @@ data class DetailScreen<T>(
                     val message = state.getMessage(context)
                     snackbarHostState.showSnackbar(
                         message = message,
+                        withDismissAction = true,
                         duration = SnackbarDuration.Long,
                     )
                 }

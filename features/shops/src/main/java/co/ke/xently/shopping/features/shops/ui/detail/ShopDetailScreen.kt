@@ -2,24 +2,30 @@ package co.ke.xently.shopping.features.shops.ui.detail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.shop.R
 import co.ke.xently.shopping.features.shops.repositories.exceptions.ShopHttpException
+import co.ke.xently.shopping.features.shops.ui.MapViewWithLoadingIndicator
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
+import co.ke.xently.shopping.libraries.data.source.Coordinate
 import co.ke.xently.shopping.libraries.data.source.Shop
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberMarkerState
 
 internal object ShopDetailScreen {
     data class Config(
@@ -72,6 +78,10 @@ internal object ShopDetailScreen {
         )
         val (shop, shouldResetFields, showProgressIndicator) = detailScreen
 
+        var coordinates by remember(shop) {
+            mutableStateOf(shop?.coordinates)
+        }
+
         val appBarTitle = detailScreen.title(R.string.feature_shops_detail_toolbar_title)
 
         Scaffold(
@@ -98,6 +108,29 @@ internal object ShopDetailScreen {
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                MapViewWithLoadingIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(550.dp),
+                    onMapClick = {
+                        coordinates = Coordinate(it.latitude, it.longitude)
+                    },
+                ) {
+                    coordinates?.also {
+                        val markerState = rememberMarkerState(
+                            position = LatLng(it.lat, it.lon),
+                        )
+                        Marker(
+                            draggable = true,
+                            state = markerState,
+                            onClick = {
+                                coordinates = null
+                                true
+                            },
+                        )
+                    }
+                }
+
                 val name = TextFieldConfig(
                     labelId = R.string.feature_shops_detail_input_field_label_name,
                     valueInputs = shop?.name,
@@ -107,9 +140,7 @@ internal object ShopDetailScreen {
                     (it.error as? ShopHttpException)?.name?.joinToString("\n")
                 }
                 TextField(
-                    modifier = Modifier
-                        .fillMaxWidthHorizontalPadding()
-                        .padding(top = 16.dp),
+                    modifier = Modifier.fillMaxWidthHorizontalPadding(),
                     value = name.value,
                     isError = name.hasError,
                     onValueChange = name.onValueChange,
@@ -139,10 +170,14 @@ internal object ShopDetailScreen {
                     },
                     isError = taxPin.hasError,
                     onValueChange = taxPin.onValueChange,
-                    keyboardOptions = DefaultKeyboardOptions.copy(keyboardType = KeyboardType.Decimal),
                     supportingText = {
                         SupportingText(config = taxPin)
                     },
+                    keyboardOptions = DefaultKeyboardOptions.copy(
+                        imeAction = ImeAction.Done,
+                        capitalization = KeyboardCapitalization.Characters,
+                    ),
+                    keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 )
 
                 val requiredFields = arrayOf(name, taxPin)
@@ -160,7 +195,9 @@ internal object ShopDetailScreen {
                             ?: Shop.DEFAULT_INSTANCE).copy(
                             name = name.value.text.trim(),
                             taxPin = taxPin.value.text.trim(),
-                        ))
+                        ).run {
+                            coordinates?.let { copy(coordinates = it) } ?: this
+                        })
                     },
                 ) {
                     Text(

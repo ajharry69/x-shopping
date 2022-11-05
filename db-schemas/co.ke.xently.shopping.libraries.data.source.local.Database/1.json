@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e1da492f4fb002b0ebd12ea341344837",
+    "identityHash": "17540a67e59ab8e0858a1b4976b8c40a",
     "entities": [
       {
         "tableName": "remote_keys",
@@ -134,7 +134,7 @@
       },
       {
         "tableName": "shops",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shops_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `taxPin` TEXT NOT NULL, `shops_latitude` REAL NOT NULL, `shops_longitude` REAL NOT NULL, PRIMARY KEY(`shops_id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`shops_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `taxPin` TEXT NOT NULL, `shops_lat` REAL NOT NULL, `shops_lon` REAL NOT NULL, PRIMARY KEY(`shops_id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -155,14 +155,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "coordinates.latitude",
-            "columnName": "shops_latitude",
+            "fieldPath": "coordinates.lat",
+            "columnName": "shops_lat",
             "affinity": "REAL",
             "notNull": true
           },
           {
-            "fieldPath": "coordinates.longitude",
-            "columnName": "shops_longitude",
+            "fieldPath": "coordinates.lon",
+            "columnName": "shops_lon",
             "affinity": "REAL",
             "notNull": true
           }
@@ -371,7 +371,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e1da492f4fb002b0ebd12ea341344837')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '17540a67e59ab8e0858a1b4976b8c40a')"
     ]
   }
 }
