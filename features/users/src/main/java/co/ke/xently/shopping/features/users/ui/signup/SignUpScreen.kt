@@ -65,7 +65,7 @@ internal object SignUpScreen {
         }
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
-        val showProgressBar by remember(signUpState) {
+        val showProgressIndicator by remember(signUpState) {
             derivedStateOf {
                 signUpState is State.Loading
             }
@@ -82,11 +82,14 @@ internal object SignUpScreen {
         }
         Scaffold(
             topBar = {
-                ToolbarWithProgressbar(
-                    title = stringResource(R.string.fusers_sign_up),
-                    showProgress = showProgressBar,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                )
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.fusers_sign_up)) },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -228,9 +231,9 @@ internal object SignUpScreen {
                         }
                 }
                 val requiredFields = arrayOf(name, email, password)
-                val enableSubmitButton by remember(showProgressBar, *requiredFields) {
+                val enableSubmitButton by remember(showProgressIndicator, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { !it.hasError } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressIndicator
                     }
                 }
                 Button(

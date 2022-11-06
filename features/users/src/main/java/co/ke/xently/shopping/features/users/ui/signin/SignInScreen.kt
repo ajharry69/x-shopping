@@ -62,7 +62,7 @@ internal object SignInScreen {
     operator fun invoke(modifier: Modifier, signInState: State<User>, config: Config) {
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
-        val showProgressBar by remember(signInState) {
+        val showProgressIndicator by remember(signInState) {
             derivedStateOf {
                 signInState is State.Loading
             }
@@ -79,11 +79,14 @@ internal object SignInScreen {
         }
         Scaffold(
             topBar = {
-                ToolbarWithProgressbar(
-                    title = stringResource(R.string.fusers_sign_in),
-                    showProgress = showProgressBar,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                )
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.fusers_sign_in)) },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -173,9 +176,9 @@ internal object SignInScreen {
                         username,
                         password,
                     )
-                    val enableSubmitButton by remember(showProgressBar, *requiredFields) {
+                    val enableSubmitButton by remember(showProgressIndicator, *requiredFields) {
                         derivedStateOf {
-                            requiredFields.all { !it.hasError } && !showProgressBar
+                            requiredFields.all { !it.hasError } && !showProgressIndicator
                         }
                     }
                     Button(

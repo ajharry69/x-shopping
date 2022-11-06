@@ -18,7 +18,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
 import co.ke.xently.shopping.features.shoppinglist.ui.shared.*
-import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Query
 import co.ke.xently.shopping.features.utils.Shared
@@ -99,77 +98,37 @@ internal object ShoppingListItemDetailScreen {
         onAttributeValueQueryChange: (String, String) -> Unit = { _, _ -> },
         onMeasurementUnitQueryChange: (String) -> Unit = {},
     ) {
-        val shoppingListItem by remember(detailState) {
-            derivedStateOf {
-                (detailState as? State.Success)?.data
-            }
-        }
-        val toolbarTitle = stringRes(
-            R.string.feature_shoppinglist_detail_toolbar_title,
-            if (shoppingListItem == null) {
-                R.string.feature_shoppinglist_add
-            } else {
-                R.string.feature_shoppinglist_update
-            },
-        )
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
-        val showProgressBar by remember(detailState, saveState) {
-            derivedStateOf {
-                detailState is State.Loading || saveState is State.Loading
-            }
-        }
 
-        val saveStateData by remember(saveState) {
-            derivedStateOf {
-                (saveState as? State.Success)?.data
-            }
-        }
-
-        val shouldResetFields by remember(saveStateData, shoppingListItem) {
-            derivedStateOf {
-                saveStateData != null && shoppingListItem == null
-            }
-        }
-
-        LaunchedEffect(saveState, shoppingListItem) {
-            if (saveState is State.Success) {
-                if (saveState.data == null) {
-                    return@LaunchedEffect
-                }
-                if (shoppingListItem == null) {
-                    config.shared.snackbarHostState.showSnackbar(
-                        duration = SnackbarDuration.Short,
-                        message = context.getString(R.string.feature_shoppinglist_detail_success_adding_item),
-                    )
-                } else {
-                    config.onUpdateSuccess.invoke()
-                }
-            } else if (saveState is State.Error) {
+        val detailScreen = DetailScreen(
+            state = detailState,
+            saveState = saveState,
+            snackbarHostState = config.shared.snackbarHostState,
+            onUpdateSuccess = config.onUpdateSuccess,
+            onAddSuccess = {
                 config.shared.snackbarHostState.showSnackbar(
-                    duration = SnackbarDuration.Long,
-                    message = saveState.getMessage(context),
+                    duration = SnackbarDuration.Short,
+                    message = context.getString(R.string.feature_shoppinglist_add_success),
                 )
-            }
-        }
+            },
+        )
+        val (item, shouldResetFields, showProgressIndicator) = detailScreen
 
-        LaunchedEffect(detailState) {
-            if (detailState is State.Error) {
-                val message = detailState.getMessage(context)
-                config.shared.snackbarHostState.showSnackbar(
-                    message = message,
-                    duration = SnackbarDuration.Long,
-                )
-            }
-        }
+        val appBarTitle = detailScreen.title(R.string.feature_shoppinglist_detail_toolbar_title)
 
         Scaffold(
             topBar = {
-                ToolbarWithProgressbar(
-                    title = toolbarTitle,
-                    showProgress = showProgressBar,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                )
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = {
+                            Text(appBarTitle)
+                        },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -189,7 +148,7 @@ internal object ShoppingListItemDetailScreen {
 
                 val name = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_name,
-                    valueInputs = shoppingListItem?.name,
+                    valueInputs = item?.name,
                     state = saveState,
                     shouldResetField = shouldResetFields,
                 ) {
@@ -213,7 +172,7 @@ internal object ShoppingListItemDetailScreen {
 
                 val unit = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_measurement_unit,
-                    valueInputs = shoppingListItem?.unit,
+                    valueInputs = item?.unit,
                     state = saveState,
                     shouldResetField = shouldResetFields,
                 ) {
@@ -222,7 +181,7 @@ internal object ShoppingListItemDetailScreen {
 
                 val unitQuantity = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_measurement_unit_quantity,
-                    valueInputs = shoppingListItem?.unitQuantity,
+                    valueInputs = item?.unitQuantity,
                     state = saveState,
                     shouldResetField = shouldResetFields,
                     defaultValue = unGroupedNumberFormat::format,
@@ -269,7 +228,7 @@ internal object ShoppingListItemDetailScreen {
 
                 val purchaseQuantity = TextFieldConfig(
                     labelId = R.string.feature_shoppinglist_detail_input_field_label_purchase_quantity,
-                    valueInputs = shoppingListItem?.purchaseQuantity,
+                    valueInputs = item?.purchaseQuantity,
                     state = saveState,
                     shouldResetField = shouldResetFields,
                     defaultValue = {
@@ -296,7 +255,7 @@ internal object ShoppingListItemDetailScreen {
                 val (brandConfig, selectedBrands) = BrandsInput(
                     state = saveState,
                     shouldResetFields = shouldResetFields,
-                    default = shoppingListItem?.brands,
+                    default = item?.brands,
                     suggestions = brandSuggestions,
                     onQueryChange = onBrandQueryChange,
                     create = {
@@ -311,7 +270,7 @@ internal object ShoppingListItemDetailScreen {
                     snackbarState = config.shared.snackbarHostState,
                     state = saveState,
                     shouldResetFields = shouldResetFields,
-                    default = shoppingListItem?.attributes,
+                    default = item?.attributes,
                     suggestions = attributeSuggestions,
                     nameSuggestions = attributeNameSuggestions,
                     onAttributeNameQueryChange = onAttributeNameQueryChange,
@@ -333,9 +292,9 @@ internal object ShoppingListItemDetailScreen {
                     unitQuantity,
                     purchaseQuantity,
                 )
-                val enableSubmitButton by remember(showProgressBar, *requiredFields) {
+                val enableSubmitButton by remember(showProgressIndicator, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { !it.hasError } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressIndicator
                     }
                 }
                 Button(
@@ -343,7 +302,7 @@ internal object ShoppingListItemDetailScreen {
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
                     onClick = {
                         focusManager.clearFocus()
-                        config.onSubmitDetails.invoke((shoppingListItem
+                        config.onSubmitDetails.invoke((item
                             ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
                             brands = selectedBrands.map {
                                 if (it is ShoppingListItem.Brand) {
@@ -368,7 +327,7 @@ internal object ShoppingListItemDetailScreen {
                     },
                 ) {
                     Text(
-                        text = toolbarTitle.toUpperCase(Locale.current),
+                        text = appBarTitle.toUpperCase(Locale.current),
                         style = MaterialTheme.typography.labelLarge,
                     )
                 }

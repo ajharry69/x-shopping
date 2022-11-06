@@ -39,6 +39,12 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
+      - name: Add required properties
+        run: |
+          cat > local.properties <<EOF
+          MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}
+          EOF
+
       - name: Get tag version
         if: startsWith(github.ref, 'refs/tags/')
         id: tagVersion
@@ -47,7 +53,7 @@ jobs:
       - name: Update app version name
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          cat > local.properties <<EOF
+          cat >> local.properties <<EOF
           versionName=${{ steps.tagVersion.outputs.TAG }}
           EOF
 

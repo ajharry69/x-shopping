@@ -11,4 +11,5 @@
     <!-- this is a pre-text that'll be concatenated by other texts -->
     <string name="recommend">Recommend</string>
     <string name="update">Update</string>
+    <string name="dashboard_item_add_shop">Add shop</string>
 </resources>

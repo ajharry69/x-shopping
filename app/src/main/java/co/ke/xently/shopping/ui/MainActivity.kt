@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddBusiness
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,6 +20,7 @@ import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.features.utils.buildRoute
+import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.libraries.data.source.User
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import dagger.hilt.android.AndroidEntryPoint
@@ -92,11 +94,11 @@ class MainActivity : FragmentActivity() {
                         }
                     }
 
-                    val showProgressbar: Boolean by remember(signOutState) {
+                    /*val showProgressbar: Boolean by remember(signOutState) {
                         derivedStateOf {
                             signOutState is State.Loading
                         }
-                    }
+                    }*/
 
                     NavHost(
                         navController = navController,
@@ -129,6 +131,13 @@ class MainActivity : FragmentActivity() {
                             },
                         ),
                         items = listOf(
+                            DashboardScreen.Item(
+                                logo = Icons.Default.AddBusiness,
+                                title = stringResource(R.string.dashboard_item_add_shop),
+                                onClick = {
+                                    navController.navigate(Routes.Shop.DETAIL.buildRoute("id" to Shop.DEFAULT_INSTANCE.id))
+                                },
+                            ),
                             DashboardScreen.Item(
                                 logo = Icons.Default.Logout,
                                 onClick = viewModel::signOut,

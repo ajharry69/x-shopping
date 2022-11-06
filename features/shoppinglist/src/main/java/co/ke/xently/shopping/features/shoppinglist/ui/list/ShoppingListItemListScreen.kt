@@ -24,8 +24,9 @@ import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSea
 import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSearchScreen.Content
 import co.ke.xently.shopping.features.stringRes
 import co.ke.xently.shopping.features.ui.ConfirmableDelete
+import co.ke.xently.shopping.features.ui.MoveBackNavigationIconButton
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
-import co.ke.xently.shopping.features.ui.ToolbarWithProgressbar
+import co.ke.xently.shopping.features.ui.TopAppBarWithProgressIndicator
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
@@ -85,23 +86,44 @@ internal object ShoppingListItemListScreen {
 
         val listState = rememberLazyListState()
 
+        val showProgressIndicator by remember(removeState) {
+            derivedStateOf {
+                removeState is State.Loading
+            }
+        }
+
         Scaffold(
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
             },
             topBar = {
-                ToolbarWithProgressbar(
-                    title = stringResource(R.string.feature_shoppinglist_list_toolbar_title),
-                    subTitle = group?.group?.toString(),
-                    showProgress = removeState is State.Loading,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                ) {
-                    IconButton(onClick = config.onSearchClick) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = stringResource(R.string.feature_shoppinglist_search_hint),
-                        )
-                    }
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = {
+                            val title =
+                                stringResource(R.string.feature_shoppinglist_list_toolbar_title)
+                            val subTitle = group?.group?.toString()
+                            if (subTitle == null) {
+                                Text(title)
+                            } else {
+                                ListItem(
+                                    headlineText = { Text(title) },
+                                    supportingText = { Text(subTitle) },
+                                )
+                            }
+                        },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                        actions = {
+                            IconButton(onClick = config.onSearchClick) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = stringResource(R.string.feature_shoppinglist_search_hint),
+                                )
+                            }
+                        },
+                    )
                 }
             },
             floatingActionButton = {

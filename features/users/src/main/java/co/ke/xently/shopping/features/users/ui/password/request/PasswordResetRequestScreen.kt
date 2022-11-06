@@ -19,10 +19,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.ke.xently.shopping.features.ui.DefaultKeyboardOptions
-import co.ke.xently.shopping.features.ui.TextFieldConfig
-import co.ke.xently.shopping.features.ui.ToolbarWithProgressbar
-import co.ke.xently.shopping.features.ui.fillMaxWidthHorizontalPadding
+import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.repositories.exceptions.PasswordResetRequestHttpException
 import co.ke.xently.shopping.features.utils.Shared
@@ -63,7 +60,7 @@ internal object PasswordResetRequestScreen {
     ) {
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
-        val showProgressBar by remember(passwordResetRequestState) {
+        val showProgressIndicator by remember(passwordResetRequestState) {
             derivedStateOf {
                 passwordResetRequestState is State.Loading
             }
@@ -80,11 +77,14 @@ internal object PasswordResetRequestScreen {
         }
         Scaffold(
             topBar = {
-                ToolbarWithProgressbar(
-                    title = stringResource(R.string.fusers_request_password_reset),
-                    showProgress = showProgressBar,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                )
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.fusers_request_password_reset)) },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -124,9 +124,9 @@ internal object PasswordResetRequestScreen {
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 )
                 val requiredFields = arrayOf(emailAddress)
-                val enableSubmitButton by remember(showProgressBar, *requiredFields) {
+                val enableSubmitButton by remember(showProgressIndicator, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { !it.hasError } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressIndicator
                     }
                 }
                 Button(

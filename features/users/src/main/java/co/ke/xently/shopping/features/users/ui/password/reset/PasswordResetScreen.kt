@@ -63,7 +63,7 @@ internal object PasswordResetScreen {
     ) {
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
-        val showProgressBar by remember(passwordResetState) {
+        val showProgressIndicator by remember(passwordResetState) {
             derivedStateOf {
                 passwordResetState is State.Loading
             }
@@ -80,11 +80,14 @@ internal object PasswordResetScreen {
         }
         Scaffold(
             topBar = {
-                ToolbarWithProgressbar(
-                    title = stringResource(R.string.fusers_reset_password),
-                    showProgress = showProgressBar,
-                    onNavigationIconClicked = config.shared.onNavigationIconClicked,
-                )
+                TopAppBarWithProgressIndicator(showProgressIndicator = showProgressIndicator) {
+                    TopAppBar(
+                        title = { Text(stringResource(R.string.fusers_reset_password)) },
+                        navigationIcon = {
+                            MoveBackNavigationIconButton(config.shared)
+                        },
+                    )
+                }
             },
             snackbarHost = {
                 SnackbarHost(hostState = config.shared.snackbarHostState)
@@ -171,9 +174,9 @@ internal object PasswordResetScreen {
                     keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 )
                 val requiredFields = arrayOf(oldPassword, newPassword)
-                val enableSubmitButton by remember(showProgressBar, *requiredFields) {
+                val enableSubmitButton by remember(showProgressIndicator, *requiredFields) {
                     derivedStateOf {
-                        requiredFields.all { !it.hasError } && !showProgressBar
+                        requiredFields.all { !it.hasError } && !showProgressIndicator
                     }
                 }
                 Button(

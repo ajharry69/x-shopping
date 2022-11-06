@@ -11,6 +11,7 @@ import co.ke.xently.shopping.features.shoppinglist.shoppingListGraph
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListScreen
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
+import co.ke.xently.shopping.features.shops.shopGraph
 import co.ke.xently.shopping.features.users.authenticationGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
@@ -99,6 +100,7 @@ internal object NavHost {
                     )
                 }
             }
+            shopGraph(shared = shared)
             shoppingListGraph(navController = navController, shared = shared)
             authenticationGraph(navController = navController, shared = shared)
         }
