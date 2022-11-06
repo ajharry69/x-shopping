@@ -15,7 +15,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.ke.xently.shopping.features.shop.R
+import co.ke.xently.shopping.features.shops.R
 import co.ke.xently.shopping.features.shops.repositories.exceptions.ShopHttpException
 import co.ke.xently.shopping.features.shops.ui.MapViewWithLoadingIndicator
 import co.ke.xently.shopping.features.ui.*

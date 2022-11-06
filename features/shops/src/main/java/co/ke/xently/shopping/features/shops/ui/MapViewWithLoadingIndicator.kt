@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import co.ke.xently.shopping.features.shop.R
+import co.ke.xently.shopping.features.shops.R
 import co.ke.xently.shopping.features.shops.ui.Permissions.requestLocationPermission
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.CameraPosition
