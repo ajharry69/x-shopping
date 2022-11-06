@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shoppinglist.ui.shared
+package co.ke.xently.shopping.features.products.shared
 
 import co.ke.xently.shopping.features.search.SearchViewModel
 import co.ke.xently.shopping.features.search.repositories.ISearchRepository

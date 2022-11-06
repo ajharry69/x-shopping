@@ -7,12 +7,11 @@ plugins {
 
 dependencies {
     implementation project(path: ":features:search")
-    implementation project(path: ":features:products:shared")
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 }
 
 apply from: "$rootDir/features/config.common.gradle"
 apply from: "$rootDir/features/dependencies.features.gradle"
 android {
-    namespace 'co.ke.xently.shopping.features.shoppinglist'
+    namespace 'co.ke.xently.shopping.features.products.shared'
 }

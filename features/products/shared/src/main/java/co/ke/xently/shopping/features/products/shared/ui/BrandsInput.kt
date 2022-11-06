@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shoppinglist.ui.shared
+package co.ke.xently.shopping.features.products.shared.ui
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.products.shared.R
 import co.ke.xently.shopping.features.ui.AutoCompleteTextView
 import co.ke.xently.shopping.features.ui.TextFieldConfig
 import co.ke.xently.shopping.features.ui.fillMaxWidthHorizontalPadding
@@ -46,7 +46,7 @@ data class BrandsInput(
                 mutableStateOf<Pair<Int, AbstractBrand>?>(null)
             }
             val config = TextFieldConfig(
-                labelId = R.string.feature_shoppinglist_detail_input_field_label_brand,
+                labelId = R.string.feature_products_shared_detail_input_field_label_brand,
                 state = state,
                 valueInputs = brandBeingEdited?.second?.name,
                 shouldResetField = shouldResetFields,

@@ -15,9 +15,11 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import co.ke.xently.shopping.features.products.shared.*
+import co.ke.xently.shopping.features.products.shared.ui.AttributesInput
+import co.ke.xently.shopping.features.products.shared.ui.BrandsInput
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
-import co.ke.xently.shopping.features.shoppinglist.ui.shared.*
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Query
 import co.ke.xently.shopping.features.utils.Shared

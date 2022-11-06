@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shoppinglist.ui.shared
+package co.ke.xently.shopping.features.products.shared.ui
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.products.shared.R
 import co.ke.xently.shopping.features.ui.AutoCompleteTextView
 import co.ke.xently.shopping.features.ui.TextFieldConfig
 import co.ke.xently.shopping.features.ui.fillMaxWidthHorizontalPadding
@@ -51,14 +51,14 @@ data class AttributesInput(
                 mutableStateOf<Pair<Int, AbstractAttribute>?>(null)
             }
             val nameConfig = TextFieldConfig(
-                labelId = R.string.feature_shoppinglist_detail_input_field_label_attribute_name,
+                labelId = R.string.feature_products_shared_detail_input_field_label_attribute_name,
                 state = state,
                 valueInputs = attributeBeingEdited?.second?.name,
                 shouldResetField = shouldResetFields,
                 errorMessage = errorMessage,
             )
             val valueConfig = TextFieldConfig(
-                labelId = R.string.feature_shoppinglist_detail_input_field_label_attribute_value,
+                labelId = R.string.feature_products_shared_detail_input_field_label_attribute_value,
                 state = state,
                 valueInputs = attributeBeingEdited?.second?.value,
                 shouldResetField = shouldResetFields,
@@ -90,14 +90,14 @@ data class AttributesInput(
                 if (attributeName == null) {
                     scope.launch {
                         snackbarState.showSnackbar(
-                            context.getString(R.string.feature_shoppinglist_error_requires_attr_name),
+                            context.getString(R.string.feature_products_shared_error_requires_attr_name),
                             withDismissAction = true,
                         )
                     }
                 } else if (attributeValue == null) {
                     scope.launch {
                         snackbarState.showSnackbar(
-                            context.getString(R.string.feature_shoppinglist_error_requires_attr_value),
+                            context.getString(R.string.feature_products_shared_error_requires_attr_value),
                             withDismissAction = true,
                         )
                     }

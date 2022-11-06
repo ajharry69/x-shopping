@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shoppinglist.ui.shared.di.qualifiers
+package co.ke.xently.shopping.features.products.shared.di.qualifiers
 
 import javax.inject.Qualifier
 
