@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_products_detail_toolbar_title">%1$s product</string>
+    <string name="feature_products_detail_input_field_label_measurement_unit">Unit*</string>
+    <string name="feature_products_detail_input_field_label_name">Name*</string>
+    <string name="feature_products_detail_input_field_label_measurement_unit_quantity">Unit quantity</string>
+    <string name="feature_products_detail_input_field_label_unit_price">Unit price*</string>
+    <string name="feature_products_add_success">Successfully added product</string>
+    <string name="feature_products_detail_input_field_label_shop">Shop*</string>
+
+    <plurals name="feature_products_default_measurement_unit">
+        <item quantity="one">piece</item>
+        <item quantity="other">pieces</item>
+    </plurals>
+</resources>

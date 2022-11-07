@@ -6,6 +6,7 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBusiness
+import androidx.compose.material.icons.filled.AddTask
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,6 +21,7 @@ import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.features.utils.buildRoute
+import co.ke.xently.shopping.libraries.data.source.Product
 import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.libraries.data.source.User
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -136,6 +138,13 @@ class MainActivity : FragmentActivity() {
                                 title = stringResource(R.string.dashboard_item_add_shop),
                                 onClick = {
                                     navController.navigate(Routes.Shop.DETAIL.buildRoute("id" to Shop.DEFAULT_INSTANCE.id))
+                                },
+                            ),
+                            DashboardScreen.Item(
+                                logo = Icons.Default.AddTask,
+                                title = stringResource(R.string.dashboard_item_add_product),
+                                onClick = {
+                                    navController.navigate(Routes.Product.DETAIL.buildRoute("id" to Product.DEFAULT_INSTANCE.id))
                                 },
                             ),
                             DashboardScreen.Item(

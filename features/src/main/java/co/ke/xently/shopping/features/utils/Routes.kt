@@ -53,7 +53,16 @@ object Routes {
     object Shop {
         const val LIST = "shops/"
         const val SEARCH = "shops/search/"
-        const val DETAIL = "shops/{id}/"
+        const val DETAIL = "shops/{id}/?name={name}"
+        override fun toString(): String {
+            return javaClass.name
+        }
+    }
+
+    object Product {
+        const val LIST = "products/"
+        const val SEARCH = "products/search/"
+        const val DETAIL = "products/{id}/"
         override fun toString(): String {
             return javaClass.name
         }

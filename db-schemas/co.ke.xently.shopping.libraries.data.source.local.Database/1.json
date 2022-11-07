@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "17540a67e59ab8e0858a1b4976b8c40a",
+    "identityHash": "588648682a1c1aa1de508c279e0bde0e",
     "entities": [
       {
         "tableName": "remote_keys",
@@ -185,6 +185,215 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "products",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`products_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, `shopId` INTEGER NOT NULL, `unitQuantity` REAL NOT NULL, `purchaseQuantity` REAL NOT NULL, `dateAdded` INTEGER NOT NULL, PRIMARY KEY(`products_id`), FOREIGN KEY(`shopId`) REFERENCES `shops`(`shops_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "products_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unit",
+            "columnName": "unit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shopId",
+            "columnName": "shopId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "unitQuantity",
+            "columnName": "unitQuantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "purchaseQuantity",
+            "columnName": "purchaseQuantity",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dateAdded",
+            "columnName": "dateAdded",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "products_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_products_shopId",
+            "unique": false,
+            "columnNames": [
+              "shopId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_products_shopId` ON `${TABLE_NAME}` (`shopId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "shops",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "shopId"
+            ],
+            "referencedColumns": [
+              "shops_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "products_brands",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `productId` INTEGER NOT NULL, PRIMARY KEY(`name`, `productId`), FOREIGN KEY(`productId`) REFERENCES `products`(`products_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "productId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name",
+            "productId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_products_brands_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_products_brands_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_products_brands_productId",
+            "unique": false,
+            "columnNames": [
+              "productId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_products_brands_productId` ON `${TABLE_NAME}` (`productId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "products",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "productId"
+            ],
+            "referencedColumns": [
+              "products_id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "products_attributes",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `value` TEXT NOT NULL, `productId` INTEGER NOT NULL, PRIMARY KEY(`name`, `value`), FOREIGN KEY(`productId`) REFERENCES `products`(`products_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "productId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "name",
+            "value"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_products_attributes_name",
+            "unique": false,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_products_attributes_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_products_attributes_value",
+            "unique": false,
+            "columnNames": [
+              "value"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_products_attributes_value` ON `${TABLE_NAME}` (`value`)"
+          },
+          {
+            "name": "index_products_attributes_productId",
+            "unique": false,
+            "columnNames": [
+              "productId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_products_attributes_productId` ON `${TABLE_NAME}` (`productId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "products",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "productId"
+            ],
+            "referencedColumns": [
+              "products_id"
+            ]
+          }
+        ]
       },
       {
         "tableName": "shoppinglist",
@@ -371,7 +580,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '17540a67e59ab8e0858a1b4976b8c40a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '588648682a1c1aa1de508c279e0bde0e')"
     ]
   }
 }

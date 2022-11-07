@@ -25,12 +25,20 @@ fun NavGraphBuilder.shopGraph(shared: Shared) {
                     type = NavType.StringType
                     defaultValue = Shop.DEFAULT_INSTANCE.id.toString()
                 },
+                navArgument("name") {
+                    type = NavType.StringType
+                    defaultValue = null
+                    nullable = true
+                },
             ),
         ) {
             ShopDetailScreen(
                 id = it.arguments?.getString("id")?.toLongOrNull() ?: Shop.DEFAULT_INSTANCE.id,
                 modifier = Modifier.fillMaxSize(),
-                config = ShopDetailScreen.Config(shared = shared),
+                config = ShopDetailScreen.Config(
+                    shared = shared,
+                    name = it.arguments?.getString("name"),
+                ),
             )
         }
     }

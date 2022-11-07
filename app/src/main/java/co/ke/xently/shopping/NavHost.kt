@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import co.ke.xently.shopping.features.products.productGraph
 import co.ke.xently.shopping.features.shoppinglist.shoppingListGraph
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListScreen
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
@@ -16,6 +17,7 @@ import co.ke.xently.shopping.features.users.authenticationGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.buildRoute
+import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import co.ke.xently.shopping.ui.DashboardScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
@@ -101,6 +103,13 @@ internal object NavHost {
                 }
             }
             shopGraph(shared = shared)
+            productGraph(shared = shared) {
+                navController.navigate(Routes.Shop.DETAIL.buildRoute(
+                    "id" to Shop.DEFAULT_INSTANCE.id,
+                    "name" to it)) {
+                    launchSingleTop = true
+                }
+            }
             shoppingListGraph(navController = navController, shared = shared)
             authenticationGraph(navController = navController, shared = shared)
         }

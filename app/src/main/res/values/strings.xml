@@ -12,4 +12,5 @@
     <string name="recommend">Recommend</string>
     <string name="update">Update</string>
     <string name="dashboard_item_add_shop">Add shop</string>
+    <string name="dashboard_item_add_product">Add product</string>
 </resources>
