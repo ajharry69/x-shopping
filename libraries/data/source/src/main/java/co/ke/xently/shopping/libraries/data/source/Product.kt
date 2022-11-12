@@ -10,8 +10,9 @@ data class Product(
     val unit: String,
     val shop: Shop,
     val unitQuantity: Float,
+    val purchasedQuantity: Float,
     val unitPrice: Float,
-    val dateAdded: Date,
+    val datePurchased: Date,
     val brands: List<Brand>,
     val attributes: List<Attribute>,
 ) {
@@ -20,10 +21,11 @@ data class Product(
             id = id,
             name = name,
             unit = unit,
+            unitPrice = unitPrice,
             shopId = shop.id,
             unitQuantity = unitQuantity,
-            purchaseQuantity = unitPrice,
-            dateAdded = dateAdded,
+            purchasedQuantity = purchasedQuantity,
+            datePurchased = datePurchased,
         )
 
     val asResource
@@ -31,10 +33,11 @@ data class Product(
             id = id,
             name = name,
             unit = unit,
-            shopId = shop.id,
+            unitPrice = unitPrice,
+            shop = shop.id,
             unitQuantity = unitQuantity,
-            purchaseQuantity = unitPrice,
-            dateAdded = dateAdded,
+            purchasedQuantity = purchasedQuantity,
+            datePurchased = datePurchased,
             brands = emptyList(),
             attributes = emptyList(),
         ).copy(
@@ -72,7 +75,8 @@ data class Product(
             attributes = emptyList(),
             unitQuantity = 1f,
             unitPrice = 0f,
-            dateAdded = Date(),
+            datePurchased = Date(),
+            purchasedQuantity = 0f,
         )
     }
 }

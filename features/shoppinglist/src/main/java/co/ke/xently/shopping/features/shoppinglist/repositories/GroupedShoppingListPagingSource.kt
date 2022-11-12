@@ -17,7 +17,6 @@ internal class GroupedShoppingListPagingSource(
     override fun getRefreshKey(state: PagingState<Int, GroupedShoppingList>): Int? = null
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, GroupedShoppingList> {
-        params.key
         return try {
             // Start refresh at page 1 if undefined.
             val nextPageNumber = params.key ?: 1

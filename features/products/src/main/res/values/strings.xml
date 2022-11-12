@@ -7,6 +7,9 @@
     <string name="feature_products_detail_input_field_label_unit_price">Unit price*</string>
     <string name="feature_products_add_success">Successfully added product</string>
     <string name="feature_products_detail_input_field_label_shop">Shop*</string>
+    <string name="feature_products_detail_input_field_label_purchased_quantity">Purchased quantity</string>
+    <string name="feature_products_detail_input_field_label_date_of_purchase">Date of purchase</string>
+    <string name="feature_products_content_desc_pick_date_of_purchase">Pick date of purchase</string>
 
     <plurals name="feature_products_default_measurement_unit">
         <item quantity="one">piece</item>

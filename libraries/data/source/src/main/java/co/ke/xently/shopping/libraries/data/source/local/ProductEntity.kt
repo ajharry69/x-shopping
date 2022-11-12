@@ -27,10 +27,11 @@ data class ProductEntity(
     val id: Long,
     val name: String,
     val unit: String,
+    val unitPrice: Float,
     val shopId: Long,
     val unitQuantity: Float,
-    val purchaseQuantity: Float,
-    val dateAdded: Date,
+    val purchasedQuantity: Float,
+    val datePurchased: Date,
 ) {
     data class WithRelated(
         @Embedded
@@ -106,9 +107,10 @@ data class ProductEntity(
             unit = unit,
             shop = Shop.DEFAULT_INSTANCE,
             unitQuantity = unitQuantity,
-            unitPrice = purchaseQuantity,
-            dateAdded = dateAdded,
+            unitPrice = unitPrice,
             brands = emptyList(),
             attributes = emptyList(),
+            purchasedQuantity = purchasedQuantity,
+            datePurchased = datePurchased,
         )
 }

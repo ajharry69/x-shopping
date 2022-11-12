@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "588648682a1c1aa1de508c279e0bde0e",
+    "identityHash": "65a76ee9a5c4a9cc30b59e496cff7486",
     "entities": [
       {
         "tableName": "remote_keys",
@@ -188,7 +188,7 @@
       },
       {
         "tableName": "products",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`products_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, `shopId` INTEGER NOT NULL, `unitQuantity` REAL NOT NULL, `purchaseQuantity` REAL NOT NULL, `dateAdded` INTEGER NOT NULL, PRIMARY KEY(`products_id`), FOREIGN KEY(`shopId`) REFERENCES `shops`(`shops_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`products_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `unit` TEXT NOT NULL, `unitPrice` REAL NOT NULL, `shopId` INTEGER NOT NULL, `unitQuantity` REAL NOT NULL, `purchasedQuantity` REAL NOT NULL, `datePurchased` INTEGER NOT NULL, PRIMARY KEY(`products_id`), FOREIGN KEY(`shopId`) REFERENCES `shops`(`shops_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -209,6 +209,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "unitPrice",
+            "columnName": "unitPrice",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
             "fieldPath": "shopId",
             "columnName": "shopId",
             "affinity": "INTEGER",
@@ -221,14 +227,14 @@
             "notNull": true
           },
           {
-            "fieldPath": "purchaseQuantity",
-            "columnName": "purchaseQuantity",
+            "fieldPath": "purchasedQuantity",
+            "columnName": "purchasedQuantity",
             "affinity": "REAL",
             "notNull": true
           },
           {
-            "fieldPath": "dateAdded",
-            "columnName": "dateAdded",
+            "fieldPath": "datePurchased",
+            "columnName": "datePurchased",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -580,7 +586,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '588648682a1c1aa1de508c279e0bde0e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '65a76ee9a5c4a9cc30b59e496cff7486')"
     ]
   }
 }

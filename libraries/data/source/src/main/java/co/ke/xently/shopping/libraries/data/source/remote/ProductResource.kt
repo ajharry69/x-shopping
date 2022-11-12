@@ -9,10 +9,11 @@ data class ProductResource(
     val id: Long,
     val name: String,
     val unit: String,
+    val unitPrice: Float,
     val unitQuantity: Float,
-    val purchaseQuantity: Float,
-    val dateAdded: Date,
-    val shopId: Long,
+    val purchasedQuantity: Float,
+    val shop: Long,
+    val datePurchased: Date,
     val brands: List<Brand>,
     val attributes: List<Attribute>,
 ) {
@@ -21,10 +22,11 @@ data class ProductResource(
             id = id,
             name = name,
             unit = unit,
-            shopId = shopId,
+            unitPrice = unitPrice,
+            shopId = shop,
             unitQuantity = unitQuantity,
-            purchaseQuantity = purchaseQuantity,
-            dateAdded = dateAdded,
+            purchasedQuantity = purchasedQuantity,
+            datePurchased = datePurchased,
         )
 
     data class Attribute(

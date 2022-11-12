@@ -29,11 +29,11 @@ interface ProductDao {
     fun get(): PagingSource<Int, ProductEntity.WithRelated>
 
     @Transaction
-    @Query("SELECT * FROM products WHERE dateAdded = :group ORDER BY name")
+    @Query("SELECT * FROM products WHERE datePurchased = :group ORDER BY name")
     fun get(group: Date): PagingSource<Int, ProductEntity.WithRelated>
 
     @Transaction
-    @Query("SELECT * FROM products WHERE dateAdded = :group ORDER BY name")
+    @Query("SELECT * FROM products WHERE datePurchased = :group ORDER BY name")
     fun getList(group: Date): Flow<List<ProductEntity.WithRelated>>
 
     @Transaction

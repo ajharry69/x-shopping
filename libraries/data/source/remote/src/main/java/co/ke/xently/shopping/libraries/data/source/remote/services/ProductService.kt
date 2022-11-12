@@ -37,11 +37,17 @@ interface ProductService {
         queries: Map<String, String> = emptyMap(),
     ): Response<PagedData<ProductResource>>
 
-    @GET("products/grouped/")
+    @GET("search/products/")
     suspend fun get(
-        @Query("by") groupBy: String,
+        @Query("query")
+        query: String,
+        @Query("page")
+        page: Int = 1,
+        @Query("size")
+        size: Int? = null,
         @Header("Cache-Control")
         cacheControl: String = "only-if-cached",
-        @Query("page") page: Int = 1,
-    ): Response<Map<String, List<ProductResource>>>
+        @QueryMap
+        queries: Map<String, String> = emptyMap(),
+    ): Response<PagedData<ProductResource>>
 }
