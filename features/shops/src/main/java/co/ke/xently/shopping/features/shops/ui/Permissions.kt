@@ -8,7 +8,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
-import co.ke.xently.shopping.features.shop.R
+import co.ke.xently.shopping.features.shops.R
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 

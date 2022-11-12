@@ -1,0 +1,19 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id "dagger.hilt.android.plugin"
+    id "kotlin-kapt"
+}
+
+dependencies {
+    implementation project(path: ":features:search")
+    implementation project(path: ":features:shops:search")
+    implementation project(path: ":features:products:shared")
+    kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+}
+
+apply from: "$rootDir/features/config.common.gradle"
+apply from: "$rootDir/features/dependencies.features.gradle"
+android {
+    namespace 'co.ke.xently.shopping.features.products'
+}

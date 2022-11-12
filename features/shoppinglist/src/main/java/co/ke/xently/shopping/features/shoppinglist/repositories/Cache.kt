@@ -25,15 +25,6 @@ internal suspend fun List<ShoppingListItem>.saveLocally(
     scope.launch(dependencies.dispatcher.io) {
         dependencies.database.shoppingListDao.saveBrands(brands)
     }
-    /*scope.launch(dependencies.dispatcher.io) {
-        dependencies.database.brandDao.add(
-            withContext(dependencies.dispatcher.computation) {
-                brands.map {
-                    Product.Brand(name = it.name)
-                }
-            },
-        )
-    }*/
     val attributes = withContext(dependencies.dispatcher.computation) {
         flatMap { item ->
             item.attributes.flatMap { attr ->
@@ -52,15 +43,6 @@ internal suspend fun List<ShoppingListItem>.saveLocally(
     scope.launch(dependencies.dispatcher.io) {
         dependencies.database.shoppingListDao.saveAttributes(attributes)
     }
-    /*scope.launch(dependencies.dispatcher.io) {
-        dependencies.database.attributeDao.add(
-            withContext(dependencies.dispatcher.computation) {
-                attributes.map {
-                    Product.Attribute(name = it.name, value = it.value, values = it.values)
-                }
-            },
-        )
-    }*/
 }
 
 internal suspend fun ShoppingListItem.saveLocally(

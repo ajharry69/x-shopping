@@ -33,4 +33,18 @@ interface ShopService {
         @QueryMap
         queries: Map<String, String> = emptyMap(),
     ): Response<PagedData<Shop>>
+
+    @GET("search/shops/")
+    suspend fun get(
+        @Query("q")
+        query: String,
+        @Query("page")
+        page: Int = 1,
+        @Query("size")
+        size: Int? = null,
+        @Header("Cache-Control")
+        cacheControl: String = "only-if-cached",
+        @QueryMap
+        queries: Map<String, String> = emptyMap(),
+    ): Response<PagedData<Shop>>
 }

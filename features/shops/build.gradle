@@ -14,5 +14,5 @@ apply from: "$rootDir/features/config.common.gradle"
 apply from: "$rootDir/features/dependencies.maps.gradle"
 apply from: "$rootDir/features/dependencies.features.gradle"
 android {
-    namespace 'co.ke.xently.shopping.features.shop'
+    namespace 'co.ke.xently.shopping.features.shops'
 }

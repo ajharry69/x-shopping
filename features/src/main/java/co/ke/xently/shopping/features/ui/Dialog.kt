@@ -1,9 +1,7 @@
 package co.ke.xently.shopping.features.ui
 
 import androidx.annotation.StringRes
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener
@@ -18,6 +16,7 @@ fun rememberDatePickerDialog(
     bounds: CalendarConstraints? = null,
     onDateSelected: (Date) -> Unit = {},
 ): MaterialDatePicker<Long> {
+    val onDateSelectedRemembered by rememberUpdatedState(onDateSelected)
     val datePicker = remember {
         MaterialDatePicker.Builder.datePicker()
             .setSelection(
@@ -31,7 +30,7 @@ fun rememberDatePickerDialog(
 
     DisposableEffect(datePicker) {
         val listener = MaterialPickerOnPositiveButtonClickListener<Long> {
-            if (it != null) onDateSelected(Date(it))
+            if (it != null) onDateSelectedRemembered(Date(it))
         }
         datePicker.addOnPositiveButtonClickListener(listener)
         onDispose {

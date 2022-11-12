@@ -15,7 +15,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.ke.xently.shopping.features.shop.R
+import co.ke.xently.shopping.features.shops.R
 import co.ke.xently.shopping.features.shops.repositories.exceptions.ShopHttpException
 import co.ke.xently.shopping.features.shops.ui.MapViewWithLoadingIndicator
 import co.ke.xently.shopping.features.ui.*
@@ -29,6 +29,7 @@ import com.google.maps.android.compose.rememberMarkerState
 
 internal object ShopDetailScreen {
     data class Config(
+        val name: String? = null,
         val shared: Shared = Shared(),
         val onSubmitDetails: (Shop) -> Unit = {},
         val onUpdateSuccess: () -> Unit = shared.onNavigationIconClicked,
@@ -133,7 +134,7 @@ internal object ShopDetailScreen {
 
                 val name = TextFieldConfig(
                     labelId = R.string.feature_shops_detail_input_field_label_name,
-                    valueInputs = shop?.name,
+                    valueInputs = shop?.name ?: config.name,
                     state = saveState,
                     shouldResetField = shouldResetFields,
                 ) {

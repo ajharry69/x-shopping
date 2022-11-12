@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_products_shared_detail_input_field_label_brand">Brand</string>
+    <string name="feature_products_shared_detail_input_field_label_attribute_name">Attr name</string>
+    <string name="feature_products_shared_detail_input_field_label_attribute_value">Attr value</string>
+    <string name="feature_products_shared_error_requires_attr_name">Requires attribute name</string>
+    <string name="feature_products_shared_error_requires_attr_value">Requires attribute value</string>
+</resources>
