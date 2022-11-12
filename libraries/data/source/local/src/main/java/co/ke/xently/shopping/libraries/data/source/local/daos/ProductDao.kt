@@ -2,7 +2,7 @@ package co.ke.xently.shopping.libraries.data.source.local.daos
 
 import androidx.paging.PagingSource
 import androidx.room.*
-import co.ke.xently.shopping.libraries.data.source.local.ProductEntity
+import co.ke.xently.shopping.libraries.data.source.local.models.ProductEntity
 import kotlinx.coroutines.flow.Flow
 import java.util.*
 

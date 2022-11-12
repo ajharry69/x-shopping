@@ -1,8 +1,9 @@
 package co.ke.xently.shopping.features.products.repositories
 
 import co.ke.xently.shopping.features.Dependencies
-import co.ke.xently.shopping.libraries.data.source.local.ProductEntity
-import co.ke.xently.shopping.libraries.data.source.remote.ProductResource
+import co.ke.xently.shopping.features.products.models.mappers.asEntity
+import co.ke.xently.shopping.libraries.data.source.local.models.ProductEntity
+import co.ke.xently.shopping.libraries.data.source.remote.models.ProductResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

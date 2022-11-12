@@ -1,8 +1,10 @@
 package co.ke.xently.shopping.features.products.repositories
 
 import co.ke.xently.shopping.features.Dependencies
+import co.ke.xently.shopping.features.products.models.Product
+import co.ke.xently.shopping.features.products.models.mappers.asEntity
+import co.ke.xently.shopping.features.products.models.mappers.asUIInstance
 import co.ke.xently.shopping.features.products.repositories.exceptions.ProductHttpException
-import co.ke.xently.shopping.libraries.data.source.Product
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.retryCatch
 import co.ke.xently.shopping.libraries.data.source.remote.Http.sendRequest
 import co.ke.xently.shopping.libraries.data.source.utils.Retry

@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import co.ke.xently.shopping.libraries.data.source.local.daos.*
+import co.ke.xently.shopping.libraries.data.source.local.models.ProductEntity
 
 @Database(
     entities = [

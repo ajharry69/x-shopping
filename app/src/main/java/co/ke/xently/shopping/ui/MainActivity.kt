@@ -21,7 +21,7 @@ import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.features.utils.buildRoute
-import co.ke.xently.shopping.libraries.data.source.Product
+import co.ke.xently.shopping.features.products.models.Product
 import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.libraries.data.source.User
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController

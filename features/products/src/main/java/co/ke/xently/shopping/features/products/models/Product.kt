@@ -1,7 +1,10 @@
-package co.ke.xently.shopping.libraries.data.source
+package co.ke.xently.shopping.features.products.models
 
-import co.ke.xently.shopping.libraries.data.source.local.ProductEntity
-import co.ke.xently.shopping.libraries.data.source.remote.ProductResource
+import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
+import co.ke.xently.shopping.libraries.data.source.AbstractBrand
+import co.ke.xently.shopping.libraries.data.source.Shop
+import co.ke.xently.shopping.libraries.data.source.local.models.ProductEntity
+import co.ke.xently.shopping.libraries.data.source.remote.models.ProductResource
 import java.util.*
 
 data class Product(

@@ -1,10 +1,9 @@
-package co.ke.xently.shopping.libraries.data.source.local
+package co.ke.xently.shopping.libraries.data.source.local.models
 
 import androidx.room.*
 import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
 import co.ke.xently.shopping.libraries.data.source.AbstractBrand
-import co.ke.xently.shopping.libraries.data.source.Product
-import co.ke.xently.shopping.libraries.data.source.Shop
+import co.ke.xently.shopping.libraries.data.source.local.ShopEntity
 import java.util.*
 
 @Entity(
@@ -42,22 +41,7 @@ data class ProductEntity(
         val brands: List<Brand>,
         @Relation(parentColumn = "products_id", entityColumn = "productId")
         val attributes: List<Attribute>,
-    ) {
-        val asUIInstance
-            get() = entity.asUIInstance.copy(
-                shop = shop.asUIInstance,
-                brands = brands.map {
-                    Product.Brand(name = it.name)
-                },
-                attributes = attributes.map {
-                    Product.Attribute(
-                        name = it.name,
-                        value = it.value,
-                        values = emptyList(),
-                    )
-                },
-            )
-    }
+    )
 
     @Entity(
         tableName = "products_attributes",
@@ -99,18 +83,4 @@ data class ProductEntity(
         ],
     )
     data class Brand(override val name: String, val productId: Long) : AbstractBrand()
-
-    val asUIInstance
-        get() = Product(
-            id = id,
-            name = name,
-            unit = unit,
-            shop = Shop.DEFAULT_INSTANCE,
-            unitQuantity = unitQuantity,
-            unitPrice = unitPrice,
-            brands = emptyList(),
-            attributes = emptyList(),
-            purchasedQuantity = purchasedQuantity,
-            datePurchased = datePurchased,
-        )
 }

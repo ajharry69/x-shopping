@@ -39,7 +39,7 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
 import co.ke.xently.shopping.libraries.data.source.AbstractBrand
-import co.ke.xently.shopping.libraries.data.source.Product
+import co.ke.xently.shopping.features.products.models.Product
 import co.ke.xently.shopping.libraries.data.source.Shop
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward

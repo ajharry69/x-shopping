@@ -1,6 +1,6 @@
 package co.ke.xently.shopping.features.products.repositories
 
-import co.ke.xently.shopping.libraries.data.source.Product
+import co.ke.xently.shopping.features.products.models.Product
 import kotlinx.coroutines.flow.Flow
 
 interface IProductRepository {

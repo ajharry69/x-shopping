@@ -10,7 +10,7 @@ import co.ke.xently.shopping.features.products.ui.detail.ProductDetailScreen
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.buildRoute
-import co.ke.xently.shopping.libraries.data.source.Product
+import co.ke.xently.shopping.features.products.models.Product
 import com.google.accompanist.navigation.animation.composable
 
 fun NavGraphBuilder.productGraph(shared: Shared, onAddNewShopClicked: (String) -> Unit) {

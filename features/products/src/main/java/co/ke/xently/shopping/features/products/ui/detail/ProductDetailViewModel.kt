@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.ke.xently.shopping.features.products.repositories.IProductRepository
 import co.ke.xently.shopping.features.utils.State
-import co.ke.xently.shopping.libraries.data.source.Product
+import co.ke.xently.shopping.features.products.models.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch

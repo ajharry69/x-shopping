@@ -1,6 +1,6 @@
 package co.ke.xently.shopping.libraries.data.source.remote.services
 
-import co.ke.xently.shopping.libraries.data.source.remote.ProductResource
+import co.ke.xently.shopping.libraries.data.source.remote.models.ProductResource
 import co.ke.xently.shopping.libraries.data.source.remote.models.PagedData
 import retrofit2.Response
 import retrofit2.http.*
