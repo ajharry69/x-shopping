@@ -29,8 +29,8 @@ internal class ProductRepository @Inject constructor(
                 }
             })
         }.retryCatch(this).map { result ->
-            result.getOrNull()?.asEntity?.let {
-                dependencies.database.productDao.save(it)
+            result.getOrNull()?.let {
+                it.saveLocally(dependencies)
                 Result.success(dependencies.database.productDao.get(it.id).single()!!.asUIInstance)
             } ?: Result.failure(result.exceptionOrNull()!!)
         }.flowOn(dependencies.dispatcher.io)

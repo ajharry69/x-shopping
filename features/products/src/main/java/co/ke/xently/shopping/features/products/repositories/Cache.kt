@@ -1,29 +1,29 @@
-package co.ke.xently.shopping.features.shoppinglist.repositories
+package co.ke.xently.shopping.features.products.repositories
 
 import co.ke.xently.shopping.features.Dependencies
-import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
-import co.ke.xently.shopping.libraries.data.source.local.ShoppingListItemEntity
+import co.ke.xently.shopping.libraries.data.source.local.ProductEntity
+import co.ke.xently.shopping.libraries.data.source.remote.ProductResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal suspend fun List<ShoppingListItem>.saveLocally(
+internal suspend fun List<ProductResource>.saveLocally(
     dependencies: Dependencies,
     scope: CoroutineScope = CoroutineScope(dependencies.dispatcher.io),
 ) {
     scope.launch(dependencies.dispatcher.io) {
         val items = this@saveLocally.map { it.asEntity }
-        dependencies.database.shoppingListDao.save(items)
+        dependencies.database.productDao.save(items)
     }
     val brands = withContext(dependencies.dispatcher.computation) {
         flatMap { item ->
             item.brands.map {
-                ShoppingListItemEntity.Brand(name = it.name, shoppingListItemId = item.id)
+                ProductEntity.Brand(name = it.name, productId = item.id)
             }
         }
     }
     scope.launch(dependencies.dispatcher.io) {
-        dependencies.database.shoppingListDao.saveBrands(brands)
+        dependencies.database.productDao.saveBrands(brands)
     }
     val attributes = withContext(dependencies.dispatcher.computation) {
         flatMap { item ->
@@ -32,20 +32,20 @@ internal suspend fun List<ShoppingListItem>.saveLocally(
                     attr.copy(value = it)
                 }
             }.map {
-                ShoppingListItemEntity.Attribute(
+                ProductEntity.Attribute(
                     name = it.name,
                     value = it.value,
-                    shoppingListItemId = item.id,
+                    productId = item.id,
                 )
             }
         }
     }
     scope.launch(dependencies.dispatcher.io) {
-        dependencies.database.shoppingListDao.saveAttributes(attributes)
+        dependencies.database.productDao.saveAttributes(attributes)
     }
 }
 
-internal suspend fun ShoppingListItem.saveLocally(
+internal suspend fun ProductResource.saveLocally(
     dependencies: Dependencies,
     scope: CoroutineScope = CoroutineScope(dependencies.dispatcher.io),
 ) {
