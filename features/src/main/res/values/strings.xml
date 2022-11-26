@@ -19,6 +19,7 @@
     <string name="error_message_generic_empty_list">No %1$s added, yet!</string>
     <string name="feature_update">Update</string>
     <string name="feature_add">Add</string>
+    <string name="dropdown_menu_content_description">More options for \"%1$s\"</string>
 
     <!-- Test tags -->
 </resources>

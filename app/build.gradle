@@ -39,11 +39,12 @@ android {
 
 dependencies {
     implementation project(path: ":features")
+    implementation project(path: ":features:users")
     implementation project(path: ":features:shops")
     implementation project(path: ":features:products")
     implementation project(path: ":features:shoppinglist")
-    implementation project(path: ':features:users')
-    implementation project(path: ':libraries:data:source')
+    implementation project(path: ":libraries:data:source")
+    implementation project(path: ":features:recommendation")
 
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 }

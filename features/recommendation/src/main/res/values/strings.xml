@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="toolbar_title_request_recommendation">Recommendation request</string>
+    <string name="toolbar_title_recommendations">Recommendations</string>
+    <string name="recommendations_directions">Directions</string>
+    <string name="recommendations_details">Details</string>
+    <string name="saved_shopping_list_title">Saved shopping list</string>
+    <string name="delete_saved_shopping_list_description">Delete \"%1$s\" from saved shopping list</string>
+    <string name="unsaved_shopping_list_title">Unsaved shopping list</string>
+    <string name="delete_unsaved_shopping_list_description">Delete \"%1$s\" from unsaved shopping list</string>
+    <string name="button_label_get_recommendations">Get recommendations</string>
+    <string name="add_unsaved_item_description">Add unsaved item</string>
+    <string name="help_text_click_to_add_unsaved_item">Click on + icon to add item to unsaved shopping list</string>
+    <string name="field_label_item_name">Item name*</string>
+    <string name="restore_unsaved_shopping_list">Restore deleted unsaved shopping list items</string>
+    <string name="restore_saved_shopping_list">Restore deleted saved shopping list items</string>
+
+    <plurals name="recommendations_heading_hits">
+        <item quantity="one">Item found</item>
+        <item quantity="other">Items found</item>
+    </plurals>
+
+    <plurals name="recommendations_heading_misses">
+        <item quantity="one">Item not found</item>
+        <item quantity="other">Items not found</item>
+    </plurals>
+
+    <plurals name="recommendations_item_description">
+        <item quantity="one">Found %1$d of %2$d item at an estimated total expenditure of %3$s.</item>
+        <item quantity="other">Found %1$d of %2$d items at an estimated total expenditure of %3$s.</item>
+    </plurals>
+</resources>

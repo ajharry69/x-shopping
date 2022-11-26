@@ -76,4 +76,11 @@ object Routes {
             return javaClass.name
         }
     }
+    object Recommendation {
+        const val REQUEST = "shopping-list/recommendations/request/?itemId={itemId}&group={group}&groupBy={groupBy}"
+        const val RECOMMEND = "shopping-list/recommendations/?numberOfItems={numberOfItems}"
+        override fun toString(): String {
+            return javaClass.name
+        }
+    }
 }

@@ -59,5 +59,5 @@ interface ShoppingListService {
     ): Response<List<Recommendation>>
 
     @POST("shopping-list/recommendations/")
-    suspend fun getRecommendations(@Body request: RecommendationRequest): Response<DeferredRecommendation>*/
+    suspend fun getRecommendations(@Body request: RecommendationRequestResource): Response<DeferredRecommendation>*/
 }

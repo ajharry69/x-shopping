@@ -2,10 +2,12 @@ package co.ke.xently.shopping.features.utils
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
+import androidx.compose.runtime.Stable
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.getErrorMessage
 import timber.log.Timber
 import kotlin.reflect.KClass
 
+@Stable
 sealed class State<out T> {
     object Loading : State<Nothing>()
     data class Success<T>(val data: T?) : State<T>()

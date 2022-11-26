@@ -140,13 +140,13 @@ class TextFieldConfig<Value> private constructor(
         @Composable
         operator fun <T : Any> invoke(
             @StringRes labelId: Int,
-            state: State<*>,
+            state: State<*> = State.Success(null),
             valueInputs: T? = null,
             shouldResetField: Boolean = false,
             expectedNumberOfCharacters: Int? = null,
             defaultValue: (T) -> String? = { it.toString() },
             extraErrorChecks: ((TextFieldValue) -> Pair<Boolean, String>)? = null,
-            errorMessage: (State.Error) -> String?,
+            errorMessage: (State.Error) -> String? = {null},
         ) = invoke(
             label = stringResource(labelId),
             valueInputs = valueInputs,
