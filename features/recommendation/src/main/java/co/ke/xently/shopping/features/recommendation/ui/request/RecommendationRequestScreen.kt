@@ -50,8 +50,7 @@ internal object RecommendationRequestScreen {
         val unsavedShoppingList by viewModel.unsavedShoppingList.collectAsState()
         val hasSavedShoppingListItemInTheRecycleBin by viewModel.hasSavedShoppingListItemInTheRecycleBin.collectAsState()
         val hasUnsavedShoppingListItemInTheRecycleBin by viewModel.hasUnsavedShoppingListItemInTheRecycleBin.collectAsState()
-        val itemToBeAddedExistsInUnsavedShoppingList by viewModel.itemToBeAddedExistsInUnsavedShoppingList.collectAsState(
-            false)
+        val itemToBeAddedExistsInUnsavedShoppingList by viewModel.itemToBeAddedExistsInUnsavedShoppingList.collectAsState()
 
         CallOnLifecycleEvent {
             if (it == Lifecycle.Event.ON_DESTROY) {
@@ -185,8 +184,10 @@ internal object RecommendationRequestScreen {
                             keyboardActions = KeyboardActions(
                                 onDone = {
                                     focusManager.clearFocus()
-                                    config.addUnsavedItem(name.value.text.trim())
-                                    name.onValueChange(TextFieldValue())
+                                    if (!name.hasError) {
+                                        config.addUnsavedItem(name.value.text.trim())
+                                        name.onValueChange(TextFieldValue())
+                                    }
                                 },
                             ),
                         )

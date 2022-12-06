@@ -67,8 +67,13 @@ internal class RecommendationRepository @Inject constructor(
 
     override fun addUnsavedShoppingListItem(item: String) {
         // Restore the item if it was previously flagged as deleted.
-        if (item in removedUnsavedShoppingList.value) {
-            stateHandle[REMOVED_UNSAVED_SHOPPING_LIST_KEY] = removedUnsavedShoppingList.value - item
+        val itemInLowerCase = item.lowercase()
+        val itemToRestore = removedUnsavedShoppingList.value.firstOrNull {
+            it.lowercase() == itemInLowerCase
+        }
+        if (itemToRestore != null) {
+            stateHandle[REMOVED_UNSAVED_SHOPPING_LIST_KEY] =
+                removedUnsavedShoppingList.value - itemToRestore
         } else {
             stateHandle[UNSAVED_SHOPPING_LIST_KEY] =
                 (stateHandle.get<List<String>>(UNSAVED_SHOPPING_LIST_KEY) ?: emptyList()) + item

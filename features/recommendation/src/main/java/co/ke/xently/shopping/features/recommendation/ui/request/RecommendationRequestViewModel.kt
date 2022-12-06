@@ -28,9 +28,9 @@ internal open class RecommendationRequestViewModel @Inject constructor(
         repository.unsavedShoppingList.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     private val itemToBeAdded = MutableSharedFlow<String>()
-    private val _itemToBeAddedExistsInUnsavedShoppingList = MutableSharedFlow<Boolean>()
+    private val _itemToBeAddedExistsInUnsavedShoppingList = MutableStateFlow(false)
     val itemToBeAddedExistsInUnsavedShoppingList =
-        _itemToBeAddedExistsInUnsavedShoppingList.asSharedFlow()
+        _itemToBeAddedExistsInUnsavedShoppingList.asStateFlow()
 
     init {
         viewModelScope.launch {
