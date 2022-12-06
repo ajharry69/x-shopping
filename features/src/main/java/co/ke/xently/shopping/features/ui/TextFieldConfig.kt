@@ -34,7 +34,7 @@ class TextFieldConfig<Value> private constructor(
             generateDefaultValue: (String) -> Value,
             blankLookupValue: (Value) -> String,
             currentNumberOfCharacters: (Value) -> Int,
-            extraErrorChecks: ((Value) -> Pair<Boolean, String>)?,
+            extraErrorChecks: ((Value) -> String?)?,
         ): TextFieldConfig<Value> {
             val context = LocalContext.current
 
@@ -52,16 +52,15 @@ class TextFieldConfig<Value> private constructor(
                 mutableStateOf(state)
             }
 
-            val error = rememberSaveable(label, value, usableState) {
+            val updatedExtraErrorChecks by rememberUpdatedState(extraErrorChecks)
+
+            val error = rememberSaveable(label, value, usableState, updatedExtraErrorChecks) {
                 if (isFieldRequired && blankLookupValue(value).isBlank()) {
                     context.getString(R.string.feature_field_required, label.trimEnd { it == '*' })
                 } else {
-                    val check = extraErrorChecks?.invoke(value) ?: (false to "")
-                    if (check.first) {
-                        check.second
-                    } else {
-                        (usableState as? State.Error)?.let(errorMessage) ?: ""
-                    }
+                    updatedExtraErrorChecks?.invoke(value)?.ifBlank {
+                        (usableState as? State.Error)?.let(errorMessage)
+                    } ?: ""
                 }
             }
 
@@ -116,7 +115,7 @@ class TextFieldConfig<Value> private constructor(
             shouldResetField: Boolean = false,
             expectedNumberOfCharacters: Int? = null,
             defaultValue: (T) -> String? = { it.toString() },
-            extraErrorChecks: ((TextFieldValue) -> Pair<Boolean, String>)? = null,
+            extraErrorChecks: ((TextFieldValue) -> String?)? = null,
             errorMessage: (State.Error) -> String?,
         ) = invoke(
             label = label,
@@ -145,8 +144,8 @@ class TextFieldConfig<Value> private constructor(
             shouldResetField: Boolean = false,
             expectedNumberOfCharacters: Int? = null,
             defaultValue: (T) -> String? = { it.toString() },
-            extraErrorChecks: ((TextFieldValue) -> Pair<Boolean, String>)? = null,
-            errorMessage: (State.Error) -> String? = {null},
+            extraErrorChecks: ((TextFieldValue) -> String?)? = null,
+            errorMessage: (State.Error) -> String? = { null },
         ) = invoke(
             label = stringResource(labelId),
             valueInputs = valueInputs,
@@ -166,7 +165,7 @@ class TextFieldConfig<Value> private constructor(
             shouldResetField: Boolean = false,
             expectedNumberOfCharacters: Int? = null,
             defaultValue: (T) -> String? = { it.toString() },
-            extraErrorChecks: ((String) -> Pair<Boolean, String>)? = null,
+            extraErrorChecks: ((String) -> String?)? = null,
             errorMessage: (State.Error) -> String?,
         ) = invoke(
             state = state,
@@ -200,7 +199,7 @@ class TextFieldConfig<Value> private constructor(
             shouldResetField: Boolean = false,
             expectedNumberOfCharacters: Int? = null,
             defaultValue: (T) -> String? = { it.toString() },
-            extraErrorChecks: ((String) -> Pair<Boolean, String>)? = null,
+            extraErrorChecks: ((String) -> String?)? = null,
             errorMessage: (State.Error) -> String?,
         ) = forString(
             state = state,

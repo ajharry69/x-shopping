@@ -104,7 +104,9 @@ internal object SignInScreen {
                     valueInputs = null,
                     state = signInState,
                     extraErrorChecks = {
-                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                        if (!it.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
+                            context.getString(R.string.fusers_email_invalid)
+                        } else null
                     },
                 ) {
                     (it.error as? SignInHttpException)?.email?.joinToString("\n")

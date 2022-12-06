@@ -128,7 +128,9 @@ internal object SignUpScreen {
                     valueInputs = null,
                     state = signUpState,
                     extraErrorChecks = {
-                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                        if (!it.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
+                            context.getString(R.string.fusers_email_invalid)
+                        } else null
                     },
                 ) {
                     (it.error as? SignUpHttpException)?.email?.joinToString("\n")

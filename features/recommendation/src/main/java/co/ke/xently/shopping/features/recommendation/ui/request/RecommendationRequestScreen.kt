@@ -50,7 +50,8 @@ internal object RecommendationRequestScreen {
         val unsavedShoppingList by viewModel.unsavedShoppingList.collectAsState()
         val hasSavedShoppingListItemInTheRecycleBin by viewModel.hasSavedShoppingListItemInTheRecycleBin.collectAsState()
         val hasUnsavedShoppingListItemInTheRecycleBin by viewModel.hasUnsavedShoppingListItemInTheRecycleBin.collectAsState()
-        val itemToBeAddedExistsInUnsavedShoppingList by viewModel.itemToBeAddedExistsInUnsavedShoppingList.collectAsState(false)
+        val itemToBeAddedExistsInUnsavedShoppingList by viewModel.itemToBeAddedExistsInUnsavedShoppingList.collectAsState(
+            false)
 
         CallOnLifecycleEvent {
             if (it == Lifecycle.Event.ON_DESTROY) {
@@ -132,10 +133,12 @@ internal object RecommendationRequestScreen {
                         val name = TextFieldConfig<String>(
                             labelId = R.string.field_label_item_name,
                             extraErrorChecks = {
-                                itemToBeAddedExistsInUnsavedShoppingList to context.getString(
-                                    R.string.duplicate_unsaved_shopping_list_item,
-                                    it.text.trim(),
-                                )
+                                if (itemToBeAddedExistsInUnsavedShoppingList) {
+                                    context.getString(
+                                        R.string.duplicate_unsaved_shopping_list_item,
+                                        it.text.trim(),
+                                    )
+                                } else null
                             },
                         )
 
