@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DeleteForever
@@ -12,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -24,7 +26,6 @@ import co.ke.xently.shopping.features.recommendation.R
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
-import timber.log.Timber
 
 internal object RecommendationRequestScreen {
     data class Config(
@@ -33,6 +34,7 @@ internal object RecommendationRequestScreen {
         val addUnsavedItem: (String) -> Unit = {},
         val removeUnsavedItem: (String) -> Unit = {},
         val restoreRemovedSavedItems: () -> Unit = {},
+        val lookupItemToBeAdded: (String) -> Unit = {},
         val restoreRemovedUnsavedItems: () -> Unit = {},
         val removeSavedItem: (ShoppingListItem) -> Unit = {},
         val onUpdateSuccess: () -> Unit = shared.onNavigationIconClicked,
@@ -48,11 +50,7 @@ internal object RecommendationRequestScreen {
         val unsavedShoppingList by viewModel.unsavedShoppingList.collectAsState()
         val hasSavedShoppingListItemInTheRecycleBin by viewModel.hasSavedShoppingListItemInTheRecycleBin.collectAsState()
         val hasUnsavedShoppingListItemInTheRecycleBin by viewModel.hasUnsavedShoppingListItemInTheRecycleBin.collectAsState()
-        val recommendations by viewModel.recommendations.collectAsState()
-
-        LaunchedEffect(recommendations) {
-            Timber.i("Recommendations: $recommendations")  // TODO: Delete...
-        }
+        val itemToBeAddedExistsInUnsavedShoppingList by viewModel.itemToBeAddedExistsInUnsavedShoppingList.collectAsState(false)
 
         CallOnLifecycleEvent {
             if (it == Lifecycle.Event.ON_DESTROY) {
@@ -65,14 +63,15 @@ internal object RecommendationRequestScreen {
             savedShoppingList = savedShoppingList,
             unsavedShoppingList = unsavedShoppingList,
             hasSavedShoppingListItemInTheRecycleBin = hasSavedShoppingListItemInTheRecycleBin,
+            itemToBeAddedExistsInUnsavedShoppingList = itemToBeAddedExistsInUnsavedShoppingList,
             hasUnsavedShoppingListItemInTheRecycleBin = hasUnsavedShoppingListItemInTheRecycleBin,
             config = config.copy(
                 addUnsavedItem = viewModel::addUnsavedShoppingList,
                 removeSavedItem = viewModel::removeSavedShoppingList,
+                lookupItemToBeAdded = viewModel::lookupItemToBeAdded,
                 removeUnsavedItem = viewModel::removeUnsavedShoppingList,
                 restoreRemovedSavedItems = viewModel::restoreRemovedSavedItems,
                 restoreRemovedUnsavedItems = viewModel::restoreRemovedUnsavedItems,
-                onRecommendClick = viewModel::getRecommendation,  // TODO: Delete...
             ),
         )
     }
@@ -86,8 +85,10 @@ internal object RecommendationRequestScreen {
         unsavedShoppingList: List<String>,
         savedShoppingList: List<ShoppingListItem>,
         hasSavedShoppingListItemInTheRecycleBin: Boolean = false,
+        itemToBeAddedExistsInUnsavedShoppingList: Boolean = false,
         hasUnsavedShoppingListItemInTheRecycleBin: Boolean = false,
     ) {
+        val context = LocalContext.current
         val focusManager = LocalFocusManager.current
         val ungroupedNumberFormat = rememberNumberFormat {
             isGroupingUsed = true
@@ -128,7 +129,15 @@ internal object RecommendationRequestScreen {
                             .fillMaxWidthHorizontalPadding()
                             .padding(top = 8.dp),
                     ) {
-                        val name = TextFieldConfig<String>(labelId = R.string.field_label_item_name)
+                        val name = TextFieldConfig<String>(
+                            labelId = R.string.field_label_item_name,
+                            extraErrorChecks = {
+                                itemToBeAddedExistsInUnsavedShoppingList to context.getString(
+                                    R.string.duplicate_unsaved_shopping_list_item,
+                                    it.text.trim(),
+                                )
+                            },
+                        )
 
                         val requiredFields = arrayOf(name)
                         val enableSubmitButton by remember(*requiredFields) {
@@ -139,9 +148,13 @@ internal object RecommendationRequestScreen {
 
                         TextField(
                             modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
                             value = name.value,
                             isError = name.hasError,
-                            onValueChange = name.onValueChange,
+                            onValueChange = {
+                                name.onValueChange(it)
+                                config.lookupItemToBeAdded(it.text.trim())
+                            },
                             label = {
                                 Text(name.label)
                             },
@@ -165,7 +178,14 @@ internal object RecommendationRequestScreen {
                                         contentDescription = stringResource(R.string.add_unsaved_item_description),
                                     )
                                 }
-                            }
+                            },
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    focusManager.clearFocus()
+                                    config.addUnsavedItem(name.value.text.trim())
+                                    name.onValueChange(TextFieldValue())
+                                },
+                            ),
                         )
                         Button(
                             enabled = enableRecommendButton,

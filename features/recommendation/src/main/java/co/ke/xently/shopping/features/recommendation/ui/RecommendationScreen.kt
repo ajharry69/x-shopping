@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import co.ke.xently.shopping.features.models.MenuItem
 import co.ke.xently.shopping.features.recommendation.R
 import co.ke.xently.shopping.features.recommendation.models.Recommendation
@@ -23,10 +24,7 @@ import co.ke.xently.shopping.features.recommendation.ui.detail.RecommendationDet
 import co.ke.xently.shopping.features.recommendation.ui.shared.ModalBottomSheetLayout
 import co.ke.xently.shopping.features.recommendation.ui.shared.ModalBottomSheetValue
 import co.ke.xently.shopping.features.recommendation.ui.shared.rememberModalBottomSheetState
-import co.ke.xently.shopping.features.ui.FullscreenEmptyList
-import co.ke.xently.shopping.features.ui.FullscreenError
-import co.ke.xently.shopping.features.ui.FullscreenLoading
-import co.ke.xently.shopping.features.ui.TopAppBarWithProgressIndicator
+import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import kotlinx.coroutines.launch
@@ -72,6 +70,12 @@ internal object RecommendationScreen {
 
         LaunchedEffect(recommendations) {
             Timber.i("Recommendations: $recommendations")  // TODO: Delete...
+        }
+
+        CallOnLifecycleEvent {
+            if (it == Lifecycle.Event.ON_START) {
+                viewModel.getRecommendation()
+            }
         }
 
         invoke(
