@@ -15,6 +15,7 @@
     <string name="restore_unsaved_shopping_list">Restore deleted unsaved shopping list items</string>
     <string name="restore_saved_shopping_list">Restore deleted saved shopping list items</string>
     <string name="duplicate_unsaved_shopping_list_item">Item \"%1$s\" already exists</string>
+    <string name="request_location_permission">Request location permission</string>
 
     <plurals name="recommendations_heading_hits">
         <item quantity="one">Item found</item>

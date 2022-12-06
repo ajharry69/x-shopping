@@ -93,19 +93,6 @@ internal class RecommendationRepository @Inject constructor(
         stateHandle.remove<List<String>>(REMOVED_UNSAVED_SHOPPING_LIST_KEY)
     }
 
-    override fun get(lookupId: String) = Retry().run {
-        flow {
-            emit(sendRequest {
-                dependencies.service.recommendation.get(lookupId)
-            })
-        }.retryCatch(this).flowOn(dependencies.dispatcher.io)
-            .map { result ->
-                result.map { resources ->
-                    resources.map { it.asUi }
-                }
-            }
-    }
-
     override fun get() =
         combineTransform(savedShoppingList, unsavedShoppingList) { saved, unsaved ->
             val items = saved + unsaved
@@ -121,8 +108,8 @@ internal class RecommendationRepository @Inject constructor(
             })
         }.retryCatch(this@run).flowOn(dependencies.dispatcher.io)
             .map { result ->
-                result.map {
-                    it.asUi
+                result.map { resources ->
+                    resources.map { it.asUi }
                 }
             }
     }

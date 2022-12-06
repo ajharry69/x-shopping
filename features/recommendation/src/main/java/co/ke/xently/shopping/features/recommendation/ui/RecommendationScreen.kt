@@ -11,7 +11,10 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,8 +30,8 @@ import co.ke.xently.shopping.features.recommendation.ui.shared.rememberModalBott
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
+import co.ke.xently.shopping.libraries.data.source.remote.HttpException
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 internal object RecommendationScreen {
     data class Config(
@@ -68,10 +71,6 @@ internal object RecommendationScreen {
     ) {
         val recommendations by viewModel.recommendations.collectAsState()
 
-        LaunchedEffect(recommendations) {
-            Timber.i("Recommendations: $recommendations")  // TODO: Delete...
-        }
-
         CallOnLifecycleEvent {
             if (it == Lifecycle.Event.ON_START) {
                 viewModel.getRecommendation()
@@ -80,11 +79,9 @@ internal object RecommendationScreen {
 
         invoke(
             modifier = modifier,
+            state = recommendations,
             recommendation = viewModel.recommendation,
-            config = config.copy(
-                onDetailClick = viewModel::updateRecommendation,
-            ),
-            state = State.Success(data = listOf(Recommendation.DEFAULT)),
+            config = config.copy(onDetailClick = viewModel::updateRecommendation),
         )
     }
 
@@ -127,6 +124,13 @@ internal object RecommendationScreen {
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxWidth(),
+                                postErrorContent = { error ->
+                                    if (error is HttpException && error.errorCode == "my_location_required") {
+                                        Button(onClick = { /*TODO*/ }) {
+                                            Text(text = stringResource(R.string.request_location_permission))
+                                        }
+                                    }
+                                },
                             )
                         }
                     }

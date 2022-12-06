@@ -1,23 +1,9 @@
 package co.ke.xently.shopping.features.recommendation.models.mappers
 
-import co.ke.xently.shopping.features.recommendation.models.DeferredRecommendation
 import co.ke.xently.shopping.features.recommendation.models.Recommendation
 import co.ke.xently.shopping.features.recommendation.models.RecommendationRequest
-import co.ke.xently.shopping.libraries.data.source.remote.models.DeferredRecommendationResource
 import co.ke.xently.shopping.libraries.data.source.remote.models.RecommendationRequestResource
 import co.ke.xently.shopping.libraries.data.source.remote.models.RecommendationResource
-
-internal val DeferredRecommendation.asResource
-    get() = DeferredRecommendationResource(
-        id = id,
-        numberOfItems = numberOfItems,
-    )
-
-internal val DeferredRecommendationResource.asUi
-    get() = DeferredRecommendation(
-        id = id,
-        numberOfItems = numberOfItems,
-    )
 
 internal val RecommendationRequest.asResource
     get() = RecommendationRequestResource(

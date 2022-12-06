@@ -26,7 +26,8 @@ internal class RecommendationViewModel @Inject constructor(
         this.recommendation = recommendation
     }
 
-    private val _recommendations = MutableStateFlow<State<*>>(State.Success(null))
+    private val _recommendations =
+        MutableStateFlow<State<List<Recommendation>>>(State.Success(null))
     val recommendations = _recommendations.asStateFlow()
 
     private val getRecommendations = MutableSharedFlow<Boolean>()
