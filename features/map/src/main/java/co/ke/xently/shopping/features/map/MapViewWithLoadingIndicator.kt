@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shops.ui
+package co.ke.xently.shopping.features.map
 
 import android.annotation.SuppressLint
 import android.os.Looper
@@ -21,18 +21,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import co.ke.xently.shopping.features.shops.R
-import co.ke.xently.shopping.features.shops.ui.Permissions.requestLocationPermission
+import co.ke.xently.shopping.features.map.Permissions.requestLocationPermission
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.*
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 object MapViewWithLoadingIndicator {
+    @Stable
     data class MyUpdatedLocation(
         val myLocation: LatLng? = null,
         val isLocationPermissionGranted: Boolean,
@@ -51,6 +52,7 @@ object MapViewWithLoadingIndicator {
          * may receive updates less frequently than this interval when the app is no longer in the
          * foreground.
          */
+        @Stable
         data class Args(
             val myDefaultLocation: LatLng? = null,
             val maxBatchWaitTime: Duration = 2.minutes,
@@ -67,7 +69,7 @@ object MapViewWithLoadingIndicator {
      */
     @SuppressLint("MissingPermission")
     @Composable
-    fun rememberMyUpdatedLocation(args: MyUpdatedLocation.Args): MyUpdatedLocation {
+    fun rememberMyUpdatedLocation(args: MyUpdatedLocation.Args = MyUpdatedLocation.Args()): MyUpdatedLocation {
         val permissionState = requestLocationPermission(
             shouldRequestPermission = args.shouldRequestPermission,
             onLocationPermissionChanged = args.onLocationPermissionChanged,
@@ -123,16 +125,19 @@ object MapViewWithLoadingIndicator {
             return myUpdatedLocation
         }
 
-        val locationCallback = object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                super.onLocationResult(locationResult)
+        val locationCallback = remember {
+            object : LocationCallback() {
+                override fun onLocationResult(locationResult: LocationResult) {
+                    super.onLocationResult(locationResult)
 
-                val myLocation = locationResult.lastLocation?.run {
-                    LatLng(latitude, longitude).also {
-                        args.onMyUpdatedLocationChanged(it)
+                    val myLocation = locationResult.lastLocation?.run {
+                        Timber.i("Current location: $latitude, $longitude")
+                        LatLng(latitude, longitude).also {
+                            args.onMyUpdatedLocationChanged(it)
+                        }
                     }
+                    myUpdatedLocation = myUpdatedLocation.copy(myLocation = myLocation)
                 }
-                myUpdatedLocation = myUpdatedLocation.copy(myLocation = myLocation)
             }
         }
 
@@ -157,6 +162,7 @@ object MapViewWithLoadingIndicator {
                 Looper.getMainLooper(),
             )
             onDispose {
+                Timber.i("Removing location tracking...")
                 fusedLocationProviderClient.removeLocationUpdates(locationCallback)
             }
         }
@@ -260,9 +266,9 @@ object MapViewWithLoadingIndicator {
                         },
                     ) {
                         val (icon, description) = if (mapMaximized) {
-                            Icons.Default.FullscreenExit to stringResource(R.string.feature_shops_minimize_map)
+                            Icons.Default.FullscreenExit to stringResource(R.string.minimize_map)
                         } else {
-                            Icons.Default.Fullscreen to stringResource(R.string.feature_shops_maximize_map)
+                            Icons.Default.Fullscreen to stringResource(R.string.maximize_map)
                         }
                         Icon(
                             imageVector = icon,

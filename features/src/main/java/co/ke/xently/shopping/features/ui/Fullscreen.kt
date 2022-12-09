@@ -1,6 +1,5 @@
 package co.ke.xently.shopping.features.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
@@ -53,7 +52,6 @@ fun FullscreenError(
 
 const val PLACEHOLDER_COUNT_SMALL_ITEM_SIZE = 30
 const val PLACEHOLDER_COUNT_MEDIUM_ITEM_SIZE = 10
-const val PLACEHOLDER_COUNT_LARGE_ITEM_SIZE = 5
 
 const val TEST_TAG_CIRCULAR_PROGRESS_BAR = "TEST_TAG_CIRCULAR_PROGRESS_BAR"
 
@@ -89,25 +87,36 @@ fun <T> FullscreenLoading(
     }
 }
 
+val EMPTY_LIST_PREFIX = mutableMapOf<String, String>()
+
 @Composable
 inline fun <reified T : Any> FullscreenEmptyList(
     modifier: Modifier,
     error: String? = null,
+    preContent: @Composable ColumnScope.() -> Unit = {},
+    postContent: @Composable ColumnScope.() -> Unit = {},
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            textAlign = TextAlign.Center,
-            text = error ?: stringResource(
-                R.string.error_message_generic_empty_list,
-                T::class.java.simpleName.mapIndexed { i, c -> if (i != 0 && c.isUpperCase()) " $c" else "$c" }
-                    .joinToString("") { it }.lowercase()
-            ),
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            preContent()
+            Text(
+                textAlign = TextAlign.Center,
+                text = error ?: stringResource(
+                    R.string.error_message_generic_empty_list,
+                    EMPTY_LIST_PREFIX.getOrPut(T::class.java.simpleName) {
+                        T::class.java.simpleName.mapIndexed { i, c -> if (i != 0 && c.isUpperCase()) " $c" else "$c" }
+                            .joinToString("") { it }.lowercase()
+                    },
+                )
+            )
+            postContent()
+        }
     }
-}
-
-@Composable
-inline fun <reified T : Any> FullscreenEmptyList(modifier: Modifier, @StringRes error: Int) {
-    FullscreenEmptyList<T>(modifier = modifier, error = stringResource(error))
 }

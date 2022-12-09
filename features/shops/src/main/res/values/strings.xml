@@ -4,11 +4,4 @@
     <string name="feature_shops_detail_input_field_label_name">Name*</string>
     <string name="feature_shops_detail_input_field_label_tax_pin">Tax PIN*</string>
     <string name="feature_shops_add_success">Successfully added shop</string>
-    <string name="feature_shops_maximize_map">Maximize map</string>
-    <string name="feature_shops_minimize_map">Minimize map</string>
-
-
-    <string name="request_permission_button_label">REQUEST PERMISSION</string>
-    <string name="never_show_again_button_label">NEVER SHOW AGAIN</string>
-    <string name="location_permission_rationale">Location service is important for effective shop recommendation by this app. Please grant the permission.</string>
 </resources>

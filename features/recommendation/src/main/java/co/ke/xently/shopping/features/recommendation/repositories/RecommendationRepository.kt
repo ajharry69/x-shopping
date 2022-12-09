@@ -93,19 +93,17 @@ internal class RecommendationRepository @Inject constructor(
         stateHandle.remove<List<String>>(REMOVED_UNSAVED_SHOPPING_LIST_KEY)
     }
 
-    override fun get() =
-        combineTransform(savedShoppingList, unsavedShoppingList) { saved, unsaved ->
-            val items = saved + unsaved
-            if (items.isNotEmpty()) {
-                emitAll(get(RecommendationRequest(items = items)))
-            }
-        }
-
     override fun get(request: RecommendationRequest) = Retry().run {
-        flow {
-            emit(sendRequest {
-                dependencies.service.recommendation.get(request.asResource)
-            })
+        combineTransform(savedShoppingList, unsavedShoppingList) { saved, unsaved ->
+            val items = request.items.ifEmpty {
+                saved + unsaved
+            }
+            if (items.isNotEmpty()) {
+                emit(sendRequest {
+                    val resource = request.copy(items = items).asResource
+                    dependencies.service.recommendation.get(resource)
+                })
+            }
         }.retryCatch(this@run).flowOn(dependencies.dispatcher.io)
             .map { result ->
                 result.map { resources ->

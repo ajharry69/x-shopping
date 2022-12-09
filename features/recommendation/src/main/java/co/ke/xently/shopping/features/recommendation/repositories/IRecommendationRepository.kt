@@ -30,7 +30,5 @@ internal interface IRecommendationRepository {
 
     fun clearUnsavedShoppingList()
 
-    fun get(): Flow<Result<List<Recommendation>>>
-
     fun get(request: RecommendationRequest): Flow<Result<List<Recommendation>>>
 }

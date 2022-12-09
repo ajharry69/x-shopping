@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="maximize_map">Maximize map</string>
+    <string name="minimize_map">Minimize map</string>
+    <string name="request_permission_button_label">REQUEST PERMISSION</string>
+    <string name="never_show_again_button_label">NEVER SHOW AGAIN</string>
+    <string name="location_permission_rationale">Location service is important for effective shop recommendation by this app. Please grant the permission.</string>
+</resources>
