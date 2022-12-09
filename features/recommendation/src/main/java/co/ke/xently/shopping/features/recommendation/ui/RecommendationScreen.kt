@@ -182,6 +182,11 @@ internal object RecommendationScreen {
                 }
             }
         }
+        val onLocationPermissionGranted = {
+            usableState = State.Loading
+            shouldGetMyCurrentLocationThenFetchRecommendations = true
+            loadingMessage = context.getString(R.string.capturing_location)
+        }
 
         ModalBottomSheetLayout(
             sheetState = sheetState,
@@ -231,13 +236,7 @@ internal object RecommendationScreen {
                                 modifier = Modifier.fillMaxSize(),
                                 postErrorContent = { error ->
                                     if (error is HttpException && error.errorCode == "location_required") {
-                                        LocationRequired {
-                                            usableState = State.Loading
-                                            shouldGetMyCurrentLocationThenFetchRecommendations =
-                                                true
-                                            loadingMessage =
-                                                context.getString(R.string.capturing_location)
-                                        }
+                                        LocationRequired(onLocationPermissionGranted)
                                     }
                                 },
                             )
@@ -273,9 +272,8 @@ internal object RecommendationScreen {
                                 config = config,
                                 sheetState = sheetState,
                                 modifier = Modifier.fillMaxSize(),
-                            ) {
-                                shouldGetMyCurrentLocationThenFetchRecommendations = true
-                            }
+                                onRetryButtonClick = onLocationPermissionGranted,
+                            )
                         }
                     }
                 }
