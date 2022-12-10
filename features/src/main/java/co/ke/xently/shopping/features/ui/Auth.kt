@@ -25,6 +25,8 @@ import co.ke.xently.shopping.libraries.data.source.utils.RetryError
 fun ErrorButton(
     modifier: Modifier = Modifier,
     error: Throwable? = null,
+    defaultErrorButtonLabel: String = stringResource(R.string.retry).toUpperCase(Locale.current),
+    showDefaultErrorButton: Boolean = false,
     retryError: RetryError = RetryError(),
     onClick: ((Throwable?) -> Unit)? = null,
 ) {
@@ -33,7 +35,7 @@ fun ErrorButton(
         Button(modifier = modifier, onClick = { onClickRemembered?.invoke(null) }) {
             Text(
                 style = MaterialTheme.typography.labelLarge,
-                text = stringResource(R.string.retry).toUpperCase(Locale.current),
+                text = defaultErrorButtonLabel,
             )
         }
     } else {
@@ -56,6 +58,13 @@ fun ErrorButton(
                 Text(
                     style = MaterialTheme.typography.labelLarge,
                     text = stringResource(R.string.retry).toUpperCase(Locale.current),
+                )
+            }
+        } else if (showDefaultErrorButton) {
+            Button(modifier = modifier, onClick = { onClickRemembered?.invoke(null) }) {
+                Text(
+                    style = MaterialTheme.typography.labelLarge,
+                    text = defaultErrorButtonLabel,
                 )
             }
         }
