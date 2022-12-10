@@ -24,11 +24,9 @@ fun FullscreenError(
     modifier: Modifier,
     error: Throwable,
     retryError: RetryError = RetryError(),
-    click: ErrorButtonClick = ErrorButtonClick(),
-    preErrorContent: @Composable ColumnScope.(Throwable) -> Unit = {},
-    postErrorContent: @Composable ColumnScope.(Throwable) -> Unit = {
-        ErrorButton(it, retryError = retryError, click = click)
-    },
+    onErrorClick: ((Throwable?) -> Unit)? = null,
+    preMessageContent: @Composable ColumnScope.(Throwable) -> Unit = {},
+    postMessageContent: (@Composable ColumnScope.(Throwable) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
@@ -40,12 +38,20 @@ fun FullscreenError(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            preErrorContent(error)
+            preMessageContent(error)
             Text(
                 textAlign = TextAlign.Center,
                 text = error.getErrorMessage(context = context),
             )
-            postErrorContent(error)
+            if (postMessageContent == null) {
+                ErrorButton(
+                    error = error,
+                    retryError = retryError,
+                    onClick = onErrorClick,
+                )
+            } else {
+                postMessageContent(error)
+            }
         }
     }
 }

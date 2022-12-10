@@ -33,13 +33,11 @@ object PagedDataScreen {
         noinline placeholder: (() -> T)?,
         emptyListMessage: String? = null,
         retryError: RetryError = RetryError(),
-        click: ErrorButtonClick = ErrorButtonClick(retryAble = { items.retry() }),
+        noinline onErrorClick: ((Throwable?) -> Unit)? = null,
         numberOfPlaceholders: Int = PLACEHOLDER_COUNT_SMALL_ITEM_SIZE,
         noinline key: ((item: T) -> Any)? = null,
-        noinline preErrorContent: @Composable (ColumnScope.(Throwable) -> Unit) = {},
-        noinline postErrorContent: @Composable (ColumnScope.(Throwable) -> Unit) = {
-            ErrorButton(it, retryError = retryError, click = click)
-        },
+        noinline preMessageContent: @Composable (ColumnScope.(Throwable?) -> Unit) = {},
+        noinline postMessageContent: (@Composable (ColumnScope.(Throwable?) -> Unit))? = null,
         noinline itemContent: @Composable (LazyItemScope.(T) -> Unit),
     ) {
         val context = LocalContext.current
@@ -57,8 +55,10 @@ object PagedDataScreen {
                     FullscreenError(
                         modifier = modifier,
                         error = refresh.error,
-                        preErrorContent = preErrorContent,
-                        postErrorContent = postErrorContent,
+                        retryError = retryError,
+                        preMessageContent = preMessageContent,
+                        postMessageContent = postMessageContent,
+                        onErrorClick = onErrorClick ?: { items.retry() },
                     )
                 }
                 is LoadState.NotLoading -> {
