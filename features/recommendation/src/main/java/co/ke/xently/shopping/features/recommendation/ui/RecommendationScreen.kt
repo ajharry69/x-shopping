@@ -21,6 +21,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import co.ke.xently.shopping.features.map.MapViewWithLoadingIndicator
 import co.ke.xently.shopping.features.map.MapViewWithLoadingIndicator.rememberMyUpdatedLocation
 import co.ke.xently.shopping.features.map.Permissions
 import co.ke.xently.shopping.features.models.MenuItem
@@ -37,6 +38,9 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.Coordinate
 import co.ke.xently.shopping.libraries.data.source.remote.HttpException
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.rememberMarkerState
 import kotlinx.coroutines.launch
 
 internal object RecommendationScreen {
@@ -52,12 +56,26 @@ internal object RecommendationScreen {
     private fun SuccessView(
         config: Config,
         modifier: Modifier,
-        data: List<Recommendation>?,
+        recommendations: List<Recommendation>?,
         sheetState: ModalBottomSheetState,
         onRetryButtonClick: () -> Unit,
     ) {
         val scope = rememberCoroutineScope()
-        if (data.isNullOrEmpty()) {
+        val currencyFormat = rememberCurrencyFormat()
+        val onRecommendationClick: (Recommendation) -> Unit = { recommendation ->
+            scope.launch {
+                if (sheetState.isVisible) {
+                    sheetState.hide()
+                } else {
+                    config.onDetailClick(recommendation)
+                    sheetState.show()
+                }
+            }
+        }
+        val shopLocationCache = remember {
+            mutableStateMapOf<Long, LatLng>()
+        }
+        if (recommendations.isNullOrEmpty()) {
             FullscreenEmptyList<Unit>(
                 modifier = modifier,
                 error = stringResource(R.string.error_empty_recommendations),
@@ -69,21 +87,42 @@ internal object RecommendationScreen {
             )
         } else {
             LazyColumn {
-                items(data) { recommendation ->
-                    val onClick: (Recommendation) -> Unit = { r ->
-                        scope.launch {
-                            if (sheetState.isVisible) {
-                                sheetState.hide()
-                            } else {
-                                config.onDetailClick(r)
-                                sheetState.show()
-                            }
+                stickyHeader {
+                    MapViewWithLoadingIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(350.dp),
+                    ) {
+                        recommendations.forEach { recommendation ->
+                            val shop = recommendation.shop
+                            val markerState = rememberMarkerState(
+                                key = shop.id.toString(),
+                                position = shopLocationCache.getOrPut(shop.id) {
+                                    LatLng(shop.coordinates.lat, shop.coordinates.lon)
+                                },
+                            )
+                            Marker(
+                                state = markerState,
+                                title = "${shop.name}, ${shop.taxPin}",
+                                snippet = LocalContext.current.resources.getQuantityString(
+                                    R.plurals.recommendations_item_description,
+                                    recommendation.numberOfItems,
+                                    recommendation.hit.count,
+                                    recommendation.numberOfItems,
+                                    recommendation.expenditure.total.let(currencyFormat::format),
+                                ),
+                                onInfoWindowClick = {
+                                    onRecommendationClick(recommendation)
+                                },
+                            )
                         }
                     }
+                }
+                items(recommendations) { recommendation ->
                     RecommendationCardItem(
                         modifier = Modifier,
                         recommendation = recommendation,
-                        onClick = onClick,
+                        onClick = onRecommendationClick,
                         menuItems = setOf(
                             MenuItem(
                                 label = R.string.recommendations_directions,
@@ -91,7 +130,7 @@ internal object RecommendationScreen {
                             ),
                             MenuItem(
                                 label = R.string.recommendations_details,
-                                onClick = onClick,
+                                onClick = onRecommendationClick,
                             ),
                         ),
                     )
@@ -268,7 +307,7 @@ internal object RecommendationScreen {
                         }
                         is State.Success -> {
                             SuccessView(
-                                data = it.data,
+                                recommendations = it.data,
                                 config = config,
                                 sheetState = sheetState,
                                 modifier = Modifier.fillMaxSize(),

@@ -29,7 +29,7 @@ internal object RecommendationCardItem {
             headlineText = {
                 Text(
                     modifier = Modifier.wrapContentWidth(),
-                    text = recommendation.shop.name,
+                    text = "${recommendation.shop.name}, ${recommendation.shop.taxPin}",
                 )
             },
             supportingText = {
