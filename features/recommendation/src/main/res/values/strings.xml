@@ -17,7 +17,7 @@
     <string name="duplicate_unsaved_shopping_list_item">Item \"%1$s\" already exists</string>
     <string name="retry_with_location_captured">Retry with my location</string>
     <string name="error_empty_recommendations">Sorry, no applicable shop recommendations were found around your current location.</string>
-    <string name="capturing_location">Getting your current location. Please wait...</string>
+    <string name="capturing_location">Getting your current location. Please wait…</string>
     <string name="retry">Retry</string>
 
     <plurals name="recommendations_heading_hits">
@@ -31,7 +31,7 @@
     </plurals>
 
     <plurals name="recommendations_item_description">
-        <item quantity="one">Found %1$d of %2$d item at an estimated total expenditure of %3$s.</item>
-        <item quantity="other">Found %1$d of %2$d items at an estimated total expenditure of %3$s.</item>
+        <item quantity="one">Has %1$d of %2$d item at an estimated total cost of %3$s.</item>
+        <item quantity="other">Has %1$d of %2$d items at an estimated total cost of %3$s.</item>
     </plurals>
 </resources>
