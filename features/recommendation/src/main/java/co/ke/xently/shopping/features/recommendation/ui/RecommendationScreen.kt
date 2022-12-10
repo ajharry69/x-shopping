@@ -1,7 +1,6 @@
 package co.ke.xently.shopping.features.recommendation.ui
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -354,13 +353,14 @@ internal object RecommendationScreen {
                             }
                         },
                         actions = {
-                            AnimatedVisibility(visible = !isLoading) {
-                                IconButton(onClick = onLocationPermissionGranted) {
-                                    Icon(
-                                        Icons.Default.Update,
-                                        contentDescription = stringResource(R.string.update_recommendations),
-                                    )
-                                }
+                            IconButton(
+                                enabled = !isLoading,
+                                onClick = onLocationPermissionGranted,
+                            ) {
+                                Icon(
+                                    Icons.Default.Update,
+                                    contentDescription = stringResource(R.string.update_recommendations),
+                                )
                             }
                             Box {
                                 var showMenu by rememberSaveable {
