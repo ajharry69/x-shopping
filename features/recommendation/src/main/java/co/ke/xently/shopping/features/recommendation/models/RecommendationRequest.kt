@@ -7,6 +7,7 @@ internal data class RecommendationRequest(
     // Save shopping list items...
     val persist: Boolean = true,
     val lookupId: String? = null,
+    val shopDistanceMeters: Int = 0,
     val myLocation: Coordinate? = null,
     val isLocationPermissionGranted: Boolean = false,
     val cacheRecommendationsForLater: Boolean = false,
