@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -19,7 +20,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import co.ke.xently.shopping.features.map.MapViewWithLoadingIndicator
@@ -48,9 +54,10 @@ internal object RecommendationScreen {
     @Stable
     data class Config(
         val shared: Shared = Shared(),
+        val setShopDistanceMeters: (Int) -> Unit = {},
         val onDetailClick: (Recommendation) -> Unit = {},
         val onDirectionClick: (Recommendation) -> Unit = {},
-        val getRecommendations: (RecommendationRequest) -> Unit = {},
+        val getRecommendationsFromLocation: (Coordinate) -> Unit = {},
     )
 
     @Composable
@@ -162,6 +169,69 @@ internal object RecommendationScreen {
     }
 
     @Composable
+    private fun RecommendationRequestConfigurationScreen(
+        config: Config,
+        request: RecommendationRequest,
+        onDismissRequest: () -> Unit,
+    ) {
+        val context = LocalContext.current
+        val distanceToShop = TextFieldConfig(
+            labelId = R.string.field_label_distance_to_shop,
+            valueInputs = request.shopDistanceMeters,
+            extraErrorChecks = {
+                if (it.text.trim().isDigitsOnly()) {
+                    null
+                } else {
+                    context.getString(R.string.error_include_numbers_only)
+                }
+            },
+        )
+
+        val fields = arrayOf(distanceToShop)
+        val enableConfirmButton by remember(*fields) {
+            derivedStateOf {
+                fields.all { !it.hasError }
+            }
+        }
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
+            title = {
+                Text(stringResource(R.string.request_configuration))
+            },
+            text = {
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    value = distanceToShop.value,
+                    isError = distanceToShop.hasError,
+                    onValueChange = distanceToShop.onValueChange,
+                    label = {
+                        Text(distanceToShop.label)
+                    },
+                    supportingText = {
+                        SupportingText(config = distanceToShop)
+                    },
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Next,
+                        keyboardType = KeyboardType.Number,
+                    ),
+                )
+            },
+            confirmButton = {
+                Button(
+                    enabled = enableConfirmButton,
+                    onClick = {
+                        config.setShopDistanceMeters(distanceToShop.value.text.trim().toInt())
+                        onDismissRequest()
+                    },
+                ) {
+                    Text(text = stringResource(R.string.save_changes).toUpperCase(Locale.current))
+                }
+            },
+        )
+    }
+
+    @Composable
     operator fun invoke(
         modifier: Modifier,
         config: Config,
@@ -178,10 +248,12 @@ internal object RecommendationScreen {
         invoke(
             modifier = modifier,
             state = recommendations,
+            request = viewModel.recommendationRequest,
             recommendation = viewModel.recommendation,
             config = config.copy(
                 onDetailClick = viewModel::updateRecommendation,
-                getRecommendations = viewModel::getRecommendation,
+                setShopDistanceMeters = viewModel::setShopDistanceMeters,
+                getRecommendationsFromLocation = viewModel::getRecommendation,
             ),
         )
     }
@@ -190,6 +262,7 @@ internal object RecommendationScreen {
     operator fun invoke(
         modifier: Modifier,
         config: Config,
+        request: RecommendationRequest,
         recommendation: Recommendation?,
         state: State<List<Recommendation>>,
     ) {
@@ -209,14 +282,12 @@ internal object RecommendationScreen {
             val updatedLocation = rememberMyUpdatedLocation()
             LaunchedEffect(updatedLocation.myLocation) {
                 updatedLocation.myLocation?.also { location ->
-                    val request = RecommendationRequest(
-                        emptyList(),
-                        myLocation = Coordinate(
+                    config.getRecommendationsFromLocation(
+                        Coordinate(
                             lat = location.latitude,
                             lon = location.longitude,
                         ),
                     )
-                    config.getRecommendations(request)
                     loadingMessage = null
                     shouldGetMyCurrentLocationThenFetchRecommendations = false
                 }
@@ -232,6 +303,20 @@ internal object RecommendationScreen {
             derivedStateOf {
                 usableState is State.Loading
             }
+        }
+
+        var showRequestConfigurationDialog by rememberSaveable {
+            mutableStateOf(false)
+        }
+
+        if (showRequestConfigurationDialog) {
+            RecommendationRequestConfigurationScreen(
+                config = config,
+                request = request,
+                onDismissRequest = {
+                    showRequestConfigurationDialog = false
+                },
+            )
         }
 
         ModalBottomSheetLayout(
@@ -295,7 +380,10 @@ internal object RecommendationScreen {
                                         text = {
                                             Text(text = stringResource(R.string.menu_item_shop_distance))
                                         },
-                                        onClick = { /*TODO*/ },
+                                        onClick = {
+                                            showMenu = false
+                                            showRequestConfigurationDialog = true
+                                        },
                                     )
                                 }
                             }

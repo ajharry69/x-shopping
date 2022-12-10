@@ -5,6 +5,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import co.ke.xently.shopping.features.recommendation.models.Recommendation
+import co.ke.xently.shopping.features.recommendation.models.RecommendationRequest
 import co.ke.xently.shopping.features.ui.XentlyPreview
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.features.utils.State
@@ -23,6 +24,7 @@ private fun RecommendationScreenPreview() {
             ),
             state = State.Success(data = listOf(Recommendation.DEFAULT)),
             recommendation = recommendation,
+            request = RecommendationRequest(emptyList()),
         )
     }
 }
@@ -34,6 +36,7 @@ private fun RecommendationScreenLoadingPreview() {
         RecommendationScreen(
             modifier = Modifier.fillMaxSize(),
             config = RecommendationScreen.Config(),
+            request = RecommendationRequest(emptyList()),
             state = State.Loading,
             recommendation = null,
         )
@@ -46,6 +49,7 @@ private fun RecommendationScreenErrorPreview() {
     XentlyTheme {
         RecommendationScreen(
             modifier = Modifier.fillMaxSize(),
+            request = RecommendationRequest(emptyList()),
             config = RecommendationScreen.Config(),
             state = State.Error(RuntimeException("An error was encountered.")),
             recommendation = null,

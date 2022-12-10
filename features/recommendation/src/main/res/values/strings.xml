@@ -23,6 +23,10 @@
     <string name="content_desc_options_menu">Menu of options</string>
     <string name="menu_item_shop_distance">Distance to shop</string>
     <string name="app_handling_directions_not_found">"Sorry, we did not find an application on your device that can handle map directions. As we work on a native implementation, please, consider installing Google Maps or an equivalent application before trying again. "</string>
+    <string name="field_label_distance_to_shop">Distance to shop(meters)</string>
+    <string name="save_changes">Save changes</string>
+    <string name="request_configuration">Request configuration</string>
+    <string name="error_include_numbers_only">Please, include numbers only.</string>
 
     <plurals name="recommendations_heading_hits">
         <item quantity="one">Item found</item>

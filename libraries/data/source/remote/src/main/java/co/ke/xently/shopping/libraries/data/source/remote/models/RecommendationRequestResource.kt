@@ -6,8 +6,7 @@ data class RecommendationRequestResource(
     val items: List<Any>,
     // Save shopping list items...
     val persist: Boolean,
-    val lookupId: String?,
     val myLocation: Coordinate?,
-    val isLocationPermissionGranted: Boolean,
+    val shopDistanceMeters: Int,
     val cacheRecommendationsForLater: Boolean,
 )

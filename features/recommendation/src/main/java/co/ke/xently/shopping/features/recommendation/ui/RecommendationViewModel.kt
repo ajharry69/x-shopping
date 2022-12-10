@@ -9,6 +9,7 @@ import co.ke.xently.shopping.features.recommendation.models.RecommendationReques
 import co.ke.xently.shopping.features.recommendation.repositories.IRecommendationRepository
 import co.ke.xently.shopping.features.recommendation.ui.request.RecommendationRequestViewModel
 import co.ke.xently.shopping.features.utils.State
+import co.ke.xently.shopping.libraries.data.source.Coordinate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -18,6 +19,8 @@ import javax.inject.Inject
 internal class RecommendationViewModel @Inject constructor(
     private val repository: IRecommendationRepository,
 ) : RecommendationRequestViewModel(repository) {
+    var recommendationRequest by mutableStateOf(RecommendationRequest(emptyList()))
+        private set
 
     var recommendation by mutableStateOf<Recommendation?>(null)
         private set
@@ -48,13 +51,21 @@ internal class RecommendationViewModel @Inject constructor(
         }
     }
 
-    fun getRecommendation(request: RecommendationRequest) {
+    private fun getRecommendation(request: RecommendationRequest) {
         viewModelScope.launch {
             getRecommendations.emit(request)
         }
     }
 
+    fun getRecommendation(myLocation: Coordinate?) {
+        getRecommendation(recommendationRequest.copy(myLocation = myLocation))
+    }
+
+    fun setShopDistanceMeters(shopDistanceMeters: Int) {
+        recommendationRequest = recommendationRequest.copy(shopDistanceMeters = shopDistanceMeters)
+    }
+
     fun getRecommendation() {
-        getRecommendation(RecommendationRequest(emptyList()))
+        getRecommendation(recommendationRequest)
     }
 }

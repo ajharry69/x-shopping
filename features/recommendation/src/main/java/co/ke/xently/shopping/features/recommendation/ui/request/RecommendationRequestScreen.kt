@@ -170,7 +170,6 @@ internal object RecommendationRequestScreen {
                                 IconButton(
                                     enabled = enableSubmitButton,
                                     onClick = {
-                                        focusManager.clearFocus()
                                         config.addUnsavedItem(name.value.text.trim())
                                         name.onValueChange(TextFieldValue())
                                     },
@@ -183,7 +182,6 @@ internal object RecommendationRequestScreen {
                             },
                             keyboardActions = KeyboardActions(
                                 onDone = {
-                                    focusManager.clearFocus()
                                     if (!name.hasError) {
                                         config.addUnsavedItem(name.value.text.trim())
                                         name.onValueChange(TextFieldValue())

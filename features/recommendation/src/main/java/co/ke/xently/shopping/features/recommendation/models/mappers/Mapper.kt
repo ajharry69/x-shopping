@@ -9,9 +9,8 @@ internal val RecommendationRequest.asResource
     get() = RecommendationRequestResource(
         items = items,
         persist = persist,
-        lookupId = lookupId,
         myLocation = myLocation,
-        isLocationPermissionGranted = isLocationPermissionGranted,
+        shopDistanceMeters = shopDistanceMeters,
         cacheRecommendationsForLater = cacheRecommendationsForLater,
     )
 
@@ -19,9 +18,8 @@ internal val RecommendationRequestResource.asUi
     get() = RecommendationRequest(
         items = items,
         persist = persist,
-        lookupId = lookupId,
         myLocation = myLocation,
-        isLocationPermissionGranted = isLocationPermissionGranted,
+        shopDistanceMeters = shopDistanceMeters,
         cacheRecommendationsForLater = cacheRecommendationsForLater,
     )
 
