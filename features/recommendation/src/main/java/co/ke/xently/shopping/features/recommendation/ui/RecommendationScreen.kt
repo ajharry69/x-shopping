@@ -1,12 +1,15 @@
 package co.ke.xently.shopping.features.recommendation.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -16,8 +19,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
-import androidx.compose.ui.text.intl.Locale
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -80,8 +81,8 @@ internal object RecommendationScreen {
                 modifier = modifier,
                 error = stringResource(R.string.error_empty_recommendations),
                 postContent = {
-                    Button(onClick = onRetryButtonClick) {
-                        Text(stringResource(R.string.retry).toUpperCase(Locale.current))
+                    ErrorButton {
+                        onRetryButtonClick()
                     }
                 },
             )
@@ -227,10 +228,18 @@ internal object RecommendationScreen {
             loadingMessage = context.getString(R.string.capturing_location)
         }
 
+        val isLoading by remember(usableState) {
+            derivedStateOf {
+                usableState is State.Loading
+            }
+        }
+
         ModalBottomSheetLayout(
             sheetState = sheetState,
-            sheetShape = MaterialTheme.shapes.large.copy(bottomEnd = CornerSize(0),
-                bottomStart = CornerSize(0)),
+            sheetShape = MaterialTheme.shapes.large.copy(
+                bottomEnd = CornerSize(0),
+                bottomStart = CornerSize(0),
+            ),
             sheetContent = {
                 AnimatedContent(targetState = recommendation) {
                     if (it == null) {
@@ -259,6 +268,38 @@ internal object RecommendationScreen {
                                 Icon(Icons.Default.ArrowBack, contentDescription = null)
                             }
                         },
+                        actions = {
+                            AnimatedVisibility(visible = !isLoading) {
+                                IconButton(onClick = onLocationPermissionGranted) {
+                                    Icon(
+                                        Icons.Default.Update,
+                                        contentDescription = stringResource(R.string.update_recommendations),
+                                    )
+                                }
+                            }
+                            Box {
+                                var showMenu by rememberSaveable {
+                                    mutableStateOf(false)
+                                }
+                                IconButton(onClick = { showMenu = true }) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = stringResource(R.string.content_desc_options_menu),
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = showMenu,
+                                    onDismissRequest = { showMenu = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(text = stringResource(R.string.menu_item_shop_distance))
+                                        },
+                                        onClick = { /*TODO*/ },
+                                    )
+                                }
+                            }
+                        },
                     )
                 }
 
@@ -273,9 +314,11 @@ internal object RecommendationScreen {
                             FullscreenError(
                                 error = it.error,
                                 modifier = Modifier.fillMaxSize(),
-                                postErrorContent = { error ->
+                                postMessageContent = { error ->
                                     if (error is HttpException && error.errorCode == "location_required") {
                                         LocationRequired(onLocationPermissionGranted)
+                                    } else {
+                                        ErrorButton(error = error)
                                     }
                                 },
                             )

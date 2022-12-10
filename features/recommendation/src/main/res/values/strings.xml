@@ -19,6 +19,10 @@
     <string name="error_empty_recommendations">Sorry, no applicable shop recommendations were found around your current location.</string>
     <string name="capturing_location">Getting your current location. Please wait…</string>
     <string name="retry">Retry</string>
+    <string name="update_recommendations">Update recommendations</string>
+    <string name="content_desc_options_menu">Menu of options</string>
+    <string name="menu_item_shop_distance">Distance to shop</string>
+    <string name="app_handling_directions_not_found">"Sorry, we did not find an application on your device that can handle map directions. As we work on a native implementation, please, consider installing Google Maps or an equivalent application before trying again. "</string>
 
     <plurals name="recommendations_heading_hits">
         <item quantity="one">Item found</item>
