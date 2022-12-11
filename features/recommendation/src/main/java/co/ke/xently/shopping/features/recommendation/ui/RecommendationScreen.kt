@@ -83,7 +83,7 @@ internal object RecommendationScreen {
             mutableStateMapOf<Long, LatLng>()
         }
         if (recommendations.isNullOrEmpty()) {
-            FullscreenEmptyList<Unit>(
+            Fullscreen.EmptyList<Unit>(
                 modifier = modifier,
                 error = stringResource(R.string.error_empty_recommendations),
                 postContent = {
@@ -327,7 +327,7 @@ internal object RecommendationScreen {
             sheetContent = {
                 AnimatedContent(targetState = recommendation) {
                     if (it == null) {
-                        FullscreenLoading<Nothing>(
+                        Fullscreen.Loading<Nothing>(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(100.dp),
@@ -399,7 +399,7 @@ internal object RecommendationScreen {
                 ) {
                     when (it) {
                         is State.Error -> {
-                            FullscreenError(
+                            Fullscreen.Error(
                                 error = it.error,
                                 modifier = Modifier.fillMaxSize(),
                                 postMessageContent = { error ->
@@ -426,7 +426,7 @@ internal object RecommendationScreen {
                                 ) {
                                     CircularProgressIndicator(
                                         modifier = Modifier.semantics {
-                                            testTag = TEST_TAG_CIRCULAR_PROGRESS_BAR
+                                            testTag = Fullscreen.TEST_TAG_CIRCULAR_PROGRESS_BAR
                                         },
                                     )
 

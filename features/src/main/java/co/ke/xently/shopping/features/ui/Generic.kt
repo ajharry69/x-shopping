@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -17,17 +18,23 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
 import java.text.NumberFormat
 import java.util.*
-
-val VIEW_SPACE = 16.dp
-
-val VIEW_SPACE_HALVED = VIEW_SPACE / 2
 
 val DefaultKeyboardOptions = KeyboardOptions.Default.copy(
     imeAction = ImeAction.Next,
     capitalization = KeyboardCapitalization.Sentences,
 )
+
+fun Modifier.shimmerPlaceholder(visible: Boolean) = composed {
+    placeholder(
+        visible = visible,
+        highlight = PlaceholderHighlight.shimmer(),
+    )
+}
 
 @Composable
 fun labelAsRequired(@StringRes id: Int, positionAtStart: Boolean = false): String {

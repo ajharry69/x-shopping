@@ -28,8 +28,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import co.ke.xently.shopping.features.search.R
-import co.ke.xently.shopping.features.ui.VIEW_SPACE
-import co.ke.xently.shopping.features.ui.VIEW_SPACE_HALVED
 import kotlinx.coroutines.delay
 
 abstract class SearchScreen<S, T>(@StringRes private val searchHint: Int = R.string.fsearch_hint) {
@@ -310,10 +308,7 @@ abstract class SearchScreen<S, T>(@StringRes private val searchHint: Int = R.str
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(PaddingValues(
-                        horizontal = VIEW_SPACE,
-                        vertical = VIEW_SPACE_HALVED,
-                    )),
+                    .padding(PaddingValues(horizontal = 16.dp, vertical = 8.dp)),
             ) {
                 Icon(imageVector = Icons.Default.Search, contentDescription = null)
                 Text(
