@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddBusiness
 import androidx.compose.material.icons.filled.AddTask
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Recommend
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -16,12 +17,12 @@ import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavHostController
 import co.ke.xently.shopping.NavHost
 import co.ke.xently.shopping.R
+import co.ke.xently.shopping.features.products.models.Product
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.features.utils.buildRoute
-import co.ke.xently.shopping.features.products.models.Product
 import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.libraries.data.source.User
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -145,6 +146,13 @@ class MainActivity : FragmentActivity() {
                                 title = stringResource(R.string.dashboard_item_add_product),
                                 onClick = {
                                     navController.navigate(Routes.Product.DETAIL.buildRoute("id" to Product.DEFAULT_INSTANCE.id))
+                                },
+                            ),
+                            DashboardScreen.Item(
+                                logo = Icons.Default.Recommend,
+                                title = stringResource(R.string.dashboard_item_recommend_shops),
+                                onClick = {
+                                    navController.navigate(Routes.Recommendation.REQUEST.buildRoute())
                                 },
                             ),
                             DashboardScreen.Item(

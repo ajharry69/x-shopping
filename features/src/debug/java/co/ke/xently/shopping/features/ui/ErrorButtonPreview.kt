@@ -22,23 +22,3 @@ private fun ErrorButtonRequiresAuthenticationPreview() {
         ErrorButton(error = HttpException(statusCode = 401))
     }
 }
-
-@XentlyPreview
-@Composable
-private fun PasswordVisibilityToggleInvisiblePreview() {
-    XentlyTheme {
-        PasswordVisibilityToggle(isVisible = false) {
-
-        }
-    }
-}
-
-@XentlyPreview
-@Composable
-private fun PasswordVisibilityToggleVisiblePreview() {
-    XentlyTheme {
-        PasswordVisibilityToggle(isVisible = true) {
-
-        }
-    }
-}

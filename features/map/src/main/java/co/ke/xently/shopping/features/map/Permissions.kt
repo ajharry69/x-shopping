@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.features.shops.ui
+package co.ke.xently.shopping.features.map
 
 import android.Manifest
 import androidx.compose.material3.AlertDialog
@@ -8,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.DialogProperties
-import co.ke.xently.shopping.features.shops.R
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 
@@ -36,6 +35,8 @@ object Permissions {
         if (!shouldRequestPermission) {
             return permissionState
         }
+
+        val onLocationPermissionChangedUpdated by rememberUpdatedState(newValue = onLocationPermissionChanged)
 
 //    if (!permissionState.permissionRequested) {
         if (!permissionState.allPermissionsGranted) {
@@ -67,9 +68,8 @@ object Permissions {
                 text = { Text(stringResource(R.string.location_permission_rationale)) },
             )
         } else {
-            SideEffect {
-                val granted = Granted(permissionState.allPermissionsGranted)
-                onLocationPermissionChanged.invoke(granted)
+            LaunchedEffect(onLocationPermissionChangedUpdated) {
+                onLocationPermissionChangedUpdated(Granted(permissionState.allPermissionsGranted))
             }
         }
         return permissionState

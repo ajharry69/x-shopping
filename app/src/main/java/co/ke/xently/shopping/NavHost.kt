@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import co.ke.xently.shopping.features.products.productGraph
+import co.ke.xently.shopping.features.recommendation.recommendationGraph
 import co.ke.xently.shopping.features.shoppinglist.shoppingListGraph
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListScreen
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
@@ -82,8 +83,10 @@ internal object NavHost {
                             },
                         ),
                         menuItems = setOf(
-                            ShoppingListItemListItem.MenuItem(R.string.recommend) {
-                                // TODO: Implement recommendation...
+                            ShoppingListItemListItem.MenuItem(R.string.button_label_get_recommendations) {
+                                navController.navigate(Routes.Recommendation.REQUEST.buildRoute()) {
+                                    launchSingleTop = true
+                                }
                             },
                             ShoppingListItemListItem.MenuItem(
                                 label = R.string.update,
@@ -95,8 +98,10 @@ internal object NavHost {
                             ),
                         ),
                         groupMenuItems = setOf(
-                            GroupedShoppingListItemCard.MenuItem(R.string.recommend) {
-                                // TODO: Implement recommendation...
+                            GroupedShoppingListItemCard.MenuItem(R.string.button_label_get_recommendations) {
+                                navController.navigate(Routes.Recommendation.REQUEST.buildRoute()) {
+                                    launchSingleTop = true
+                                }
                             },
                         ),
                     )
@@ -111,6 +116,7 @@ internal object NavHost {
                 }
             }
             shoppingListGraph(navController = navController, shared = shared)
+            recommendationGraph(navController = navController, shared = shared)
             authenticationGraph(navController = navController, shared = shared)
         }
     }

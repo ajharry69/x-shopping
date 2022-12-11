@@ -23,6 +23,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import co.ke.xently.shopping.features.products.R
+import co.ke.xently.shopping.features.products.models.Product
 import co.ke.xently.shopping.features.products.repositories.exceptions.ProductHttpException
 import co.ke.xently.shopping.features.products.shared.AttributeNameSearchViewModel
 import co.ke.xently.shopping.features.products.shared.AttributeSearchViewModel
@@ -39,7 +40,6 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
 import co.ke.xently.shopping.libraries.data.source.AbstractBrand
-import co.ke.xently.shopping.features.products.models.Product
 import co.ke.xently.shopping.libraries.data.source.Shop
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
@@ -329,7 +329,7 @@ internal object ProductDetailScreen {
                 ) {
                     mutableStateOf(product?.datePurchased ?: Date())
                 }
-                val datePurchasedPicker = rememberDatePickerDialog(
+                val datePurchasedPicker = Dialog.rememberDatePicker(
                     select = datePurchased,
                     title = R.string.feature_products_detail_input_field_label_date_of_purchase,
                     bounds = CalendarConstraints.Builder()

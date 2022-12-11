@@ -1,6 +1,5 @@
 package co.ke.xently.shopping.features.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
@@ -20,94 +19,109 @@ import co.ke.xently.shopping.features.R
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.getErrorMessage
 import co.ke.xently.shopping.libraries.data.source.utils.RetryError
 
-@Composable
-fun FullscreenError(
-    modifier: Modifier,
-    error: Throwable,
-    retryError: RetryError = RetryError(),
-    click: ErrorButtonClick = ErrorButtonClick(),
-    preErrorContent: @Composable ColumnScope.(Throwable) -> Unit = {},
-    postErrorContent: @Composable ColumnScope.(Throwable) -> Unit = {
-        ErrorButton(it, retryError = retryError, click = click)
-    },
-) {
-    val context = LocalContext.current
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            preErrorContent(error)
-            Text(
-                textAlign = TextAlign.Center,
-                text = error.getErrorMessage(context = context),
-            )
-            postErrorContent(error)
-        }
-    }
-}
+object Fullscreen {
+    const val TEST_TAG_CIRCULAR_PROGRESS_BAR = "TEST_TAG_CIRCULAR_PROGRESS_BAR"
 
-const val PLACEHOLDER_COUNT_SMALL_ITEM_SIZE = 30
-const val PLACEHOLDER_COUNT_MEDIUM_ITEM_SIZE = 10
-const val PLACEHOLDER_COUNT_LARGE_ITEM_SIZE = 5
+    val EMPTY_LIST_PREFIX = mutableMapOf<String, String>()
 
-const val TEST_TAG_CIRCULAR_PROGRESS_BAR = "TEST_TAG_CIRCULAR_PROGRESS_BAR"
-
-@Composable
-fun <T> FullscreenLoading(
-    modifier: Modifier,
-    placeholder: (() -> T)? = null,
-    numberOfPlaceholders: Int = PLACEHOLDER_COUNT_MEDIUM_ITEM_SIZE,
-    placeholderContent: @Composable (LazyItemScope.(item: T) -> Unit) = {},
-) {
-    if (placeholder == null) {
+    @Composable
+    fun Error(
+        modifier: Modifier,
+        error: Throwable,
+        retryError: RetryError = RetryError(),
+        onErrorClick: ((Throwable?) -> Unit)? = null,
+        preMessageContent: @Composable ColumnScope.(Throwable) -> Unit = {},
+        postMessageContent: (@Composable ColumnScope.(Throwable) -> Unit)? = null,
+    ) {
+        val context = LocalContext.current
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(
-                modifier = Modifier.semantics {
-                    testTag = TEST_TAG_CIRCULAR_PROGRESS_BAR
-                },
-            )
-        }
-    } else {
-        LazyColumn(
-            modifier = modifier,
-            userScrollEnabled = false,
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        ) {
-            items(
-                itemContent = placeholderContent,
-                items = List(numberOfPlaceholders) {
-                    placeholder.invoke()
-                },
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                preMessageContent(error)
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = error.getErrorMessage(context = context),
+                )
+                if (postMessageContent == null) {
+                    ErrorButton(
+                        error = error,
+                        retryError = retryError,
+                        onClick = onErrorClick,
+                    )
+                } else {
+                    postMessageContent(error)
+                }
+            }
         }
     }
-}
 
-@Composable
-inline fun <reified T : Any> FullscreenEmptyList(
-    modifier: Modifier,
-    error: String? = null,
-) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Text(
-            modifier = Modifier.padding(16.dp),
-            textAlign = TextAlign.Center,
-            text = error ?: stringResource(
-                R.string.error_message_generic_empty_list,
-                T::class.java.simpleName.mapIndexed { i, c -> if (i != 0 && c.isUpperCase()) " $c" else "$c" }
-                    .joinToString("") { it }.lowercase()
-            ),
-        )
+    @Composable
+    fun <T> Loading(
+        modifier: Modifier,
+        placeholder: (() -> T)? = null,
+        numberOfPlaceholders: Int = 10,
+        placeholderContent: @Composable (LazyItemScope.(item: T) -> Unit) = {},
+    ) {
+        if (placeholder == null) {
+            Box(modifier = modifier, contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(
+                    modifier = Modifier.semantics {
+                        testTag = TEST_TAG_CIRCULAR_PROGRESS_BAR
+                    },
+                )
+            }
+        } else {
+            LazyColumn(
+                modifier = modifier,
+                userScrollEnabled = false,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                items(
+                    itemContent = placeholderContent,
+                    items = List(numberOfPlaceholders) {
+                        placeholder.invoke()
+                    },
+                )
+            }
+        }
     }
-}
 
-@Composable
-inline fun <reified T : Any> FullscreenEmptyList(modifier: Modifier, @StringRes error: Int) {
-    FullscreenEmptyList<T>(modifier = modifier, error = stringResource(error))
+    @Composable
+    inline fun <reified T : Any> EmptyList(
+        modifier: Modifier,
+        error: String? = null,
+        preContent: @Composable ColumnScope.() -> Unit = {},
+        postContent: @Composable ColumnScope.() -> Unit = {},
+    ) {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                preContent()
+                Text(
+                    textAlign = TextAlign.Center,
+                    text = error ?: stringResource(
+                        R.string.error_message_generic_empty_list,
+                        EMPTY_LIST_PREFIX.getOrPut(T::class.java.simpleName) {
+                            T::class.java.simpleName.mapIndexed { i, c -> if (i != 0 && c.isUpperCase()) " $c" else "$c" }
+                                .joinToString("") { it }.lowercase()
+                        },
+                    )
+                )
+                postContent()
+            }
+        }
+    }
 }

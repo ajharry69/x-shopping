@@ -9,6 +9,6 @@ import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 @Composable
 private fun FullscreenEmptyListPreview() {
     XentlyTheme {
-        FullscreenEmptyList<String>(Modifier.fillMaxSize())
+        Fullscreen.EmptyList<String>(Modifier.fillMaxSize())
     }
 }

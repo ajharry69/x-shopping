@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.repositories.exceptions.SignUpHttpException
+import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
@@ -128,7 +129,9 @@ internal object SignUpScreen {
                     valueInputs = null,
                     state = signUpState,
                     extraErrorChecks = {
-                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                        if (!it.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
+                            context.getString(R.string.fusers_email_invalid)
+                        } else null
                     },
                 ) {
                     (it.error as? SignUpHttpException)?.email?.joinToString("\n")

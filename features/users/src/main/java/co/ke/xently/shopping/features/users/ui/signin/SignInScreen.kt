@@ -27,6 +27,7 @@ import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.BasicAuth
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.repositories.exceptions.SignInHttpException
+import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
@@ -104,7 +105,9 @@ internal object SignInScreen {
                     valueInputs = null,
                     state = signInState,
                     extraErrorChecks = {
-                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                        if (!it.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
+                            context.getString(R.string.fusers_email_invalid)
+                        } else null
                     },
                 ) {
                     (it.error as? SignInHttpException)?.email?.joinToString("\n")

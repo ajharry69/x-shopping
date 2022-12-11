@@ -102,7 +102,9 @@ internal object PasswordResetRequestScreen {
                     valueInputs = null,
                     state = passwordResetRequestState,
                     extraErrorChecks = {
-                        !it.text.matches(Patterns.EMAIL_ADDRESS.toRegex()) to context.getString(R.string.fusers_email_invalid)
+                        if (!it.text.matches(Patterns.EMAIL_ADDRESS.toRegex())) {
+                            context.getString(R.string.fusers_email_invalid)
+                        } else null
                     },
                 ) {
                     (it.error as? PasswordResetRequestHttpException)?.email?.joinToString("\n")
