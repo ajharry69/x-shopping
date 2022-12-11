@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-apply from: "$rootDir/features/config.common.gradle"
+apply from: "$rootDir/features/config.common.lib.gradle"
 apply from: "$rootDir/features/dependencies.features.gradle"
 android {
     namespace 'co.ke.xently.shopping.features.search'

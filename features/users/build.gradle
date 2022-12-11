@@ -9,7 +9,7 @@ dependencies {
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 }
 
-apply from: "$rootDir/features/config.common.gradle"
+apply from: "$rootDir/features/config.common.lib.gradle"
 apply from: "$rootDir/features/dependencies.features.gradle"
 android {
     namespace 'co.ke.xently.shopping.features.users'

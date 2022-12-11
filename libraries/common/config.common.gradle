@@ -27,9 +27,6 @@ android {
             signingConfig signingConfigs.config
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {
-            debuggable true
-        }
         alpha {
             initWith release
             matchingFallbacks = ["release", "debug"]

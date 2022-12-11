@@ -4,7 +4,7 @@ plugins {
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
-apply from: "$rootDir/features/config.common.gradle"
+apply from: "$rootDir/features/config.common.lib.gradle"
 apply from: "$rootDir/features/dependencies.maps.gradle"
 apply from: "$rootDir/features/dependencies.features.gradle"
 android {
