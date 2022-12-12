@@ -10,8 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.fragment.app.FragmentActivity
+import co.ke.xently.shopping.Navigator
 import co.ke.xently.shopping.R
-import co.ke.xently.shopping.features.shoppinglist.ui.NavGraphs
+import co.ke.xently.shopping.RootNavGraph
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.features.users.ui.destinations.SignInScreenDestination
 import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
@@ -39,7 +40,6 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             XentlyTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
@@ -102,8 +102,8 @@ class MainActivity : FragmentActivity() {
                         }
                     }*/
                     DestinationsNavHost(
+                        navGraph = RootNavGraph,
                         engine = engine,
-                        navGraph = NavGraphs.root,
                         navController = controller,
                         dependenciesContainerBuilder = {
                             val shared = Shared(
@@ -111,7 +111,7 @@ class MainActivity : FragmentActivity() {
                                 snackbarHostState = snackbarHostState,
                                 onNavigationIconClicked = onBackPressedDispatcher::onBackPressed,
                                 onAuthenticationRequired = {
-                                    navController.navigate(SignInScreenDestination()) {
+                                    destinationsNavigator.navigate(SignInScreenDestination()) {
                                         launchSingleTop = true
                                     }
                                 },
@@ -128,7 +128,7 @@ class MainActivity : FragmentActivity() {
                                             duration = SnackbarDuration.Long,
                                         )
                                         if (result == SnackbarResult.ActionPerformed) {
-                                            navController.navigate(SignInScreenDestination()) {
+                                            destinationsNavigator.navigate(SignInScreenDestination()) {
                                                 launchSingleTop = true
                                             }
                                         }
@@ -136,6 +136,7 @@ class MainActivity : FragmentActivity() {
                                 },
                             )
                             dependency(shared)
+                            dependency(Navigator(destinationsNavigator))
                         },
                     )
 

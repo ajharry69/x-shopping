@@ -16,3 +16,8 @@ apply from: "$rootDir/features/dependencies.features.gradle"
 android {
     namespace 'co.ke.xently.shopping.features.users'
 }
+
+ksp {
+    arg("compose-destinations.mode", "navgraphs")
+    arg("compose-destinations.moduleName", "users")
+}

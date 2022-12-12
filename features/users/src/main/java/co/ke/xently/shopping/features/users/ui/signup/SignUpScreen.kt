@@ -28,6 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.UsersNavGraph
+import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.SignUpHttpException
 import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
 import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
@@ -37,7 +38,6 @@ import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 internal object SignUpScreen {
     @Stable
@@ -56,7 +56,7 @@ internal object SignUpScreen {
     @Composable
     fun SignUpScreen(
         shared: Shared,
-        navigator: DestinationsNavigator,
+        navigator: UsersNavigator,
         viewModel: SignUpScreenViewModel = hiltViewModel(),
     ) {
         val signUpState by viewModel.signUpState.collectAsState(State.Success(null))

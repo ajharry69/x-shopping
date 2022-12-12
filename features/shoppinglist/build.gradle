@@ -20,3 +20,8 @@ apply from: "$rootDir/features/dependencies.features.gradle"
 android {
     namespace 'co.ke.xently.shopping.features.shoppinglist'
 }
+
+ksp {
+    arg("compose-destinations.mode", "navgraphs")
+    arg("compose-destinations.moduleName", "shoppinglist")
+}

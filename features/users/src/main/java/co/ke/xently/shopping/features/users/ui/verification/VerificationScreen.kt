@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.UsersNavGraph
+import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.VerificationHttpException
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
@@ -30,7 +31,6 @@ import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
 import co.ke.xently.shopping.libraries.data.source.remote.HttpException.Companion.requiresAuthentication
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,7 +51,7 @@ internal object VerificationScreen {
     @Composable
     fun VerificationScreen(
         shared: Shared,
-        navigator: DestinationsNavigator,
+        navigator: UsersNavigator,
         viewModel: VerificationScreenViewModel = hiltViewModel(),
     ) {
         val verificationState by viewModel.verificationState.collectAsState(

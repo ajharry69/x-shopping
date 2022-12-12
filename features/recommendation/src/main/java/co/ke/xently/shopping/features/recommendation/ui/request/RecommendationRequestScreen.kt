@@ -23,11 +23,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import co.ke.xently.shopping.features.recommendation.R
+import co.ke.xently.shopping.features.recommendation.RecommendationNavGraph
+import co.ke.xently.shopping.features.recommendation.RecommendationNavigator
+import co.ke.xently.shopping.features.recommendation.ui.destinations.RecommendationScreenDestination
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import com.ramcosta.composedestinations.annotation.Destination
 
 internal object RecommendationRequestScreen {
+    @Stable
     data class Config(
         val shared: Shared = Shared(),
         val onRecommendClick: () -> Unit = {},
@@ -40,10 +45,12 @@ internal object RecommendationRequestScreen {
         val onUpdateSuccess: () -> Unit = shared.onNavigationIconClicked,
     )
 
+    @RecommendationNavGraph(start = true)
+    @Destination
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
+    fun RecommendationRequestScreen(
+        shared: Shared,
+        navigator: RecommendationNavigator,
         viewModel: RecommendationRequestViewModel = hiltViewModel(),
     ) {
         val savedShoppingList by viewModel.savedShoppingList.collectAsState()
@@ -59,19 +66,25 @@ internal object RecommendationRequestScreen {
         }
 
         RecommendationRequestScreen(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             savedShoppingList = savedShoppingList,
             unsavedShoppingList = unsavedShoppingList,
             hasSavedShoppingListItemInTheRecycleBin = hasSavedShoppingListItemInTheRecycleBin,
             itemToBeAddedExistsInUnsavedShoppingList = itemToBeAddedExistsInUnsavedShoppingList,
             hasUnsavedShoppingListItemInTheRecycleBin = hasUnsavedShoppingListItemInTheRecycleBin,
-            config = config.copy(
+            config = Config(
+                shared = shared,
                 addUnsavedItem = viewModel::addUnsavedShoppingList,
                 removeSavedItem = viewModel::removeSavedShoppingList,
                 lookupItemToBeAdded = viewModel::lookupItemToBeAdded,
                 removeUnsavedItem = viewModel::removeUnsavedShoppingList,
                 restoreRemovedSavedItems = viewModel::restoreRemovedSavedItems,
                 restoreRemovedUnsavedItems = viewModel::restoreRemovedUnsavedItems,
+                onRecommendClick = {
+                    navigator.navigate(RecommendationScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
             ),
         )
     }

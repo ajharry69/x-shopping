@@ -34,6 +34,7 @@ import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import com.ramcosta.composedestinations.annotation.Destination
 
 object ShoppingListItemDetailScreen {
+    @Stable
     data class Config(
         val shared: Shared = Shared(),
         val onSubmitDetails: (ShoppingListItem) -> Unit = {},
@@ -45,19 +46,9 @@ object ShoppingListItemDetailScreen {
     @ShoppingListNavGraph
     @Destination(navArgsDelegate = Args::class)
     @Composable
-    fun ShoppingListItemDetailScreen(args: Args, shared: Shared) {
-        invoke(
-            args = args,
-            modifier = Modifier.fillMaxSize(),
-            config = Config(shared = shared),
-        )
-    }
-
-    @Composable
-    internal operator fun invoke(
+    internal fun ShoppingListItemDetailScreen(
         args: Args,
-        modifier: Modifier,
-        config: Config,
+        shared: Shared,
         viewModel: ShoppingListItemDetailScreenViewModel = hiltViewModel(),
         brandSearchViewModel: BrandSearchViewModel = hiltViewModel(),
         attributeSearchViewModel: AttributeSearchViewModel = hiltViewModel(),
@@ -75,10 +66,10 @@ object ShoppingListItemDetailScreen {
         }
 
         ShoppingListItemDetailScreen(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             saveState = saveState,
             detailState = detailState,
-            config = config.copy(onSubmitDetails = viewModel::save),
+            config = Config(onSubmitDetails = viewModel::save, shared = shared),
             brandSuggestions = brandSuggestions,
             attributeSuggestions = attributeSuggestions,
             attributeNameSuggestions = attributeNameSuggestions,

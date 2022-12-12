@@ -18,6 +18,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavGraph
+import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavigator
 import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGroup
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel.Request
@@ -35,7 +36,6 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 object ShoppingListItemListScreen {
     data class Args(val group: ShoppingListGroup?)
@@ -43,10 +43,29 @@ object ShoppingListItemListScreen {
     @ShoppingListNavGraph
     @Destination(navArgsDelegate = Args::class)
     @Composable
-    fun ShoppingListItemListScreen(args: Args, shared: Shared, navigator: DestinationsNavigator) {
-        invoke(
+    internal fun ShoppingListItemListScreen(
+        args: Args,
+        shared: Shared,
+        navigator: ShoppingListNavigator,
+        viewModel: ShoppingListItemListViewModel = hiltViewModel(),
+    ) {
+        val items = viewModel.listState.collectAsLazyPagingItems()
+        val removeState by viewModel.removeState.collectAsState(State.Success(null))
+
+        LaunchedEffect(args.group) {
+            viewModel.fetchShoppingList(Request(group = args.group))
+        }
+        val isRefreshing by remember(items) {
+            derivedStateOf {
+                items.loadState.refresh == LoadState.Loading
+            }
+        }
+        ShoppingListItemListScreen(
             modifier = Modifier.fillMaxSize(),
+            items = items,
             group = args.group,
+            removeState = removeState,
+            isRefreshing = isRefreshing,
             config = ShoppingListItemSearchScreen.Config(
                 shared = shared,
                 onFabClick = {
@@ -69,41 +88,12 @@ object ShoppingListItemListScreen {
                         }
                     },
                 ),
-            ),
-        )
-    }
-
-    @Composable
-    internal operator fun invoke(
-        modifier: Modifier,
-        group: ShoppingListGroup?,
-        menuItems: Set<ShoppingListItemListItem.MenuItem>,
-        config: ShoppingListItemSearchScreen.Config,
-        viewModel: ShoppingListItemListViewModel = hiltViewModel(),
-    ) {
-        val items = viewModel.listState.collectAsLazyPagingItems()
-        val removeState by viewModel.removeState.collectAsState(State.Success(null))
-
-        LaunchedEffect(group) {
-            viewModel.fetchShoppingList(Request(group = group))
-        }
-        val isRefreshing by remember(items) {
-            derivedStateOf {
-                items.loadState.refresh == LoadState.Loading
-            }
-        }
-        ShoppingListItemListScreen(
-            config = config,
-            modifier = modifier,
-            items = items,
-            group = group,
-            isRefreshing = isRefreshing,
-            removeState = removeState,
-            menuItems = menuItems + ShoppingListItemListItem.MenuItem(
-                onClick = ConfirmableDelete {
-                    viewModel.delete(it.id)
-                },
-                label = R.string.feature_shoppinglist_list_item_drop_down_menu_delete,
+                ShoppingListItemListItem.MenuItem(
+                    onClick = ConfirmableDelete {
+                        viewModel.delete(it.id)
+                    },
+                    label = R.string.feature_shoppinglist_list_item_drop_down_menu_delete,
+                ),
             ),
         )
     }

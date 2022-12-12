@@ -1,5 +1,7 @@
 package co.ke.xently.shopping.features.recommendation.ui
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,6 +34,7 @@ import co.ke.xently.shopping.features.map.MapViewWithLoadingIndicator.rememberMy
 import co.ke.xently.shopping.features.map.Permissions
 import co.ke.xently.shopping.features.models.MenuItem
 import co.ke.xently.shopping.features.recommendation.R
+import co.ke.xently.shopping.features.recommendation.RecommendationNavGraph
 import co.ke.xently.shopping.features.recommendation.models.Recommendation
 import co.ke.xently.shopping.features.recommendation.models.RecommendationRequest
 import co.ke.xently.shopping.features.recommendation.ui.detail.RecommendationDetailScreen
@@ -45,8 +48,10 @@ import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.Coordinate
 import co.ke.xently.shopping.libraries.data.source.remote.HttpException
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.rememberMarkerState
+import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 
 internal object RecommendationScreen {
@@ -230,10 +235,11 @@ internal object RecommendationScreen {
         )
     }
 
+    @RecommendationNavGraph
+    @Destination
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
+    fun RecommendationScreen(
+        shared: Shared,
         viewModel: RecommendationViewModel = hiltViewModel(),
     ) {
         val recommendations by viewModel.recommendations.collectAsState()
@@ -243,16 +249,42 @@ internal object RecommendationScreen {
                 viewModel.getRecommendation()
             }
         }
+        val context = LocalContext.current
 
         invoke(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             state = recommendations,
             request = viewModel.recommendationRequest,
             recommendation = viewModel.recommendation,
-            config = config.copy(
+            config = Config(
+                shared = shared,
                 onDetailClick = viewModel::updateRecommendation,
                 setShopDistanceMeters = viewModel::setShopDistanceMeters,
                 getRecommendationsFromLocation = viewModel::getRecommendation,
+                onDirectionClick = { recommendation ->
+                    val navigationQuery = recommendation.shop.run {
+                        coordinates.let {
+                            "${it.lat},${it.lon}"
+                        }
+                    }
+                    val uri = Uri.parse("google.navigation:q=$navigationQuery")
+                    val mapIntent = Intent(Intent.ACTION_VIEW, uri)
+                    if (mapIntent.resolveActivity(context.packageManager) == null) {
+                        MaterialAlertDialogBuilder(context)
+                            .setMessage(R.string.app_handling_directions_not_found)
+                            .setPositiveButton(android.R.string.ok) { dialog, _ -> dialog.dismiss() }
+                            .create().show()
+                    } else {
+                        mapIntent.run {
+                            setPackage("com.google.android.apps.maps")
+                            if (resolveActivity(context.packageManager) != null) {
+                                context.startActivity(this)
+                            } else {
+                                context.startActivity(mapIntent)
+                            }
+                        }
+                    }
+                },
             ),
         )
     }

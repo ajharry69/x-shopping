@@ -76,40 +76,9 @@ internal object ShoppingListItemSearchScreen :
     @ShoppingListNavGraph
     @Destination
     @Composable
-    fun ShoppingListItemSearchScreen(shared: Shared, navigator: DestinationsNavigator) {
-        invoke(
-            modifier = Modifier.fillMaxSize(),
-            config = Config(
-                shared = shared,
-                onFabClick = {
-                    navigator.navigate(ShoppingListItemDetailScreenDestination()) {
-                        launchSingleTop = true
-                    }
-                },
-                onSearchClick = {
-                    navigator.navigate(ShoppingListItemSearchScreenDestination()) {
-                        launchSingleTop = true
-                    }
-                },
-            ),
-            menuItems = setOf(
-                ShoppingListItemListItem.MenuItem(
-                    label = R.string.feature_shoppinglist_list_item_drop_down_menu_update,
-                    onClick = {
-                        navigator.navigate(ShoppingListItemDetailScreenDestination(it.id)) {
-                            launchSingleTop = true
-                        }
-                    },
-                ),
-            ),
-        )
-    }
-
-    @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
-        menuItems: Set<ShoppingListItemListItem.MenuItem>,
+    fun ShoppingListItemSearchScreen(
+        shared: Shared,
+        navigator: DestinationsNavigator,
         viewModel: ShoppingListItemListViewModel = hiltViewModel(),
         searchViewModel: ShoppingListItemSearchViewModel = hiltViewModel(),
     ) {
@@ -123,7 +92,7 @@ internal object ShoppingListItemSearchScreen :
 
         ShowRemovalMessage(
             removeState = removeState,
-            hostState = config.shared.snackbarHostState,
+            hostState = shared.snackbarHostState,
             successMessage = R.string.feature_shoppinglist_list_success_removing_item,
         )
 
@@ -136,8 +105,8 @@ internal object ShoppingListItemSearchScreen :
         ShoppingListItemSearchScreen(
             state = state,
             autoFocusSearchField = true,
-            snackbarHostState = config.shared.snackbarHostState,
-            onBack = config.shared.onNavigationIconClicked,
+            snackbarHostState = shared.snackbarHostState,
+            onBack = shared.onNavigationIconClicked,
             onQueryChange = searchViewModel::autoCompleteSearch,
             onSearchImeActionClick = searchViewModel::search,
         ) { values: PaddingValues ->
@@ -145,15 +114,40 @@ internal object ShoppingListItemSearchScreen :
             when (val response = state.searchResponse) {
                 is SearchResponse.InitialResults -> {
                     Content(
-                        config = config,
+                        config = Config(
+                            shared = shared,
+                            onFabClick = {
+                                navigator.navigate(ShoppingListItemDetailScreenDestination()) {
+                                    launchSingleTop = true
+                                }
+                            },
+                            onSearchClick = {
+                                navigator.navigate(ShoppingListItemSearchScreenDestination()) {
+                                    launchSingleTop = true
+                                }
+                            },
+                        ),
                         isRefreshing = false,
                         items = listState,
-                        menuItems = menuItems,
-                        modifier = modifier.padding(values),
+                        menuItems = setOf(
+                            ShoppingListItemListItem.MenuItem(
+                                label = R.string.feature_shoppinglist_list_item_drop_down_menu_update,
+                                onClick = {
+                                    navigator.navigate(ShoppingListItemDetailScreenDestination(it.id)) {
+                                        launchSingleTop = true
+                                    }
+                                },
+                            ),
+                        ),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(values),
                     )
                 }
                 is SearchResponse.NoResults -> {
-                    NoResults(modifier.padding(values))
+                    NoResults(Modifier
+                        .fillMaxSize()
+                        .padding(values))
                 }
                 is SearchResponse.Results -> {
 //                    val items = response.data as List<ShoppingListItem>
@@ -162,11 +156,13 @@ internal object ShoppingListItemSearchScreen :
 //                        config = config,
 //                        menuItems = menuItems,
 //                        isRefreshing = false,
-//                        modifier = modifier.padding(values),
+//                        modifier = Modifier.fillMaxSize().padding(values),
 //                    )
                 }
                 is SearchResponse.Suggestions -> {
-                    LazyColumn(modifier = modifier.padding(values)) {
+                    LazyColumn(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(values)) {
                         items(
                             key = { it.suggestionTextValue() },
                             items = response.data as List<ShoppingListItem>,

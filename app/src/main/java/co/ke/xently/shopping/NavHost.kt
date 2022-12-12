@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import co.ke.xently.shopping.features.products.productGraph
-import co.ke.xently.shopping.features.recommendation.recommendationGraph
 import co.ke.xently.shopping.features.shops.shopGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
@@ -46,7 +45,6 @@ internal object NavHost {
                     launchSingleTop = true
                 }
             }
-            recommendationGraph(navController = navController, shared = shared)
         }
     }
 }

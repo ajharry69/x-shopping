@@ -27,6 +27,7 @@ import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.BasicAuth
 import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.UsersNavGraph
+import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.SignInHttpException
 import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
 import co.ke.xently.shopping.features.users.ui.destinations.PasswordResetRequestScreenDestination
@@ -38,7 +39,6 @@ import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 internal object SignInScreen {
     @Stable
@@ -59,7 +59,7 @@ internal object SignInScreen {
     @Composable
     fun SignInScreen(
         shared: Shared,
-        navigator: DestinationsNavigator,
+        navigator: UsersNavigator,
         viewModel: SignInScreenViewModel = hiltViewModel(),
     ) {
         val signInState by viewModel.signInState.collectAsState(State.Success(null))
