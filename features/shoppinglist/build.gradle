@@ -3,11 +3,15 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id "dagger.hilt.android.plugin"
     id "kotlin-kapt"
+    id "kotlin-parcelize"
+    id "com.google.devtools.ksp" version "1.7.10-1.0.6" // Depends on your kotlin version
 }
 
 dependencies {
     implementation project(path: ":features:search")
     implementation project(path: ":features:products:shared")
+
+    ksp "io.github.raamcosta.compose-destinations:ksp:1.7.27-beta"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 }
 

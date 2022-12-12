@@ -3,6 +3,7 @@ package co.ke.xently.shopping.features.shoppinglist.ui.list.grouped
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,9 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavGraph
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemDetailScreenDestination
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemListScreenDestination
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListViewModel.Request
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
@@ -27,10 +31,14 @@ import co.ke.xently.shopping.features.ui.ConfirmableDelete
 import co.ke.xently.shopping.features.ui.PagedDataScreen
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
 import co.ke.xently.shopping.features.ui.TopAppBarWithProgressIndicator
+import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
+import co.ke.xently.shopping.features.utils.buildRoute
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 object GroupedShoppingListScreen {
     data class Config(
@@ -41,6 +49,52 @@ object GroupedShoppingListScreen {
         val onRetryClicked: (Throwable) -> Unit = {},
         val config: GroupedShoppingListItemCard.Config = GroupedShoppingListItemCard.Config(),
     )
+
+    @ShoppingListNavGraph(start = true)
+    @Destination
+    @Composable
+    fun GroupedShoppingListScreen(shared: Shared, navigator: DestinationsNavigator) {
+        invoke(
+            modifier = Modifier.fillMaxSize(),
+            config = Config(
+                shared = shared,
+                config = GroupedShoppingListItemCard.Config(
+                    onSeeAllClicked = {
+                        navigator.navigate(ShoppingListItemListScreenDestination(it)){
+                            launchSingleTop = true
+                        }
+                    }
+                ),
+                onFabClick = {
+                    navigator.navigate(ShoppingListItemDetailScreenDestination()){
+                        launchSingleTop = true
+                    }
+                },
+            ),
+            menuItems = setOf(
+                ShoppingListItemListItem.MenuItem(R.string.button_label_get_recommendations) {
+                    navigator.navigate(Routes.Recommendation.REQUEST.buildRoute()) {
+                        launchSingleTop = true
+                    }
+                },
+                ShoppingListItemListItem.MenuItem(
+                    label = R.string.update,
+                    onClick = {
+                        navigator.navigate(ShoppingListItemDetailScreenDestination(it.id)) {
+                            launchSingleTop = true
+                        }
+                    },
+                ),
+            ),
+            groupMenuItems = setOf(
+                GroupedShoppingListItemCard.MenuItem(R.string.button_label_get_recommendations) {
+                    navigator.navigate(Routes.Recommendation.REQUEST.buildRoute()) {
+                        launchSingleTop = true
+                    }
+                },
+            ),
+        )
+    }
 
     @Composable
     operator fun invoke(

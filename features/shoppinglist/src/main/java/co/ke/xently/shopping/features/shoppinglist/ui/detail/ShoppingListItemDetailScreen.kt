@@ -15,10 +15,14 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import co.ke.xently.shopping.features.products.shared.*
+import co.ke.xently.shopping.features.products.shared.AttributeNameSearchViewModel
+import co.ke.xently.shopping.features.products.shared.AttributeSearchViewModel
+import co.ke.xently.shopping.features.products.shared.BrandSearchViewModel
+import co.ke.xently.shopping.features.products.shared.MeasurementUnitSearchViewModel
 import co.ke.xently.shopping.features.products.shared.ui.AttributesInput
 import co.ke.xently.shopping.features.products.shared.ui.BrandsInput
 import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavGraph
 import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.ShoppingListItemHttpException
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Query
@@ -27,17 +31,31 @@ import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.AbstractAttribute
 import co.ke.xently.shopping.libraries.data.source.AbstractBrand
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import com.ramcosta.composedestinations.annotation.Destination
 
-internal object ShoppingListItemDetailScreen {
+object ShoppingListItemDetailScreen {
     data class Config(
         val shared: Shared = Shared(),
         val onSubmitDetails: (ShoppingListItem) -> Unit = {},
         val onUpdateSuccess: () -> Unit = shared.onNavigationIconClicked,
     )
 
+    data class Args(val id: Long = ShoppingListItem.DEFAULT_INSTANCE.id)
+
+    @ShoppingListNavGraph
+    @Destination(navArgsDelegate = Args::class)
     @Composable
-    operator fun invoke(
-        id: Long,
+    fun ShoppingListItemDetailScreen(args: Args, shared: Shared) {
+        invoke(
+            args = args,
+            modifier = Modifier.fillMaxSize(),
+            config = Config(shared = shared),
+        )
+    }
+
+    @Composable
+    internal operator fun invoke(
+        args: Args,
         modifier: Modifier,
         config: Config,
         viewModel: ShoppingListItemDetailScreenViewModel = hiltViewModel(),
@@ -52,9 +70,10 @@ internal object ShoppingListItemDetailScreen {
         val attributeNameSuggestions by attributeNameSearchViewModel.searchAutoCompleteResults.collectAsState()
         val measurementUnitSuggestions by measurementUnitSearchViewModel.searchAutoCompleteResults.collectAsState()
         val saveState by viewModel.saveState.collectAsState(State.Success(null))
-        LaunchedEffect(id) {
-            viewModel.get(id)
+        LaunchedEffect(args.id) {
+            viewModel.get(args.id)
         }
+
         ShoppingListItemDetailScreen(
             modifier = modifier,
             saveState = saveState,

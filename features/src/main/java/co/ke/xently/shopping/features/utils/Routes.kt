@@ -68,14 +68,6 @@ object Routes {
         }
     }
 
-    object ShoppingList {
-        const val LIST = "shoppinglist/?group={group}&groupBy={groupBy}"
-        const val SEARCH = "shoppinglist/search/?group={group}&groupBy={groupBy}"
-        const val DETAIL = "shoppinglist/{id}/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-    }
     object Recommendation {
         const val REQUEST = "shopping-list/recommendations/request/?itemId={itemId}&group={group}&groupBy={groupBy}"
         const val RECOMMEND = "shopping-list/recommendations/?numberOfItems={numberOfItems}"

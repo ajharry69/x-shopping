@@ -2,6 +2,7 @@ package co.ke.xently.shopping.features.shoppinglist.ui.list
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -16,9 +17,12 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavGraph
 import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGroup
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel.Request
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemDetailScreenDestination
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemSearchScreenDestination
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
 import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSearchScreen
 import co.ke.xently.shopping.features.shoppinglist.ui.search.ShoppingListItemSearchScreen.Content
@@ -27,12 +31,50 @@ import co.ke.xently.shopping.features.ui.ConfirmableDelete
 import co.ke.xently.shopping.features.ui.MoveBackNavigationIconButton
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
 import co.ke.xently.shopping.features.ui.TopAppBarWithProgressIndicator
+import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-internal object ShoppingListItemListScreen {
+object ShoppingListItemListScreen {
+    data class Args(val group: ShoppingListGroup?)
+
+    @ShoppingListNavGraph
+    @Destination(navArgsDelegate = Args::class)
     @Composable
-    operator fun invoke(
+    fun ShoppingListItemListScreen(args: Args, shared: Shared, navigator: DestinationsNavigator) {
+        invoke(
+            modifier = Modifier.fillMaxSize(),
+            group = args.group,
+            config = ShoppingListItemSearchScreen.Config(
+                shared = shared,
+                onFabClick = {
+                    navigator.navigate(ShoppingListItemDetailScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+                onSearchClick = {
+                    navigator.navigate(ShoppingListItemSearchScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+            ),
+            menuItems = setOf(
+                ShoppingListItemListItem.MenuItem(
+                    label = R.string.feature_shoppinglist_list_item_drop_down_menu_update,
+                    onClick = {
+                        navigator.navigate(ShoppingListItemDetailScreenDestination(it.id)) {
+                            launchSingleTop = true
+                        }
+                    },
+                ),
+            ),
+        )
+    }
+
+    @Composable
+    internal operator fun invoke(
         modifier: Modifier,
         group: ShoppingListGroup?,
         menuItems: Set<ShoppingListItemListItem.MenuItem>,
@@ -68,7 +110,7 @@ internal object ShoppingListItemListScreen {
 
     @Composable
     @VisibleForTesting
-    operator fun invoke(
+    internal operator fun invoke(
         modifier: Modifier,
         items: LazyPagingItems<ShoppingListItem>,
         removeState: State<Any>,
@@ -102,7 +144,7 @@ internal object ShoppingListItemListScreen {
                         title = {
                             val title =
                                 stringResource(R.string.feature_shoppinglist_list_toolbar_title)
-                            val subTitle = group?.group?.toString()
+                            val subTitle = group?.group
                             if (subTitle == null) {
                                 Text(title)
                             } else {

@@ -1,6 +1,7 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.search
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.*
@@ -13,15 +14,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import co.ke.xently.shopping.features.ui.PagedDataScreen
 import co.ke.xently.shopping.features.search.ui.SearchScreen
 import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavGraph
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemDetailScreenDestination
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemSearchScreenDestination
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
+import co.ke.xently.shopping.features.ui.PagedDataScreen
 import co.ke.xently.shopping.features.ui.ShowRemovalMessage
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 internal object ShoppingListItemSearchScreen :
     SearchScreen<ShoppingListItem, ShoppingListItem>(R.string.feature_shoppinglist_search_hint) {
@@ -65,6 +71,38 @@ internal object ShoppingListItemSearchScreen :
         ) {
             itemContent(it, isRefreshing, menuItems)
         }
+    }
+
+    @ShoppingListNavGraph
+    @Destination
+    @Composable
+    fun ShoppingListItemSearchScreen(shared: Shared, navigator: DestinationsNavigator) {
+        invoke(
+            modifier = Modifier.fillMaxSize(),
+            config = Config(
+                shared = shared,
+                onFabClick = {
+                    navigator.navigate(ShoppingListItemDetailScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+                onSearchClick = {
+                    navigator.navigate(ShoppingListItemSearchScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+            ),
+            menuItems = setOf(
+                ShoppingListItemListItem.MenuItem(
+                    label = R.string.feature_shoppinglist_list_item_drop_down_menu_update,
+                    onClick = {
+                        navigator.navigate(ShoppingListItemDetailScreenDestination(it.id)) {
+                            launchSingleTop = true
+                        }
+                    },
+                ),
+            ),
+        )
     }
 
     @Composable

@@ -18,6 +18,7 @@ import androidx.navigation.NavHostController
 import co.ke.xently.shopping.NavHost
 import co.ke.xently.shopping.R
 import co.ke.xently.shopping.features.products.models.Product
+import co.ke.xently.shopping.features.shoppinglist.ui.NavGraphs
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
@@ -26,6 +27,8 @@ import co.ke.xently.shopping.features.utils.buildRoute
 import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.libraries.data.source.User
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.ramcosta.composedestinations.DestinationsNavHost
+import com.ramcosta.composedestinations.navigation.dependency
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -103,36 +106,44 @@ class MainActivity : FragmentActivity() {
                         }
                     }*/
 
-                    NavHost(
-                        navController = navController,
-                        shared = Shared(
-                            user = user,
-                            snackbarHostState = snackbarHostState,
-                            onNavigationIconClicked = onBackPressedDispatcher::onBackPressed,
-                            onAuthenticationRequired = {
-                                navController.navigate(Routes.Users.SIGN_IN.buildRoute()) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            onAuthenticationExpected = { isNotificationDismissible ->
-                                val message =
-                                    getString(R.string.authentication_session_expired_resign_in)
-                                val actionLabel = getString(R.string.sign_in).uppercase()
-                                composeCoroutineScope.launch {
-                                    val result = snackbarHostState.showSnackbar(
-                                        message,
-                                        actionLabel = actionLabel,
-                                        withDismissAction = isNotificationDismissible,
-                                        duration = SnackbarDuration.Long,
-                                    )
-                                    if (result == SnackbarResult.ActionPerformed) {
-                                        navController.navigate(Routes.Users.SIGN_IN.buildRoute()) {
-                                            launchSingleTop = true
-                                        }
+                    val shared = Shared(
+                        user = user,
+                        snackbarHostState = snackbarHostState,
+                        onNavigationIconClicked = onBackPressedDispatcher::onBackPressed,
+                        onAuthenticationRequired = {
+                            navController.navigate(Routes.Users.SIGN_IN.buildRoute()) {
+                                launchSingleTop = true
+                            }
+                        },
+                        onAuthenticationExpected = { isNotificationDismissible ->
+                            val message =
+                                getString(R.string.authentication_session_expired_resign_in)
+                            val actionLabel = getString(R.string.sign_in).uppercase()
+                            composeCoroutineScope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message,
+                                    actionLabel = actionLabel,
+                                    withDismissAction = isNotificationDismissible,
+                                    duration = SnackbarDuration.Long,
+                                )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    navController.navigate(Routes.Users.SIGN_IN.buildRoute()) {
+                                        launchSingleTop = true
                                     }
                                 }
-                            },
-                        ),
+                            }
+                        },
+                    )
+                    DestinationsNavHost(
+                        navGraph = NavGraphs.root,
+                        dependenciesContainerBuilder = {
+                          dependency(shared)
+                        },
+                    )
+
+                    /*NavHost(
+                        navController = navController,
+                        shared = shared,
                         items = listOf(
                             DashboardScreen.Item(
                                 logo = Icons.Default.AddBusiness,
@@ -174,7 +185,7 @@ class MainActivity : FragmentActivity() {
                             },
                             onPasswordResetContinuationDismissed = viewModel::signOut,
                         ),
-                    )
+                    )*/
                 }
             }
         }
