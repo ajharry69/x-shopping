@@ -22,41 +22,61 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
+import co.ke.xently.shopping.features.users.UsersNavGraph
 import co.ke.xently.shopping.features.users.repositories.exceptions.PasswordResetHttpException
 import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
+import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
+import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-internal object PasswordResetScreen {
-    data class Config(
+object PasswordResetScreen {
+    @Stable
+    internal data class Config(
         val shared: Shared = Shared(),
         val onPasswordReset: (User.ResetPassword) -> Unit = {},
         val onPasswordResetSuccess: (User) -> Unit = {},
         val onResendPasswordResetCodeClicked: () -> Unit = {},
     )
 
+    data class Args(val isChange: Boolean = false)
+
+    @UsersNavGraph
+    @Destination(navArgsDelegate = Args::class)
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
-        isChange: Boolean = false,
+    internal fun PasswordResetScreen(
+        args: Args,
+        shared: Shared,
+        navigator: DestinationsNavigator,
         viewModel: PasswordResetScreenViewModel = hiltViewModel(),
     ) {
         val passwordResetState by viewModel.passwordResetState.collectAsState(State.Success(null))
-        PasswordResetScreen(
-            modifier = modifier,
-            isChange = isChange,
+        invoke(
+            isChange = args.isChange,
+            modifier = Modifier.fillMaxSize(),
             passwordResetState = passwordResetState,
-            config = config.copy(
+            config = Config(
+                shared = shared,
                 onPasswordReset = viewModel::invoke,
+                onPasswordResetSuccess = { user ->
+                    if (!user.isVerified) {
+                        navigator.navigate(VerificationScreenDestination()) {
+                            launchSingleTop = true
+                        }
+                    } else if (!navigator.popBackStack(Routes.Dashboard.toString(), false)) {
+                        navigator.navigateUp()
+                    }
+                },
             ),
         )
     }
 
     @Composable
     @VisibleForTesting
-    operator fun invoke(
+    internal operator fun invoke(
         modifier: Modifier,
         isChange: Boolean,
         passwordResetState: State<User>,

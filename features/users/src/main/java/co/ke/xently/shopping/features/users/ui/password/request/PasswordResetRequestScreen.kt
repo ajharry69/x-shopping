@@ -21,12 +21,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
+import co.ke.xently.shopping.features.users.UsersNavGraph
 import co.ke.xently.shopping.features.users.repositories.exceptions.PasswordResetRequestHttpException
+import co.ke.xently.shopping.features.users.ui.destinations.PasswordResetScreenDestination
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 internal object PasswordResetRequestScreen {
+    @Stable
     data class Config(
         val shared: Shared = Shared(),
         val onPasswordResetRequest: (String) -> Unit = {},
@@ -34,19 +39,27 @@ internal object PasswordResetRequestScreen {
         val onResendPasswordResetRequestCodeClicked: () -> Unit = {},
     )
 
+    @UsersNavGraph
+    @Destination
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
+    fun PasswordResetRequestScreen(
+        shared: Shared,
+        navigator: DestinationsNavigator,
         viewModel: PasswordResetRequestScreenViewModel = hiltViewModel(),
     ) {
         val passwordResetRequestState by viewModel.passwordResetRequestState.collectAsState(
             State.Success(null))
         PasswordResetRequestScreen(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             passwordResetRequestState = passwordResetRequestState,
-            config = config.copy(
+            config = Config(
+                shared = shared,
                 onPasswordResetRequest = viewModel::invoke,
+                onPasswordResetRequestSuccess = {
+                    navigator.navigate(PasswordResetScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
             ),
         )
     }

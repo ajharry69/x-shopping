@@ -35,15 +35,6 @@ object Routes {
     }
 
     object Users {
-        const val SIGN_IN = "users/signin/"
-        const val SIGN_UP = "users/signup/"
-        const val VERIFY_ACCOUNT = "users/verify-account/"
-        const val REQUEST_PASSWORD_RESET = "users/request-password-reset/?isChange={isChange}"
-        const val RESET_PASSWORD = "users/reset-password/"
-        override fun toString(): String {
-            return javaClass.name
-        }
-
         object Deeplinks {
             const val SIGN_IN = "$INTERNAL_DEEPLINK_SCHEME://users/signin/"
             const val SIGN_UP = "$INTERNAL_DEEPLINK_SCHEME://users/signup/"
@@ -51,8 +42,6 @@ object Routes {
     }
 
     object Shop {
-        const val LIST = "shops/"
-        const val SEARCH = "shops/search/"
         const val DETAIL = "shops/{id}/?name={name}"
         override fun toString(): String {
             return javaClass.name
@@ -60,8 +49,6 @@ object Routes {
     }
 
     object Product {
-        const val LIST = "products/"
-        const val SEARCH = "products/search/"
         const val DETAIL = "products/{id}/"
         override fun toString(): String {
             return javaClass.name
@@ -69,7 +56,8 @@ object Routes {
     }
 
     object Recommendation {
-        const val REQUEST = "shopping-list/recommendations/request/?itemId={itemId}&group={group}&groupBy={groupBy}"
+        const val REQUEST =
+            "shopping-list/recommendations/request/?itemId={itemId}&group={group}&groupBy={groupBy}"
         const val RECOMMEND = "shopping-list/recommendations/?numberOfItems={numberOfItems}"
         override fun toString(): String {
             return javaClass.name

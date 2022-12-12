@@ -7,7 +7,6 @@ import androidx.navigation.NavHostController
 import co.ke.xently.shopping.features.products.productGraph
 import co.ke.xently.shopping.features.recommendation.recommendationGraph
 import co.ke.xently.shopping.features.shops.shopGraph
-import co.ke.xently.shopping.features.users.authenticationGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.buildRoute
@@ -48,7 +47,6 @@ internal object NavHost {
                 }
             }
             recommendationGraph(navController = navController, shared = shared)
-            authenticationGraph(navController = navController, shared = shared)
         }
     }
 }

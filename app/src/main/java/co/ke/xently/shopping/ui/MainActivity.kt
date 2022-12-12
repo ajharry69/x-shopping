@@ -4,31 +4,24 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddBusiness
-import androidx.compose.material.icons.filled.AddTask
-import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material.icons.filled.Recommend
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.toUpperCase
 import androidx.fragment.app.FragmentActivity
-import androidx.navigation.NavHostController
-import co.ke.xently.shopping.NavHost
 import co.ke.xently.shopping.R
-import co.ke.xently.shopping.features.products.models.Product
 import co.ke.xently.shopping.features.shoppinglist.ui.NavGraphs
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
-import co.ke.xently.shopping.features.utils.Routes
+import co.ke.xently.shopping.features.users.ui.destinations.SignInScreenDestination
+import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
-import co.ke.xently.shopping.features.utils.buildRoute
-import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.libraries.data.source.User
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
+import com.ramcosta.composedestinations.navigation.navigate
+import com.ramcosta.composedestinations.rememberNavHostEngine
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -51,7 +44,8 @@ class MainActivity : FragmentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    val navController = rememberAnimatedNavController()
+                    val engine = rememberNavHostEngine()
+                    val controller = engine.rememberNavController()
                     val composeCoroutineScope = rememberCoroutineScope()
                     val snackbarHostState = remember {
                         SnackbarHostState()
@@ -76,7 +70,7 @@ class MainActivity : FragmentActivity() {
                             is State.Success -> {
                                 (userState as State.Success).data?.let {
                                     if (!it.isVerified) {
-                                        navController.navigate(Routes.Users.VERIFY_ACCOUNT.buildRoute()) {
+                                        controller.navigate(VerificationScreenDestination()) {
                                             launchSingleTop = true
                                         }
                                     }
@@ -90,7 +84,9 @@ class MainActivity : FragmentActivity() {
 
                     LaunchedEffect(signOutState) {
                         if (signOutState is State.Error || (signOutState as? State.Success)?.data != null) {
-                            navController.navigateToSignInScreenIfSignedOut(isSignedIn = false)
+                            controller.navigate(SignInScreenDestination()) {
+                                launchSingleTop = true
+                            }
                         }
                     }
 
@@ -105,39 +101,41 @@ class MainActivity : FragmentActivity() {
                             signOutState is State.Loading
                         }
                     }*/
-
-                    val shared = Shared(
-                        user = user,
-                        snackbarHostState = snackbarHostState,
-                        onNavigationIconClicked = onBackPressedDispatcher::onBackPressed,
-                        onAuthenticationRequired = {
-                            navController.navigate(Routes.Users.SIGN_IN.buildRoute()) {
-                                launchSingleTop = true
-                            }
-                        },
-                        onAuthenticationExpected = { isNotificationDismissible ->
-                            val message =
-                                getString(R.string.authentication_session_expired_resign_in)
-                            val actionLabel = getString(R.string.sign_in).uppercase()
-                            composeCoroutineScope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    message,
-                                    actionLabel = actionLabel,
-                                    withDismissAction = isNotificationDismissible,
-                                    duration = SnackbarDuration.Long,
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    navController.navigate(Routes.Users.SIGN_IN.buildRoute()) {
+                    DestinationsNavHost(
+                        engine = engine,
+                        navGraph = NavGraphs.root,
+                        navController = controller,
+                        dependenciesContainerBuilder = {
+                            val shared = Shared(
+                                user = user,
+                                snackbarHostState = snackbarHostState,
+                                onNavigationIconClicked = onBackPressedDispatcher::onBackPressed,
+                                onAuthenticationRequired = {
+                                    navController.navigate(SignInScreenDestination()) {
                                         launchSingleTop = true
                                     }
-                                }
-                            }
-                        },
-                    )
-                    DestinationsNavHost(
-                        navGraph = NavGraphs.root,
-                        dependenciesContainerBuilder = {
-                          dependency(shared)
+                                },
+                                onAuthenticationExpected = { isNotificationDismissible ->
+                                    val message =
+                                        getString(R.string.authentication_session_expired_resign_in)
+                                    val actionLabel =
+                                        getString(R.string.sign_in).toUpperCase(Locale.current)
+                                    composeCoroutineScope.launch {
+                                        val result = snackbarHostState.showSnackbar(
+                                            message,
+                                            actionLabel = actionLabel,
+                                            withDismissAction = isNotificationDismissible,
+                                            duration = SnackbarDuration.Long,
+                                        )
+                                        if (result == SnackbarResult.ActionPerformed) {
+                                            navController.navigate(SignInScreenDestination()) {
+                                                launchSingleTop = true
+                                            }
+                                        }
+                                    }
+                                },
+                            )
+                            dependency(shared)
                         },
                     )
 
@@ -187,19 +185,6 @@ class MainActivity : FragmentActivity() {
                         ),
                     )*/
                 }
-            }
-        }
-    }
-
-    private fun NavHostController.navigateToSignInScreenIfSignedOut(
-        isSignedIn: Boolean,
-        onSignIn: NavHostController.() -> Unit = {},
-    ) {
-        if (isSignedIn) {
-            onSignIn()
-        } else {
-            navigate(Routes.Users.SIGN_IN.buildRoute()) {
-                launchSingleTop = true
             }
         }
     }
