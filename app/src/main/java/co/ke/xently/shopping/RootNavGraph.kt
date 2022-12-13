@@ -1,5 +1,6 @@
 package co.ke.xently.shopping
 
+import co.ke.xently.shopping.features.products.ui.detail.ProductsNavGraph
 import co.ke.xently.shopping.features.recommendation.ui.RecommendationNavGraph
 import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListNavGraph
 import co.ke.xently.shopping.features.users.ui.UsersNavGraph
@@ -13,8 +14,9 @@ object RootNavGraph : NavGraphSpec {
     override val startRoute: Route = ShoppingListNavGraph
 
     override val nestedNavGraphs: List<NavGraphSpec> = listOf(
-        ShoppingListNavGraph,
         UsersNavGraph,
+        ProductsNavGraph,
+        ShoppingListNavGraph,
         RecommendationNavGraph,
     )
 }

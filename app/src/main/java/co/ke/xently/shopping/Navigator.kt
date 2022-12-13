@@ -1,6 +1,7 @@
 package co.ke.xently.shopping
 
 import androidx.navigation.NavOptionsBuilder
+import co.ke.xently.shopping.features.products.ProductsNavigator
 import co.ke.xently.shopping.features.recommendation.RecommendationNavigator
 import co.ke.xently.shopping.features.recommendation.ui.destinations.RecommendationRequestScreenDestination
 import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavigator
@@ -9,8 +10,12 @@ import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-class Navigator(private val navigator: DestinationsNavigator) : ShoppingListNavigator,
-    UsersNavigator, RecommendationNavigator {
+class Navigator(
+    private val navigator: DestinationsNavigator,
+) : ShoppingListNavigator,
+    UsersNavigator,
+    ProductsNavigator,
+    RecommendationNavigator {
     override fun navigateToRecommendationRequestScreen(group: ShoppingListGroup) {
         navigator.navigate(RecommendationRequestScreenDestination()) {
             launchSingleTop = true
@@ -21,6 +26,10 @@ class Navigator(private val navigator: DestinationsNavigator) : ShoppingListNavi
         navigator.navigate(RecommendationRequestScreenDestination()) {
             launchSingleTop = true
         }
+    }
+
+    override fun onAddNewShopClicked(name: String) {
+        TODO("Not yet implemented")
     }
 
     override fun clearBackStack(route: String): Boolean {

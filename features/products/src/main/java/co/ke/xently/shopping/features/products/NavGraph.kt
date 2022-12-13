@@ -1,6 +1,6 @@
 package co.ke.xently.shopping.features.products
 
-import androidx.compose.foundation.layout.fillMaxSize
+/*import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
@@ -37,4 +37,4 @@ fun NavGraphBuilder.productGraph(shared: Shared, onAddNewShopClicked: (String) -
             )
         }
     }
-}
+}*/

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import co.ke.xently.shopping.features.products.productGraph
 import co.ke.xently.shopping.features.shops.shopGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
@@ -38,13 +37,13 @@ internal object NavHost {
                 }
             }
             shopGraph(shared = shared)
-            productGraph(shared = shared) {
+            /*productGraph(shared = shared) {
                 navController.navigate(Routes.Shop.DETAIL.buildRoute(
                     "id" to Shop.DEFAULT_INSTANCE.id,
                     "name" to it)) {
                     launchSingleTop = true
                 }
-            }
+            }*/
         }
     }
 }
