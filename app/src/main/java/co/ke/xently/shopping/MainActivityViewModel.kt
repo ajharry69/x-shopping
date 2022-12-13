@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.ui
+package co.ke.xently.shopping
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

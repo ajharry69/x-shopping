@@ -1,19 +1,27 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
+    id "com.android.library"
+    id "org.jetbrains.kotlin.android"
     id "dagger.hilt.android.plugin"
     id "kotlin-kapt"
-    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id "com.google.android.libraries.mapsplatform.secrets-gradle-plugin"
+    id "com.google.devtools.ksp" version "1.7.10-1.0.6" // Depends on your kotlin version
 }
 
 dependencies {
     implementation(project(path: ':features:map'))
+
+    ksp "io.github.raamcosta.compose-destinations:ksp:1.7.27-beta"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
 }
 
-apply from: "$rootDir/features/config.common.gradle"
+apply from: "$rootDir/features/config.common.lib.gradle"
 apply from: "$rootDir/features/dependencies.maps.gradle"
 apply from: "$rootDir/features/dependencies.features.gradle"
 android {
-    namespace 'co.ke.xently.shopping.features.shops'
+    namespace "co.ke.xently.shopping.features.shops"
+}
+
+ksp {
+    arg("compose-destinations.mode", "navgraphs")
+    arg("compose-destinations.moduleName", "shops")
 }

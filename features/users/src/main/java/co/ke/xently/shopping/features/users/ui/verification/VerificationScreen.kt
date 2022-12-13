@@ -22,11 +22,14 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
+import co.ke.xently.shopping.features.users.UsersNavGraph
+import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.VerificationHttpException
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
 import co.ke.xently.shopping.libraries.data.source.remote.HttpException.Companion.requiresAuthentication
+import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,6 +37,7 @@ internal object VerificationScreen {
     private const val DEFAULT_RESEND_COUNTDOWN = 70
     private const val DEFAULT_SHOW_RESEND_UI_ON_COUNTDOWN = 60
 
+    @Stable
     data class Config(
         val shared: Shared = Shared(),
         val onVerification: (String) -> Unit = {},
@@ -41,23 +45,31 @@ internal object VerificationScreen {
         val onResendVerificationCodeClicked: () -> Unit = {},
     )
 
+    @UsersNavGraph
+    @Destination
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
+    fun VerificationScreen(
+        shared: Shared,
+        navigator: UsersNavigator,
         viewModel: VerificationScreenViewModel = hiltViewModel(),
     ) {
         val verificationState by viewModel.verificationState.collectAsState(
             State.Success(null))
         val resendVerificationCodeState by viewModel.resendVerificationCodeState.collectAsState(
             State.Success(null))
-        VerificationScreen(
-            modifier = modifier,
+        invoke(
+            modifier = Modifier.fillMaxSize(),
             verificationState = verificationState,
             resendVerificationCodeState = resendVerificationCodeState,
-            config = config.copy(
+            config = Config(
+                shared = shared,
                 onVerification = viewModel::invoke,
                 onResendVerificationCodeClicked = viewModel::resendCode,
+                onVerificationSuccess = {
+                    if (!navigator.navigateToMainScreen()) {
+                        navigator.navigateUp()
+                    }
+                },
             ),
         )
     }

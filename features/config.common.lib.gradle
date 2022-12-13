@@ -1,0 +1,11 @@
+apply from: "$rootDir/features/config.common.gradle"
+
+android {
+    libraryVariants.all { variant ->
+        kotlin.sourceSets {
+            getByName(variant.name) {
+                kotlin.srcDir("build/generated/ksp/${variant.name}/kotlin")
+            }
+        }
+    }
+}

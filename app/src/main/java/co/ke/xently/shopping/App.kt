@@ -8,7 +8,7 @@ import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @HiltAndroidApp
-class TaxPOS : Application() {
+class App : Application() {
     override fun onCreate() {
         super.onCreate()
         val tree = if (BuildConfig.DEBUG) {

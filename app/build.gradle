@@ -1,11 +1,12 @@
 plugins {
-    id 'com.google.firebase.crashlytics'
-    id 'com.google.firebase.firebase-perf'
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    id "com.google.firebase.crashlytics"
+    id "com.google.firebase.firebase-perf"
+    id "com.android.application"
+    id "org.jetbrains.kotlin.android"
     id "dagger.hilt.android.plugin"
     id "kotlin-kapt"
-    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id "com.google.android.libraries.mapsplatform.secrets-gradle-plugin"
+    id "com.google.devtools.ksp" version "1.7.10-1.0.6" // Depends on your kotlin version
 }
 
 apply from: "$rootDir/features/config.common.gradle"
@@ -35,6 +36,13 @@ android {
             applicationIdSuffix ".beta"
         }
     }
+    applicationVariants.all { variant ->
+        kotlin.sourceSets {
+            getByName(variant.name) {
+                kotlin.srcDir("build/generated/ksp/${variant.name}/kotlin")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -46,7 +54,13 @@ dependencies {
     implementation project(path: ":libraries:data:source")
     implementation project(path: ":features:recommendation")
 
+    ksp "io.github.raamcosta.compose-destinations:ksp:1.7.27-beta"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+}
+
+ksp {
+    arg("compose-destinations.mode", "navgraphs")
+    arg("compose-destinations.moduleName", "app")
 }
 
 secrets {

@@ -3,6 +3,7 @@ package co.ke.xently.shopping.features.shoppinglist.ui.list.grouped
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,10 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.shoppinglist.R
+import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavGraph
+import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavigator
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemDetailScreenDestination
+import co.ke.xently.shopping.features.shoppinglist.ui.destinations.ShoppingListItemListScreenDestination
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListViewModel.Request
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
@@ -31,9 +36,11 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import com.ramcosta.composedestinations.annotation.Destination
 
 object GroupedShoppingListScreen {
-    data class Config(
+    @Stable
+    internal data class Config(
         val shared: Shared = Shared(),
         val onFabClick: () -> Unit = {},
         val onRefresh: () -> Unit = {},
@@ -42,12 +49,12 @@ object GroupedShoppingListScreen {
         val config: GroupedShoppingListItemCard.Config = GroupedShoppingListItemCard.Config(),
     )
 
+    @ShoppingListNavGraph(start = true)
+    @Destination
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
-        menuItems: Set<ShoppingListItemListItem.MenuItem>,
-        groupMenuItems: Set<GroupedShoppingListItemCard.MenuItem>,
+    fun GroupedShoppingListScreen(
+        shared: Shared,
+        navigator: ShoppingListNavigator,
         viewModel: GroupedShoppingListViewModel = hiltViewModel(),
     ) {
         val items = viewModel.groupedShoppingList.collectAsLazyPagingItems()
@@ -59,25 +66,58 @@ object GroupedShoppingListScreen {
         }
 
         GroupedShoppingListScreen(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             items = items,
-            config = config,
             removeState = removeState,
             groupBy = GroupBy.DateAdded,
-            groupMenuItems = groupMenuItems,
             groupCount = groupedShoppingListCount,
-            menuItems = menuItems + ShoppingListItemListItem.MenuItem(
-                onClick = ConfirmableDelete {
-                    viewModel.delete(it.id)
+            config = Config(
+                shared = shared,
+                config = GroupedShoppingListItemCard.Config(
+                    onSeeAllClicked = {
+                        navigator.navigate(ShoppingListItemListScreenDestination(it)) {
+                            launchSingleTop = true
+                        }
+                    },
+                ),
+                onFabClick = {
+                    navigator.navigate(ShoppingListItemDetailScreenDestination()) {
+                        launchSingleTop = true
+                    }
                 },
-                label = R.string.feature_shoppinglist_list_item_drop_down_menu_delete,
+            ),
+            groupMenuItems = setOf(
+                GroupedShoppingListItemCard.MenuItem(
+                    label = R.string.button_label_get_recommendations,
+                    onClick = navigator::navigateToRecommendationRequestScreen,
+                ),
+            ),
+            menuItems = setOf(
+                ShoppingListItemListItem.MenuItem(
+                    label = R.string.button_label_get_recommendations,
+                    onClick = navigator::navigateToRecommendationRequestScreen,
+                ),
+                ShoppingListItemListItem.MenuItem(
+                    label = R.string.update,
+                    onClick = {
+                        navigator.navigate(ShoppingListItemDetailScreenDestination(it.id)) {
+                            launchSingleTop = true
+                        }
+                    },
+                ),
+                ShoppingListItemListItem.MenuItem(
+                    onClick = ConfirmableDelete {
+                        viewModel.delete(it.id)
+                    },
+                    label = R.string.feature_shoppinglist_list_item_drop_down_menu_delete,
+                ),
             ),
         )
     }
 
     @Composable
     @VisibleForTesting
-    operator fun invoke(
+    internal operator fun invoke(
         modifier: Modifier,
         config: Config,
         groupBy: GroupBy,

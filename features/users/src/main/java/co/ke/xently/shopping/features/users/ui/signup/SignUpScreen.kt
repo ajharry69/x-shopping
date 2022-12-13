@@ -27,31 +27,57 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.R
+import co.ke.xently.shopping.features.users.UsersNavGraph
+import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.SignUpHttpException
 import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
+import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
+import co.ke.xently.shopping.features.utils.Deeplinks
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
+import com.ramcosta.composedestinations.annotation.DeepLink
+import com.ramcosta.composedestinations.annotation.Destination
 
 internal object SignUpScreen {
+    @Stable
     data class Config(
         val shared: Shared = Shared(),
         val onSubmitDetails: (User) -> Unit = {},
         val onSignUpSuccess: (User) -> Unit = {},
     )
 
+    @UsersNavGraph
+    @Destination(
+        deepLinks = [
+            DeepLink(uriPattern = Deeplinks.SIGN_UP),
+        ],
+    )
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
+    fun SignUpScreen(
+        shared: Shared,
+        navigator: UsersNavigator,
         viewModel: SignUpScreenViewModel = hiltViewModel(),
     ) {
         val signUpState by viewModel.signUpState.collectAsState(State.Success(null))
         SignUpScreen(
-            modifier = modifier,
+            modifier = Modifier.fillMaxSize(),
             signUpState = signUpState,
-            config = config.copy(
+            config = Config(
+                shared = shared,
                 onSubmitDetails = viewModel::save,
+                onSignUpSuccess = {
+                    when {
+                        !it.isVerified -> {
+                            navigator.navigate(VerificationScreenDestination()) {
+                                launchSingleTop = true
+                            }
+                        }
+                        !navigator.navigateToMainScreen() -> {
+                            navigator.navigateUp()
+                        }
+                    }
+                },
             ),
         )
     }

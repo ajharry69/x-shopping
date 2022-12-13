@@ -26,14 +26,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.users.BasicAuth
 import co.ke.xently.shopping.features.users.R
+import co.ke.xently.shopping.features.users.UsersNavGraph
+import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.SignInHttpException
 import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
-import co.ke.xently.shopping.features.utils.Routes
+import co.ke.xently.shopping.features.users.ui.destinations.PasswordResetRequestScreenDestination
+import co.ke.xently.shopping.features.users.ui.destinations.SignUpScreenDestination
+import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
+import co.ke.xently.shopping.features.utils.Deeplinks
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
+import com.ramcosta.composedestinations.annotation.DeepLink
+import com.ramcosta.composedestinations.annotation.Destination
 
 internal object SignInScreen {
+    @Stable
     data class Config(
         val shared: Shared = Shared(),
         val onSignUp: (User) -> Unit = {},
@@ -42,18 +50,45 @@ internal object SignInScreen {
         val onForgotPasswordClicked: () -> Unit = {},
     )
 
+    @UsersNavGraph(start = true)
+    @Destination(
+        deepLinks = [
+            DeepLink(uriPattern = Deeplinks.SIGN_IN)
+        ],
+    )
     @Composable
-    operator fun invoke(
-        modifier: Modifier,
-        config: Config,
+    fun SignInScreen(
+        shared: Shared,
+        navigator: UsersNavigator,
         viewModel: SignInScreenViewModel = hiltViewModel(),
     ) {
         val signInState by viewModel.signInState.collectAsState(State.Success(null))
-        SignInScreen(
-            modifier = modifier,
+        invoke(
+            modifier = Modifier.fillMaxSize(),
             signInState = signInState,
-            config = config.copy(
+            config = Config(
+                shared = shared,
                 onSignIn = viewModel::invoke,
+                onSignUp = {
+                    navigator.navigate(SignUpScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+                onForgotPasswordClicked = {
+                    navigator.navigate(PasswordResetRequestScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+                onSignInSuccess = {
+                    if (it.isVerified) {
+                        navigator.navigateUp()
+                    } else {
+                        navigator.popBackStack() // Don't return to the sign-in screen
+                        navigator.navigate(VerificationScreenDestination()) {
+                            launchSingleTop = true
+                        }
+                    }
+                },
             ),
         )
     }
@@ -220,7 +255,7 @@ internal object SignInScreen {
                     append("${stringResource(R.string.fusers_dont_have_account_question_prefix)}, ")
                     pushStringAnnotation(
                         tag = "SIGNUP_DEEPLINK",
-                        annotation = Routes.Users.Deeplinks.SIGN_UP,
+                        annotation = Deeplinks.SIGN_UP,
                     )
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                         append(context.getString(R.string.fusers_sign_up)

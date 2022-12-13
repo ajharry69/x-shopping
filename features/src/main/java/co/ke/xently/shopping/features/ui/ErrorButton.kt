@@ -14,7 +14,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.core.net.toUri
 import co.ke.xently.shopping.features.R
-import co.ke.xently.shopping.features.utils.Routes
+import co.ke.xently.shopping.features.utils.Deeplinks
 import co.ke.xently.shopping.libraries.data.source.remote.HttpException.Companion.requiresAuthentication
 import co.ke.xently.shopping.libraries.data.source.utils.RetryError
 
@@ -41,7 +41,7 @@ object ErrorButton {
             if (error.requiresAuthentication()) {
                 val context = LocalContext.current
                 val defaultSignInClickAction: () -> Unit = {
-                    Intent(Intent.ACTION_VIEW, Routes.Users.Deeplinks.SIGN_IN.toUri()).also {
+                    Intent(Intent.ACTION_VIEW, Deeplinks.SIGN_IN.toUri()).also {
                         context.startActivity(it)
                     }
                 }

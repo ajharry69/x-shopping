@@ -8,6 +8,5 @@ dependencies {
     // Transitive dependency needed when using calling
     // `co.ke.xently.shopping.libraries.data.source.remote.Http.sendRequest(...)`
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
-    implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
-    implementation 'com.google.accompanist:accompanist-swiperefresh:0.27.0'
+    implementation "com.google.accompanist:accompanist-swiperefresh:0.28.0"
 }

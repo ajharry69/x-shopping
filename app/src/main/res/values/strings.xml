@@ -1,5 +1,4 @@
 <resources>
-    <string name="dashboard_item_logout">Logout</string>
     <string name="content_description_dashboard_user_profile_picture">Profile picture of current user</string>
     <string name="sign_in">Sign in</string>
     <string name="authentication_session_expired_resign_in">Session expired. Please sign in again.</string>
@@ -11,6 +10,7 @@
     <!-- this is a pre-text that'll be concatenated by other texts -->
     <string name="button_label_get_recommendations">Recommend</string>
     <string name="update">Update</string>
+    <string name="dashboard_item_logout">Logout</string>
     <string name="dashboard_item_add_shop">Add shop</string>
     <string name="dashboard_item_add_product">Add product</string>
     <string name="dashboard_item_recommend_shops">Recommend shops</string>
