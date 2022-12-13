@@ -1,4 +1,4 @@
-package co.ke.xently.shopping.ui
+package co.ke.xently.shopping
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -10,15 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.fragment.app.FragmentActivity
-import co.ke.xently.shopping.Navigator
-import co.ke.xently.shopping.R
-import co.ke.xently.shopping.RootNavGraph
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.features.users.ui.destinations.SignInScreenDestination
 import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
+import co.ke.xently.shopping.navigation.Navigator
+import co.ke.xently.shopping.navigation.RootNavGraph
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.navigation.navigate
@@ -136,55 +135,10 @@ class MainActivity : FragmentActivity() {
                                 },
                             )
                             dependency(shared)
+                            dependency(viewModel)
                             dependency(Navigator(destinationsNavigator))
                         },
                     )
-
-                    /*NavHost(
-                        navController = navController,
-                        shared = shared,
-                        items = listOf(
-                            DashboardScreen.Item(
-                                logo = Icons.Default.AddBusiness,
-                                title = stringResource(R.string.dashboard_item_add_shop),
-                                onClick = {
-                                    navController.navigate(Routes.Shop.DETAIL.buildRoute("id" to Shop.DEFAULT_INSTANCE.id))
-                                },
-                            ),
-                            DashboardScreen.Item(
-                                logo = Icons.Default.AddTask,
-                                title = stringResource(R.string.dashboard_item_add_product),
-                                onClick = {
-                                    navController.navigate(Routes.Product.DETAIL.buildRoute("id" to Product.DEFAULT_INSTANCE.id))
-                                },
-                            ),
-                            DashboardScreen.Item(
-                                logo = Icons.Default.Recommend,
-                                title = stringResource(R.string.dashboard_item_recommend_shops),
-                                onClick = {
-                                    navController.navigate(Routes.Recommendation.REQUEST.buildRoute())
-                                },
-                            ),
-                            DashboardScreen.Item(
-                                logo = Icons.Default.Logout,
-                                onClick = viewModel::signOut,
-                                title = stringResource(R.string.dashboard_item_logout),
-                            ),
-                        ),
-                        config = DashboardScreen.Config(
-                            onVerifyAccountRequested = {
-                                navController.navigate(Routes.Users.VERIFY_ACCOUNT.buildRoute()) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            onPasswordResetContinuationRequested = {
-                                navController.navigate(Routes.Users.RESET_PASSWORD.buildRoute()) {
-                                    launchSingleTop = true
-                                }
-                            },
-                            onPasswordResetContinuationDismissed = viewModel::signOut,
-                        ),
-                    )*/
                 }
             }
         }

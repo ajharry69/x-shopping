@@ -1,4 +1,4 @@
-package co.ke.xently.shopping
+package co.ke.xently.shopping.navigation
 
 import androidx.navigation.NavOptionsBuilder
 import co.ke.xently.shopping.features.products.ProductsNavigator

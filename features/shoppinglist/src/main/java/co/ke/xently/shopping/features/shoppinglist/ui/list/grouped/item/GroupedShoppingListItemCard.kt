@@ -20,6 +20,7 @@ import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
 object GroupedShoppingListItemCard {
+    @Stable
     data class Config(
         val onSeeAllClicked: (ShoppingListGroup) -> Unit = {},
         val onItemClicked: (ShoppingListItem) -> Unit = {},

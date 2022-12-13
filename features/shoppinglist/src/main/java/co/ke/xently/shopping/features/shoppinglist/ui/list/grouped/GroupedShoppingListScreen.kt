@@ -52,7 +52,7 @@ object GroupedShoppingListScreen {
     @ShoppingListNavGraph(start = true)
     @Destination
     @Composable
-    internal fun GroupedShoppingListScreen(
+    fun GroupedShoppingListScreen(
         shared: Shared,
         navigator: ShoppingListNavigator,
         viewModel: GroupedShoppingListViewModel = hiltViewModel(),
