@@ -25,7 +25,6 @@ import co.ke.xently.shopping.features.users.R
 import co.ke.xently.shopping.features.users.UsersNavGraph
 import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.VerificationHttpException
-import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
@@ -67,7 +66,7 @@ internal object VerificationScreen {
                 onVerification = viewModel::invoke,
                 onResendVerificationCodeClicked = viewModel::resendCode,
                 onVerificationSuccess = {
-                    if (!navigator.popBackStack(Routes.Dashboard.toString(), false)) {
+                    if (!navigator.navigateToMainScreen()) {
                         navigator.navigateUp()
                     }
                 },

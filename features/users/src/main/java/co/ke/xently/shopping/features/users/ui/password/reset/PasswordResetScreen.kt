@@ -27,7 +27,6 @@ import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.PasswordResetHttpException
 import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
 import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
-import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
@@ -66,7 +65,7 @@ object PasswordResetScreen {
                         navigator.navigate(VerificationScreenDestination()) {
                             launchSingleTop = true
                         }
-                    } else if (!navigator.popBackStack(Routes.Dashboard.toString(), false)) {
+                    } else if (!navigator.navigateToMainScreen()) {
                         navigator.navigateUp()
                     }
                 },

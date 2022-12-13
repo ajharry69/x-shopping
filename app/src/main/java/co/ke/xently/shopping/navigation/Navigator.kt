@@ -9,6 +9,7 @@ import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGrou
 import co.ke.xently.shopping.features.shops.ui.detail.destinations.ShopDetailScreenDestination
 import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
+import co.ke.xently.shopping.ui.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 class Navigator(private val navigator: DestinationsNavigator) : ShoppingListNavigator,
@@ -31,6 +32,10 @@ class Navigator(private val navigator: DestinationsNavigator) : ShoppingListNavi
         navigator.navigate(ShopDetailScreenDestination(name = name)) {
             launchSingleTop = true
         }
+    }
+
+    override fun navigateToMainScreen(): Boolean {
+        return navigator.popBackStack(MainScreenDestination().route, false)
     }
 
     override fun clearBackStack(route: String): Boolean {

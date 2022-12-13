@@ -32,7 +32,7 @@ import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.features.users.repositories.exceptions.SignUpHttpException
 import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
 import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
-import co.ke.xently.shopping.features.utils.Routes
+import co.ke.xently.shopping.features.utils.Deeplinks
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
@@ -50,7 +50,7 @@ internal object SignUpScreen {
     @UsersNavGraph
     @Destination(
         deepLinks = [
-            DeepLink(uriPattern = Routes.Users.Deeplinks.SIGN_UP),
+            DeepLink(uriPattern = Deeplinks.SIGN_UP),
         ],
     )
     @Composable
@@ -73,7 +73,7 @@ internal object SignUpScreen {
                                 launchSingleTop = true
                             }
                         }
-                        !navigator.popBackStack(Routes.Dashboard.toString(), false) -> {
+                        !navigator.navigateToMainScreen() -> {
                             navigator.navigateUp()
                         }
                     }

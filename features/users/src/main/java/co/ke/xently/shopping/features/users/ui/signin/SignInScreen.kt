@@ -33,7 +33,7 @@ import co.ke.xently.shopping.features.users.ui.PasswordVisibilityToggle
 import co.ke.xently.shopping.features.users.ui.destinations.PasswordResetRequestScreenDestination
 import co.ke.xently.shopping.features.users.ui.destinations.SignUpScreenDestination
 import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
-import co.ke.xently.shopping.features.utils.Routes
+import co.ke.xently.shopping.features.utils.Deeplinks
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.User
@@ -53,7 +53,7 @@ internal object SignInScreen {
     @UsersNavGraph(start = true)
     @Destination(
         deepLinks = [
-            DeepLink(uriPattern = Routes.Users.Deeplinks.SIGN_IN)
+            DeepLink(uriPattern = Deeplinks.SIGN_IN)
         ],
     )
     @Composable
@@ -255,7 +255,7 @@ internal object SignInScreen {
                     append("${stringResource(R.string.fusers_dont_have_account_question_prefix)}, ")
                     pushStringAnnotation(
                         tag = "SIGNUP_DEEPLINK",
-                        annotation = Routes.Users.Deeplinks.SIGN_UP,
+                        annotation = Deeplinks.SIGN_UP,
                     )
                     withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
                         append(context.getString(R.string.fusers_sign_up)
