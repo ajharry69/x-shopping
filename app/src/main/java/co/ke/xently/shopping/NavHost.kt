@@ -4,11 +4,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
-import co.ke.xently.shopping.features.shops.shopGraph
 import co.ke.xently.shopping.features.utils.Routes
 import co.ke.xently.shopping.features.utils.Shared
-import co.ke.xently.shopping.features.utils.buildRoute
-import co.ke.xently.shopping.libraries.data.source.Shop
 import co.ke.xently.shopping.ui.DashboardScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -36,8 +33,8 @@ internal object NavHost {
 
                 }
             }
-            shopGraph(shared = shared)
-            /*productGraph(shared = shared) {
+            /*shopGraph(shared = shared)
+            productGraph(shared = shared) {
                 navController.navigate(Routes.Shop.DETAIL.buildRoute(
                     "id" to Shop.DEFAULT_INSTANCE.id,
                     "name" to it)) {

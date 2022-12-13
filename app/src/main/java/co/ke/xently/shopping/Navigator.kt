@@ -6,13 +6,12 @@ import co.ke.xently.shopping.features.recommendation.RecommendationNavigator
 import co.ke.xently.shopping.features.recommendation.ui.destinations.RecommendationRequestScreenDestination
 import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavigator
 import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGroup
+import co.ke.xently.shopping.features.shops.ui.detail.destinations.ShopDetailScreenDestination
 import co.ke.xently.shopping.features.users.UsersNavigator
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
-class Navigator(
-    private val navigator: DestinationsNavigator,
-) : ShoppingListNavigator,
+class Navigator(private val navigator: DestinationsNavigator) : ShoppingListNavigator,
     UsersNavigator,
     ProductsNavigator,
     RecommendationNavigator {
@@ -29,7 +28,9 @@ class Navigator(
     }
 
     override fun onAddNewShopClicked(name: String) {
-        TODO("Not yet implemented")
+        navigator.navigate(ShopDetailScreenDestination(name = name)) {
+            launchSingleTop = true
+        }
     }
 
     override fun clearBackStack(route: String): Boolean {
