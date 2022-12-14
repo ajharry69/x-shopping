@@ -9,6 +9,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.ui.XentlyPreview
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
+import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
@@ -59,7 +60,7 @@ private fun GroupedShoppingListScreenPreview() {
         })).collectAsLazyPagingItems()
         GroupedShoppingListScreen(
             modifier = Modifier.fillMaxSize(),
-            config = GroupedShoppingListScreen.Config(),
+            shared = Shared(),
             groupBy = GroupBy.DateAdded,
             removeState = State.Success(null),
             groupCount = mapOf(Pair("2021-09-29", shoppingList.size)),

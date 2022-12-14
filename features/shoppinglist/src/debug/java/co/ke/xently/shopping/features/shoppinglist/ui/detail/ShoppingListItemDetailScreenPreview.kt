@@ -17,7 +17,6 @@ private fun ShoppingListItemDetailScreen() {
             modifier = Modifier.fillMaxSize(),
             detailState = State.Success(null),
             saveState = State.Success(null),
-            config = ShoppingListItemDetailScreen.Config(),
             brandSuggestions = emptyList(),
             attributeSuggestions = emptyList(),
             attributeNameSuggestions = emptyList(),

@@ -34,13 +34,6 @@ import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import com.ramcosta.composedestinations.annotation.Destination
 
 object ShoppingListItemDetailScreen {
-    @Stable
-    data class Config(
-        val shared: Shared = Shared(),
-        val onSubmitDetails: (ShoppingListItem) -> Unit = {},
-        val onUpdateSuccess: () -> Unit = shared.onNavigationIconClicked,
-    )
-
     data class Args(val id: Long = ShoppingListItem.DEFAULT_INSTANCE.id)
 
     @ShoppingListNavGraph
@@ -67,9 +60,10 @@ object ShoppingListItemDetailScreen {
 
         ShoppingListItemDetailScreen(
             modifier = Modifier.fillMaxSize(),
+            shared = shared,
             saveState = saveState,
             detailState = detailState,
-            config = Config(onSubmitDetails = viewModel::save, shared = shared),
+            onSubmitDetails = viewModel::save,
             brandSuggestions = brandSuggestions,
             attributeSuggestions = attributeSuggestions,
             attributeNameSuggestions = attributeNameSuggestions,
@@ -97,7 +91,6 @@ object ShoppingListItemDetailScreen {
     @Composable
     @VisibleForTesting
     operator fun invoke(
-        config: Config,
         modifier: Modifier,
         saveState: State<String>,
         detailState: State<ShoppingListItem>,
@@ -109,6 +102,8 @@ object ShoppingListItemDetailScreen {
         onAttributeNameQueryChange: (String) -> Unit = {},
         onAttributeValueQueryChange: (String, String) -> Unit = { _, _ -> },
         onMeasurementUnitQueryChange: (String) -> Unit = {},
+        shared: Shared = Shared(),
+        onSubmitDetails: (ShoppingListItem) -> Unit = {},
     ) {
         val context = LocalContext.current
         val focusManager = LocalFocusManager.current
@@ -116,10 +111,10 @@ object ShoppingListItemDetailScreen {
         val detailScreen = DetailScreen(
             state = detailState,
             saveState = saveState,
-            snackbarHostState = config.shared.snackbarHostState,
-            onUpdateSuccess = config.onUpdateSuccess,
+            snackbarHostState = shared.snackbarHostState,
+            onUpdateSuccess = shared.onNavigationIconClicked,
             onAddSuccess = {
-                config.shared.snackbarHostState.showSnackbar(
+                shared.snackbarHostState.showSnackbar(
                     duration = SnackbarDuration.Short,
                     message = context.getString(R.string.feature_shoppinglist_add_success),
                 )
@@ -137,13 +132,13 @@ object ShoppingListItemDetailScreen {
                             Text(appBarTitle)
                         },
                         navigationIcon = {
-                            MoveBackNavigationIconButton(config.shared)
+                            MoveBackNavigationIconButton(shared)
                         },
                     )
                 }
             },
             snackbarHost = {
-                SnackbarHost(hostState = config.shared.snackbarHostState)
+                SnackbarHost(hostState = shared.snackbarHostState)
             },
         ) { values: PaddingValues ->
             Column(
@@ -279,7 +274,7 @@ object ShoppingListItemDetailScreen {
                 )
 
                 val (attributeNameConfig, attributeValueConfig, selectedAttributes) = AttributesInput(
-                    snackbarState = config.shared.snackbarHostState,
+                    snackbarState = shared.snackbarHostState,
                     state = saveState,
                     shouldResetFields = shouldResetFields,
                     default = item?.attributes,
@@ -314,8 +309,7 @@ object ShoppingListItemDetailScreen {
                     modifier = Modifier.fillMaxWidthHorizontalPadding(),
                     onClick = {
                         focusManager.clearFocus()
-                        config.onSubmitDetails.invoke((item
-                            ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
+                        (item ?: ShoppingListItem.DEFAULT_INSTANCE).copy(
                             brands = selectedBrands.map {
                                 if (it is ShoppingListItem.Brand) {
                                     it
@@ -335,7 +329,7 @@ object ShoppingListItemDetailScreen {
                             unitQuantity = unitQuantity.value.text.trim().ifBlank { "1" }.toFloat(),
                             purchaseQuantity = purchaseQuantity.value.text.trim().ifBlank { "1" }
                                 .toFloat(),
-                        ))
+                        ).let(onSubmitDetails)
                     },
                 ) {
                     Text(

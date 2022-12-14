@@ -24,12 +24,11 @@ private fun ShoppingListItemListScreenPreview() {
             flowOf(PagingData.from(List(20) { ShoppingListItem.DEFAULT_INSTANCE.copy(id = it.toLong()) })).collectAsLazyPagingItems()
         ShoppingListItemListScreen(
             modifier = Modifier.fillMaxSize(),
-            config = ShoppingListItemSearchScreen.Config(),
             items = items,
             removeState = State.Success(null),
-            isRefreshing = false,
-            menuItems = emptySet(),
             group = null,
+            menuItems = emptySet(),
+            config = ShoppingListItemSearchScreen.Config(),
         )
     }
 }
@@ -43,12 +42,11 @@ private fun ShoppingListItemListScreenWithGroupPreview() {
             flowOf(PagingData.from(List(20) { ShoppingListItem.DEFAULT_INSTANCE.copy(id = it.toLong()) })).collectAsLazyPagingItems()
         ShoppingListItemListScreen(
             modifier = Modifier.fillMaxSize(),
-            config = ShoppingListItemSearchScreen.Config(),
             items = items,
             removeState = State.Success(null),
-            isRefreshing = false,
-            menuItems = emptySet(),
             group = ShoppingListGroup(group = Date().toString()),
+            menuItems = emptySet(),
+            config = ShoppingListItemSearchScreen.Config(),
         )
     }
 }

@@ -1,6 +1,6 @@
 package co.ke.xently.shopping.libraries.data.source
 
-import co.ke.xently.shopping.libraries.data.source.utils.DateFormat.DEFAULT_LOCAL_DATE_FORMAT
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
 
@@ -12,8 +12,8 @@ data class GroupedShoppingList(
     companion object {
         val DEFAULT = GroupedShoppingList(
             numberOfItems = -1,
-            group = DEFAULT_LOCAL_DATE_FORMAT.format(Date()),
-            shoppingList = List(Random.nextInt(1, 20)) {
+            group = SimpleDateFormat.getDateInstance().format(Date()),
+            shoppingList = List(Random.nextInt(1, 10)) {
                 ShoppingListItem.DEFAULT_INSTANCE
             },
         ).run {

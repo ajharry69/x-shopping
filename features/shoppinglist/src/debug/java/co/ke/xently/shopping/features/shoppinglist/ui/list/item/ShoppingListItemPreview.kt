@@ -13,7 +13,7 @@ private fun ShoppingListItemListItemPreview() {
     XentlyTheme {
         ShoppingListItemListItem(
             modifier = Modifier,
-            shoppingListItem = ShoppingListItem.DEFAULT_INSTANCE,
+            item = ShoppingListItem.DEFAULT_INSTANCE,
             showPlaceholder = false,
             menuItems = emptySet(),
         )
@@ -26,7 +26,7 @@ private fun ShoppingListItemListItemShowPlaceholderPreview() {
     XentlyTheme {
         ShoppingListItemListItem(
             modifier = Modifier,
-            shoppingListItem = ShoppingListItem.DEFAULT_INSTANCE,
+            item = ShoppingListItem.DEFAULT_INSTANCE,
             showPlaceholder = true,
             menuItems = emptySet(),
         )

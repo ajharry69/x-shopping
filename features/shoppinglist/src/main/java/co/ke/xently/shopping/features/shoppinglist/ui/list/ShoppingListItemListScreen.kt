@@ -1,6 +1,7 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.list
 
 import androidx.annotation.VisibleForTesting
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,7 +14,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import co.ke.xently.shopping.features.shoppinglist.R
@@ -55,30 +55,11 @@ object ShoppingListItemListScreen {
         LaunchedEffect(args.group) {
             viewModel.fetchShoppingList(Request(group = args.group))
         }
-        val isRefreshing by remember(items) {
-            derivedStateOf {
-                items.loadState.refresh == LoadState.Loading
-            }
-        }
         ShoppingListItemListScreen(
             modifier = Modifier.fillMaxSize(),
             items = items,
-            group = args.group,
             removeState = removeState,
-            isRefreshing = isRefreshing,
-            config = ShoppingListItemSearchScreen.Config(
-                shared = shared,
-                onFabClick = {
-                    navigator.navigate(ShoppingListItemDetailScreenDestination()) {
-                        launchSingleTop = true
-                    }
-                },
-                onSearchClick = {
-                    navigator.navigate(ShoppingListItemSearchScreenDestination()) {
-                        launchSingleTop = true
-                    }
-                },
-            ),
+            group = args.group,
             menuItems = setOf(
                 ShoppingListItemListItem.MenuItem(
                     label = R.string.feature_shoppinglist_list_item_drop_down_menu_update,
@@ -95,6 +76,19 @@ object ShoppingListItemListScreen {
                     label = R.string.feature_shoppinglist_list_item_drop_down_menu_delete,
                 ),
             ),
+            config = ShoppingListItemSearchScreen.Config(
+                shared = shared,
+                onFabClick = {
+                    navigator.navigate(ShoppingListItemDetailScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+                onSearchClick = {
+                    navigator.navigate(ShoppingListItemSearchScreenDestination()) {
+                        launchSingleTop = true
+                    }
+                },
+            ),
         )
     }
 
@@ -104,25 +98,23 @@ object ShoppingListItemListScreen {
         modifier: Modifier,
         items: LazyPagingItems<ShoppingListItem>,
         removeState: State<Any>,
-        isRefreshing: Boolean,
         group: ShoppingListGroup?,
         menuItems: Set<ShoppingListItemListItem.MenuItem>,
         config: ShoppingListItemSearchScreen.Config,
     ) {
-
         ShowRemovalMessage(
             removeState = removeState,
             hostState = config.shared.snackbarHostState,
             successMessage = R.string.feature_shoppinglist_list_success_removing_item,
         )
 
-        val listState = rememberLazyListState()
-
         val showProgressIndicator by remember(removeState) {
             derivedStateOf {
                 removeState is State.Loading
             }
         }
+
+        val listState = rememberLazyListState()
 
         Scaffold(
             snackbarHost = {
@@ -159,23 +151,33 @@ object ShoppingListItemListScreen {
                 }
             },
             floatingActionButton = {
-                FloatingActionButton(onClick = config.onFabClick) {
-                    Icon(
-                        Icons.Default.Add,
-                        stringRes(R.string.feature_shoppinglist_detail_toolbar_title,
-                            R.string.feature_shoppinglist_add),
-                    )
+                val showFab by remember(listState) {
+                    derivedStateOf {
+                        !listState.isScrollInProgress
+                    }
+                }
+                if (showFab) {
+                    // Something weird is going on here! I thought we could use the boolean
+                    // (showFab) directly (in AnimatedVisibility) but I was wrong - it doesn't
+                    // work as expected.
+                    AnimatedVisibility(visible = true) {
+                        FloatingActionButton(onClick = config.onFabClick) {
+                            Icon(
+                                Icons.Default.Add,
+                                stringRes(R.string.feature_shoppinglist_detail_toolbar_title,
+                                    R.string.feature_shoppinglist_add),
+                            )
+                        }
+                    }
                 }
             },
         ) { values: PaddingValues ->
-
             Content(
-                items = items,
+                modifier = modifier.padding(values),
                 config = config,
+                items = items,
                 menuItems = menuItems,
                 listState = listState,
-                isRefreshing = isRefreshing,
-                modifier = modifier.padding(values),
             )
         }
     }

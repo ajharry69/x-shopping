@@ -1,6 +1,7 @@
 package co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -17,15 +18,8 @@ import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGrou
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
 import co.ke.xently.shopping.features.ui.shimmerPlaceholder
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
-import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
 object GroupedShoppingListItemCard {
-    @Stable
-    data class Config(
-        val onSeeAllClicked: (ShoppingListGroup) -> Unit = {},
-        val onItemClicked: (ShoppingListItem) -> Unit = {},
-    )
-
     data class MenuItem(
         @StringRes
         val label: Int,
@@ -41,11 +35,17 @@ object GroupedShoppingListItemCard {
         groupBy: GroupBy = GroupBy.DateAdded,
         groupMenuItems: Set<MenuItem> = emptySet(),
         menuItems: Set<ShoppingListItemListItem.MenuItem> = emptySet(),
-        config: Config = Config(),
+        onSeeAllClicked: (ShoppingListGroup) -> Unit = {},
     ) {
         val itemsPerCard = 3
-        var showDropDownMenu by remember { mutableStateOf(false) }
-        val numberOfItems = listCount.getOrElse(groupList.group) { groupList.numberOfItems }
+        var showDropDownMenu by remember {
+            mutableStateOf(false)
+        }
+        val numberOfItems = remember(groupList) {
+            listCount.getOrElse(groupList.group) {
+                groupList.numberOfItems
+            }
+        }
 
         ElevatedCard(modifier = modifier) {
             Column(modifier = Modifier.padding(vertical = 8.dp)) {
@@ -61,7 +61,7 @@ object GroupedShoppingListItemCard {
                     ) {
                         Text(
                             text = groupList.group,
-                            style = MaterialTheme.typography.headlineSmall,
+                            style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.shimmerPlaceholder(showPlaceholder),
                         )
                         Text(
@@ -112,18 +112,18 @@ object GroupedShoppingListItemCard {
                 Column {
                     for (item in groupList.shoppingList.take(itemsPerCard)) {
                         ShoppingListItemListItem(
-                            shoppingListItem = item,
+                            item = item,
                             menuItems = menuItems,
                             showPlaceholder = showPlaceholder,
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
-                if (numberOfItems > itemsPerCard) {
+                AnimatedVisibility(visible = numberOfItems > itemsPerCard) {
                     OutlinedButton(
                         onClick = {
                             if (!showPlaceholder) {
-                                config.onSeeAllClicked(
+                                onSeeAllClicked(
                                     ShoppingListGroup(
                                         groupBy = groupBy,
                                         group = groupList.group,
