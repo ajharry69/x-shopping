@@ -4,7 +4,7 @@ plugins {
     id "dagger.hilt.android.plugin"
     id "kotlin-kapt"
     id "com.google.android.libraries.mapsplatform.secrets-gradle-plugin"
-    id "com.google.devtools.ksp" version "1.7.10-1.0.6" // Depends on your kotlin version
+    id "com.google.devtools.ksp" version "1.7.20-1.0.8" // Depends on your kotlin version
 }
 
 dependencies {
