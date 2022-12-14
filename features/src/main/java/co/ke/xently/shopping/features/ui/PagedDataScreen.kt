@@ -26,31 +26,6 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 object PagedDataScreen {
     @Composable
-    operator fun invoke(
-        state: LoadState,
-        loadingContent: @Composable () -> Unit,
-        errorContent: @Composable (LoadState.Error) -> Unit,
-        successContent: @Composable (LoadState.NotLoading) -> Unit,
-    ) {
-        AnimatedContent(targetState = state) { loadState ->
-            when (loadState) {
-                is LoadState.Loading -> {
-                    loadingContent()
-                }
-                is LoadState.Error -> {
-                    errorContent(loadState)
-                }
-                is LoadState.NotLoading -> {
-                    successContent(loadState)
-                }
-                else -> {
-                    throw NotImplementedError()
-                }
-            }
-        }
-    }
-
-    @Composable
     fun <T : Any> LazyPagingItems<T>.rememberSwipeRefreshState(): SwipeRefreshState {
         val loadState by remember(this) {
             derivedStateOf {
@@ -79,8 +54,59 @@ object PagedDataScreen {
         )
     }
 
+    @Composable // TODO: Change access visibility to private
+    fun Setup(
+        state: LoadState,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successContent: @Composable (LoadState.NotLoading) -> Unit,
+    ) {
+        AnimatedContent(targetState = state) { loadState ->
+            when (loadState) {
+                is LoadState.Loading -> {
+                    loadingContent()
+                }
+                is LoadState.Error -> {
+                    errorContent(loadState)
+                }
+                is LoadState.NotLoading -> {
+                    successContent(loadState)
+                }
+                else -> {
+                    throw NotImplementedError()
+                }
+            }
+        }
+    }
+
     @Composable
-    fun <T : Any> SwipeRefreshContent(
+    fun <T : Any> DefaultSetupAppendLoadState(
+        items: LazyPagingItems<T>,
+        snackbarHostState: SnackbarHostState,
+    ) {
+        Setup(
+            state = items.loadState.append,
+            loadingContent = {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally),
+                )
+            },
+            errorContent = {
+                val message = it.error.getErrorMessage(LocalContext.current)
+                LaunchedEffect(message) {
+                    snackbarHostState.showSnackbar(message)
+                }
+            },
+            successContent = {
+
+            },
+        )
+    }
+
+    @Composable
+    fun <T : Any> LazyColumnSuccessContent(
         modifier: Modifier,
         items: LazyPagingItems<T>,
         listState: LazyListState,
@@ -89,35 +115,127 @@ object PagedDataScreen {
         appendErrorContent: @Composable (LoadState.Error) -> Unit,
         appendSuccessContent: @Composable (LoadState.NotLoading) -> Unit,
     ) {
-        SwipeRefreshContent(modifier = modifier, items = items) {
-            LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                prependContent()
-                item {
-                    invoke(
-                        state = items.loadState.append,
-                        loadingContent = appendLoadingContent,
-                        errorContent = appendErrorContent,
-                        successContent = appendSuccessContent,
-                    )
-                }
+        LazyColumn(state = listState, modifier = modifier) {
+            prependContent()
+            item {
+                Setup(
+                    state = items.loadState.append,
+                    loadingContent = appendLoadingContent,
+                    errorContent = appendErrorContent,
+                    successContent = appendSuccessContent,
+                )
             }
         }
     }
 
     @Composable
-    fun <T : Any> SwipeRefreshContent(
+    operator fun <T : Any> invoke(
+        state: LoadState,
+        items: LazyPagingItems<T>,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successWithEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+        successWithNonEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+    ) {
+        val successContent by remember(items) {
+            derivedStateOf {
+                if (items.itemCount == 0) {
+                    successWithEmptyListContent
+                } else {
+                    successWithNonEmptyListContent
+                }
+            }
+        }
+        Setup(
+            state = state,
+            errorContent = errorContent,
+            loadingContent = loadingContent,
+            successContent = successContent,
+        )
+    }
+
+    @Composable
+    operator fun <T : Any> invoke(
         modifier: Modifier,
+        state: LoadState,
+        items: LazyPagingItems<T>,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successWithEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+        content: @Composable (LoadState.NotLoading) -> Unit,
+    ) {
+        invoke(
+            state = state,
+            items = items,
+            errorContent = errorContent,
+            loadingContent = loadingContent,
+            successWithEmptyListContent = successWithEmptyListContent,
+        ) {
+            SwipeRefreshContent(modifier = modifier, items = items) {
+                content(it)
+            }
+        }
+    }
+
+    @Composable
+    operator fun <T : Any> invoke(
+        modifier: Modifier,
+        state: LoadState,
         items: LazyPagingItems<T>,
         listState: LazyListState,
-        snackbarHostState: SnackbarHostState,
         prependContent: LazyListScope.() -> Unit,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successWithEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+        appendLoadingContent: @Composable () -> Unit,
+        appendErrorContent: @Composable (LoadState.Error) -> Unit,
+        appendSuccessContent: @Composable (LoadState.NotLoading) -> Unit,
     ) {
-        val context = LocalContext.current
-        SwipeRefreshContent(
-            modifier = modifier,
+        invoke(
+            state = state,
             items = items,
+            modifier = modifier,
+            errorContent = errorContent,
+            loadingContent = loadingContent,
+            successWithEmptyListContent = successWithEmptyListContent,
+        ) {
+            LazyColumnSuccessContent(
+                modifier = Modifier.fillMaxSize(),
+                items = items,
+                listState = listState,
+                prependContent = prependContent,
+                appendErrorContent = appendErrorContent,
+                appendLoadingContent = appendLoadingContent,
+                appendSuccessContent = appendSuccessContent,
+            )
+        }
+    }
+
+    @Composable
+    operator fun <T : Any> invoke(
+        modifier: Modifier,
+        state: LoadState,
+        items: LazyPagingItems<T>,
+        listState: LazyListState,
+        prependContent: LazyListScope.() -> Unit,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successWithEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+        appendErrorContent: @Composable (LoadState.Error) -> Unit,
+    ) {
+        invoke(
+            state = state,
+            items = items,
+            modifier = modifier,
             listState = listState,
+            errorContent = errorContent,
+            loadingContent = loadingContent,
             prependContent = prependContent,
+            appendErrorContent = appendErrorContent,
+            successWithEmptyListContent = successWithEmptyListContent,
+            appendSuccessContent = {
+
+            },
             appendLoadingContent = {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -125,44 +243,105 @@ object PagedDataScreen {
                         .wrapContentWidth(Alignment.CenterHorizontally),
                 )
             },
+        )
+    }
+
+    @Composable
+    operator fun <T : Any> invoke(
+        modifier: Modifier,
+        state: LoadState,
+        items: LazyPagingItems<T>,
+        listState: LazyListState,
+        snackbarHostState: SnackbarHostState,
+        prependContent: LazyListScope.() -> Unit,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successWithEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+    ) {
+        invoke(
+            state = state,
+            items = items,
+            modifier = modifier,
+            listState = listState,
+            errorContent = errorContent,
+            loadingContent = loadingContent,
+            prependContent = prependContent,
+            successWithEmptyListContent = successWithEmptyListContent,
             appendErrorContent = {
-                val message = it.error.getErrorMessage(context)
+                val message = it.error.getErrorMessage(LocalContext.current)
                 LaunchedEffect(message) {
                     snackbarHostState.showSnackbar(message)
                 }
-            },
-            appendSuccessContent = {
-
             },
         )
     }
 
     @Composable
-    fun <T : Any> SwipeRefreshContent(
+    fun <T : Any> WithoutSwipeRefresh(
         modifier: Modifier,
+        state: LoadState,
         items: LazyPagingItems<T>,
         listState: LazyListState,
-        snackbarHostState: SnackbarHostState,
-        key: ((item: T) -> Any)?,
-        placeholder: (() -> T)?,
-        itemContent: @Composable (LazyItemScope.(T) -> Unit),
+        prependContent: LazyListScope.() -> Unit,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successWithEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+        appendLoadingContent: @Composable () -> Unit,
+        appendErrorContent: @Composable (LoadState.Error) -> Unit,
+        appendSuccessContent: @Composable (LoadState.NotLoading) -> Unit,
     ) {
-        SwipeRefreshContent(
+        invoke(
+            state = state,
+            items = items,
+            errorContent = errorContent,
+            loadingContent = loadingContent,
+            successWithEmptyListContent = successWithEmptyListContent,
+        ) {
+            LazyColumnSuccessContent(
+                modifier = modifier,
+                items = items,
+                listState = listState,
+                prependContent = prependContent,
+                appendErrorContent = appendErrorContent,
+                appendLoadingContent = appendLoadingContent,
+                appendSuccessContent = appendSuccessContent,
+            )
+        }
+    }
+
+    @Composable
+    fun <T : Any> WithoutSwipeRefresh(
+        modifier: Modifier,
+        state: LoadState,
+        items: LazyPagingItems<T>,
+        listState: LazyListState,
+        prependContent: LazyListScope.() -> Unit,
+        loadingContent: @Composable () -> Unit,
+        errorContent: @Composable (LoadState.Error) -> Unit,
+        successWithEmptyListContent: @Composable (LoadState.NotLoading) -> Unit,
+        appendErrorContent: @Composable (LoadState.Error) -> Unit,
+    ) {
+        WithoutSwipeRefresh(
+            state = state,
             items = items,
             modifier = modifier,
             listState = listState,
-            snackbarHostState = snackbarHostState,
-        ) {
-            items(items, key = key) { item ->
-                if (item == null) {
-                    if (placeholder != null) {
-                        itemContent(placeholder())
-                    }
-                } else {
-                    itemContent(item)
-                }
-            }
-        }
+            errorContent = errorContent,
+            prependContent = prependContent,
+            loadingContent = loadingContent,
+            appendErrorContent = appendErrorContent,
+            successWithEmptyListContent = successWithEmptyListContent,
+            appendSuccessContent = {
+
+            },
+            appendLoadingContent = {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally),
+                )
+            },
+        )
     }
 
     @Composable
@@ -182,7 +361,11 @@ object PagedDataScreen {
         noinline itemContent: @Composable (LazyItemScope.(T) -> Unit),
     ) {
         invoke(
+            items = items,
+            modifier = modifier,
+            listState = listState,
             state = items.loadState.refresh,
+            snackbarHostState = snackbarHostState,
             errorContent = {
                 Fullscreen.Error(
                     modifier = modifier,
@@ -201,20 +384,20 @@ object PagedDataScreen {
                     numberOfPlaceholders = numberOfPlaceholders,
                 )
             },
-        ) {
-            if (items.itemCount == 0) {
+            successWithEmptyListContent = {
                 Fullscreen.EmptyList<T>(modifier, emptyListMessage)
-            } else {
-                SwipeRefreshContent(
-                    items = items,
-                    modifier = modifier,
-                    listState = listState,
-                    key = key,
-                    placeholder = placeholder,
-                    itemContent = itemContent,
-                    snackbarHostState = snackbarHostState,
-                )
+            },
+            prependContent = {
+                items(items, key = key) { item ->
+                    if (item == null) {
+                        if (placeholder != null) {
+                            itemContent(placeholder())
+                        }
+                    } else {
+                        itemContent(item)
+                    }
+                }
             }
-        }
+        )
     }
 }

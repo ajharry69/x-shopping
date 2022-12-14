@@ -2,9 +2,11 @@ package co.ke.xently.shopping.features.shoppinglist.ui.list.grouped
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -18,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import co.ke.xently.shopping.features.shoppinglist.GroupBy
 import co.ke.xently.shopping.features.shoppinglist.R
 import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavGraph
@@ -28,10 +31,7 @@ import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppi
 import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.item.GroupedShoppingListItemCard
 import co.ke.xently.shopping.features.shoppinglist.ui.list.item.ShoppingListItemListItem
 import co.ke.xently.shopping.features.stringRes
-import co.ke.xently.shopping.features.ui.ConfirmableDelete
-import co.ke.xently.shopping.features.ui.PagedDataScreen
-import co.ke.xently.shopping.features.ui.ShowRemovalMessage
-import co.ke.xently.shopping.features.ui.TopAppBarWithProgressIndicator
+import co.ke.xently.shopping.features.ui.*
 import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.features.utils.State
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
@@ -189,29 +189,68 @@ object GroupedShoppingListScreen {
         ) { values: PaddingValues ->
             PagedDataScreen(
                 modifier = modifier.padding(values),
-                listState = listState,
                 items = items,
-                key = { it.group },
-                snackbarHostState = config.shared.snackbarHostState,
-                placeholder = { GroupedShoppingList.DEFAULT },
-                emptyListMessage = stringResource(R.string.feature_shoppinglist_list_empty_list),
-            ) { groupList ->
-                val showPlaceholder by remember(groupList.shoppingList) {
-                    derivedStateOf {
-                        groupList.shoppingList.any { it.id == ShoppingListItem.DEFAULT_INSTANCE.id }
+                state = items.loadState.refresh,
+                loadingContent = {
+                    Fullscreen.Loading(
+                        modifier = modifier,
+                        placeholder = { GroupedShoppingList.DEFAULT },
+                    ) { groupList ->
+                        GroupedShoppingListItemCard(
+                            showPlaceholder = true,
+                            groupBy = groupBy,
+                            groupList = groupList,
+                            menuItems = menuItems,
+                            listCount = groupCount,
+                            config = config.config,
+                            groupMenuItems = groupMenuItems,
+                        )
                     }
-                }
-                GroupedShoppingListItemCard(
-                    groupBy = groupBy,
-                    groupList = groupList,
-                    menuItems = menuItems,
-                    listCount = groupCount,
-                    config = config.config,
-                    groupMenuItems = groupMenuItems,
-                    showPlaceholder = showPlaceholder,
-                    modifier = Modifier.padding(bottom = 16.dp),
-                )
-            }
+                },
+                errorContent = {
+                    Fullscreen.Error(
+                        modifier = modifier,
+                        error = it.error,
+                        onErrorClick = { items.retry() },
+                    )
+                },
+                successWithEmptyListContent = {
+                    Fullscreen.EmptyList<GroupedShoppingList>(
+                        modifier = modifier,
+                        error = stringResource(R.string.feature_shoppinglist_list_empty_list),
+                    )
+                },
+                content = {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(10.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                    ) {
+                        items(items, key = { it.group }) { item ->
+                            val groupList = item ?: GroupedShoppingList.DEFAULT
+                            val showPlaceholder by remember(groupList.shoppingList) {
+                                derivedStateOf {
+                                    groupList.shoppingList.any { it.id == ShoppingListItem.DEFAULT_INSTANCE.id }
+                                }
+                            }
+                            GroupedShoppingListItemCard(
+                                groupBy = groupBy,
+                                groupList = groupList,
+                                menuItems = menuItems,
+                                listCount = groupCount,
+                                config = config.config,
+                                groupMenuItems = groupMenuItems,
+                                showPlaceholder = showPlaceholder,
+                            )
+                        }
+                        item {
+                            PagedDataScreen.DefaultSetupAppendLoadState(
+                                items = items,
+                                snackbarHostState = config.shared.snackbarHostState,
+                            )
+                        }
+                    }
+                },
+            )
         }
     }
 }
