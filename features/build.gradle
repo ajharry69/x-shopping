@@ -15,7 +15,6 @@ dependencies {
     implementation project(path: ":libraries:data:source")
     implementation project(path: ":libraries:data:source:local")
     implementation project(path: ":libraries:data:source:remote")
-    implementation 'com.google.accompanist:accompanist-swiperefresh:0.28.0'
     implementation 'com.google.accompanist:accompanist-placeholder-material:0.28.0'
 }
 

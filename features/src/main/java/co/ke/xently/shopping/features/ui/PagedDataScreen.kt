@@ -1,6 +1,7 @@
 package co.ke.xently.shopping.features.ui
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.CircularProgressIndicator
@@ -11,39 +12,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import co.ke.xently.shopping.features.ui.pullrefresh.PullRefreshIndicator
+import co.ke.xently.shopping.features.ui.pullrefresh.pullRefresh
+import co.ke.xently.shopping.features.ui.pullrefresh.rememberPullRefreshState
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.getErrorMessage
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
 object PagedDataScreen {
     @Composable
-    private fun <T : Any> LazyPagingItems<T>.rememberSwipeRefreshState(): SwipeRefreshState {
-        val loadState by remember(this) {
-            derivedStateOf {
-                loadState.mediator ?: loadState.source
-            }
-        }
-        val isRefreshing by remember(loadState) {
-            derivedStateOf {
-                loadState.refresh == LoadState.Loading
-            }
-        }
-        return rememberSwipeRefreshState(isRefreshing = isRefreshing)
-    }
-
-    @Composable
-    private fun <T : Any> SwipeRefreshContent(
+    private fun <T : Any> PullRefresh(
         modifier: Modifier,
         items: LazyPagingItems<T>,
         content: @Composable () -> Unit,
     ) {
-        SwipeRefresh(
-            content = content,
-            modifier = modifier,
-            onRefresh = items::refresh,
-            state = items.rememberSwipeRefreshState(),
-        )
+        val loadState by remember(items) {
+            derivedStateOf {
+                items.loadState.mediator ?: items.loadState.source
+            }
+        }
+        val refreshing by remember(loadState) {
+            derivedStateOf {
+                loadState.refresh == LoadState.Loading
+            }
+        }
+        val state = rememberPullRefreshState(refreshing = refreshing, onRefresh = items::refresh)
+
+        Box(modifier then Modifier.pullRefresh(state)) {
+            content()
+
+            PullRefreshIndicator(
+                state = state,
+                refreshing = state.refreshing,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
+        }
     }
 
     @Composable
@@ -140,7 +141,7 @@ object PagedDataScreen {
             loadingContent = loadingContent,
             successWithEmptyListContent = successWithEmptyListContent,
         ) {
-            SwipeRefreshContent(modifier = modifier, items = items) {
+            PullRefresh(modifier = modifier, items = items) {
                 content(it)
             }
         }
