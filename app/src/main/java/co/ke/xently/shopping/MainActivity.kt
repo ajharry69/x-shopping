@@ -10,7 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.fragment.app.FragmentActivity
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListItemListViewModel
+import co.ke.xently.shopping.features.shoppinglist.ui.ShoppingListNavGraph
+import co.ke.xently.shopping.features.shoppinglist.ui.list.grouped.GroupedShoppingListViewModel
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
 import co.ke.xently.shopping.features.users.ui.destinations.SignInScreenDestination
 import co.ke.xently.shopping.features.users.ui.destinations.VerificationScreenDestination
@@ -90,6 +94,15 @@ class MainActivity : FragmentActivity() {
                             dependency(shared)
                             dependency(viewModel)
                             dependency(Navigator(destinationsNavigator))
+                            // Attached to the activity because it is used in the MainScreen that
+                            // is shown first
+                            dependency(hiltViewModel<GroupedShoppingListViewModel>(this@MainActivity))
+                            dependency(ShoppingListNavGraph) {
+                                val parentEntry = remember(navBackStackEntry) {
+                                    navController.getBackStackEntry(ShoppingListNavGraph.route)
+                                }
+                                hiltViewModel<ShoppingListItemListViewModel>(parentEntry)
+                            }
                         },
                     )
                 }
@@ -98,7 +111,10 @@ class MainActivity : FragmentActivity() {
     }
 
     @Composable
-    private fun isLoadingWithUser(state: SnackbarHostState, controller: NavHostController): Pair<Boolean, User?> {
+    private fun isLoadingWithUser(
+        state: SnackbarHostState,
+        controller: NavHostController,
+    ): Pair<Boolean, User?> {
         val userState by viewModel.userState.collectAsState(initial = State.Success(null))
 
         LaunchedEffect(userState) {

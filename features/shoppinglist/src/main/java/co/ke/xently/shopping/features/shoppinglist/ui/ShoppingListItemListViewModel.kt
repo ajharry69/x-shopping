@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class ShoppingListItemListViewModel @Inject constructor(
+class ShoppingListItemListViewModel @Inject constructor(
     repository: IShoppingListRepository,
 ) : ViewModel() {
     data class Request(
