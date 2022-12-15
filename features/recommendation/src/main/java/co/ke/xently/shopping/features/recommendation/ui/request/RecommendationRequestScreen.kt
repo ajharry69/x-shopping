@@ -32,19 +32,6 @@ import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import com.ramcosta.composedestinations.annotation.Destination
 
 internal object RecommendationRequestScreen {
-    @Stable
-    data class Config(
-        val shared: Shared = Shared(),
-        val onRecommendClick: () -> Unit = {},
-        val addUnsavedItem: (String) -> Unit = {},
-        val removeUnsavedItem: (String) -> Unit = {},
-        val restoreRemovedSavedItems: () -> Unit = {},
-        val lookupItemToBeAdded: (String) -> Unit = {},
-        val restoreRemovedUnsavedItems: () -> Unit = {},
-        val removeSavedItem: (ShoppingListItem) -> Unit = {},
-        val onUpdateSuccess: () -> Unit = shared.onNavigationIconClicked,
-    )
-
     @RecommendationNavGraph(start = true)
     @Destination
     @Composable
@@ -66,26 +53,24 @@ internal object RecommendationRequestScreen {
         }
 
         RecommendationRequestScreen(
+            shared = shared,
             modifier = Modifier.fillMaxSize(),
             savedShoppingList = savedShoppingList,
             unsavedShoppingList = unsavedShoppingList,
+            addUnsavedItem = viewModel::addUnsavedShoppingList,
+            removeSavedItem = viewModel::removeSavedShoppingList,
+            lookupItemToBeAdded = viewModel::lookupItemToBeAdded,
+            removeUnsavedItem = viewModel::removeUnsavedShoppingList,
+            restoreRemovedSavedItems = viewModel::restoreRemovedSavedItems,
+            restoreRemovedUnsavedItems = viewModel::restoreRemovedUnsavedItems,
             hasSavedShoppingListItemInTheRecycleBin = hasSavedShoppingListItemInTheRecycleBin,
             itemToBeAddedExistsInUnsavedShoppingList = itemToBeAddedExistsInUnsavedShoppingList,
             hasUnsavedShoppingListItemInTheRecycleBin = hasUnsavedShoppingListItemInTheRecycleBin,
-            config = Config(
-                shared = shared,
-                addUnsavedItem = viewModel::addUnsavedShoppingList,
-                removeSavedItem = viewModel::removeSavedShoppingList,
-                lookupItemToBeAdded = viewModel::lookupItemToBeAdded,
-                removeUnsavedItem = viewModel::removeUnsavedShoppingList,
-                restoreRemovedSavedItems = viewModel::restoreRemovedSavedItems,
-                restoreRemovedUnsavedItems = viewModel::restoreRemovedUnsavedItems,
-                onRecommendClick = {
-                    navigator.navigate(RecommendationScreenDestination()) {
-                        launchSingleTop = true
-                    }
-                },
-            ),
+            onRecommendClick = {
+                navigator.navigate(RecommendationScreenDestination()) {
+                    launchSingleTop = true
+                }
+            },
         )
     }
 
@@ -93,10 +78,17 @@ internal object RecommendationRequestScreen {
     @Composable
     @VisibleForTesting
     operator fun invoke(
-        config: Config,
+        shared: Shared,
         modifier: Modifier,
         unsavedShoppingList: List<String>,
         savedShoppingList: List<ShoppingListItem>,
+        onRecommendClick: () -> Unit = {},
+        addUnsavedItem: (String) -> Unit = {},
+        removeUnsavedItem: (String) -> Unit = {},
+        restoreRemovedSavedItems: () -> Unit = {},
+        lookupItemToBeAdded: (String) -> Unit = {},
+        restoreRemovedUnsavedItems: () -> Unit = {},
+        removeSavedItem: (ShoppingListItem) -> Unit = {},
         hasSavedShoppingListItemInTheRecycleBin: Boolean = false,
         itemToBeAddedExistsInUnsavedShoppingList: Boolean = false,
         hasUnsavedShoppingListItemInTheRecycleBin: Boolean = false,
@@ -121,13 +113,13 @@ internal object RecommendationRequestScreen {
                             Text(stringResource(R.string.toolbar_title_request_recommendation))
                         },
                         navigationIcon = {
-                            MoveBackNavigationIconButton(config.shared)
+                            MoveBackNavigationIconButton(shared)
                         },
                     )
                 }
             },
             snackbarHost = {
-                SnackbarHost(hostState = config.shared.snackbarHostState)
+                SnackbarHost(hostState = shared.snackbarHostState)
             },
         ) { values: PaddingValues ->
             LazyColumn(
@@ -168,7 +160,7 @@ internal object RecommendationRequestScreen {
                             isError = name.hasError,
                             onValueChange = {
                                 name.onValueChange(it)
-                                config.lookupItemToBeAdded(it.text.trim())
+                                lookupItemToBeAdded(it.text.trim())
                             },
                             label = {
                                 Text(name.label)
@@ -183,7 +175,7 @@ internal object RecommendationRequestScreen {
                                 IconButton(
                                     enabled = enableSubmitButton,
                                     onClick = {
-                                        config.addUnsavedItem(name.value.text.trim())
+                                        addUnsavedItem(name.value.text.trim())
                                         name.onValueChange(TextFieldValue())
                                     },
                                 ) {
@@ -196,7 +188,7 @@ internal object RecommendationRequestScreen {
                             keyboardActions = KeyboardActions(
                                 onDone = {
                                     if (!name.hasError) {
-                                        config.addUnsavedItem(name.value.text.trim())
+                                        addUnsavedItem(name.value.text.trim())
                                         name.onValueChange(TextFieldValue())
                                     }
                                 },
@@ -207,7 +199,7 @@ internal object RecommendationRequestScreen {
                             modifier = Modifier.fillMaxWidth(),
                             onClick = {
                                 focusManager.clearFocus()
-                                config.onRecommendClick()
+                                onRecommendClick()
                             },
                         ) {
                             Text(
@@ -230,7 +222,7 @@ internal object RecommendationRequestScreen {
                             },
                             trailingContent = {
                                 IconButton(
-                                    onClick = config.restoreRemovedUnsavedItems,
+                                    onClick = restoreRemovedUnsavedItems,
                                     enabled = hasUnsavedShoppingListItemInTheRecycleBin,
                                 ) {
                                     Icon(
@@ -247,7 +239,7 @@ internal object RecommendationRequestScreen {
                                 Text(it)
                             },
                             trailingContent = {
-                                IconButton(onClick = { config.removeUnsavedItem(it) }) {
+                                IconButton(onClick = { removeUnsavedItem(it) }) {
                                     Icon(
                                         imageVector = Icons.Default.DeleteForever,
                                         contentDescription = stringResource(
@@ -272,7 +264,7 @@ internal object RecommendationRequestScreen {
                             },
                             trailingContent = {
                                 IconButton(
-                                    onClick = config.restoreRemovedSavedItems,
+                                    onClick = restoreRemovedSavedItems,
                                     enabled = hasSavedShoppingListItemInTheRecycleBin,
                                 ) {
                                     Icon(
@@ -297,7 +289,7 @@ internal object RecommendationRequestScreen {
                                         it.purchaseQuantity.let(ungroupedNumberFormat::format),
                                         style = MaterialTheme.typography.titleLarge,
                                     )
-                                    IconButton(onClick = { config.removeSavedItem(it) }) {
+                                    IconButton(onClick = { removeSavedItem(it) }) {
                                         Icon(
                                             imageVector = Icons.Default.DeleteForever,
                                             contentDescription = stringResource(

@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import co.ke.xently.shopping.features.ui.XentlyPreview
 import co.ke.xently.shopping.features.ui.theme.XentlyTheme
+import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 
 @SuppressLint("VisibleForTests")
@@ -14,7 +15,7 @@ import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 private fun RecommendationRequestScreenPreview() {
     XentlyTheme {
         RecommendationRequestScreen(
-            config = RecommendationRequestScreen.Config(),
+            shared = Shared(),
             modifier = Modifier.fillMaxSize(),
             unsavedShoppingList = List(5) {
                 "Bread ${it + 1}"
