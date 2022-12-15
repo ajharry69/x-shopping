@@ -5,9 +5,9 @@ import co.ke.xently.shopping.features.products.ProductsNavigator
 import co.ke.xently.shopping.features.recommendation.RecommendationNavigator
 import co.ke.xently.shopping.features.recommendation.ui.destinations.RecommendationRequestScreenDestination
 import co.ke.xently.shopping.features.shoppinglist.ShoppingListNavigator
-import co.ke.xently.shopping.features.shoppinglist.repositories.ShoppingListGroup
 import co.ke.xently.shopping.features.shops.ui.detail.destinations.ShopDetailScreenDestination
 import co.ke.xently.shopping.features.users.UsersNavigator
+import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import co.ke.xently.shopping.ui.destinations.MainScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -16,14 +16,14 @@ class Navigator(private val navigator: DestinationsNavigator) : ShoppingListNavi
     UsersNavigator,
     ProductsNavigator,
     RecommendationNavigator {
-    override fun navigateToRecommendationRequestScreen(group: ShoppingListGroup) {
-        navigator.navigate(RecommendationRequestScreenDestination()) {
+    override fun navigateToRecommendationRequestScreen(group: GroupedShoppingList) {
+        navigator.navigate(RecommendationRequestScreenDestination(group.shoppingList.toTypedArray())) {
             launchSingleTop = true
         }
     }
 
     override fun navigateToRecommendationRequestScreen(item: ShoppingListItem) {
-        navigator.navigate(RecommendationRequestScreenDestination()) {
+        navigator.navigate(RecommendationRequestScreenDestination(arrayOf(item))) {
             launchSingleTop = true
         }
     }

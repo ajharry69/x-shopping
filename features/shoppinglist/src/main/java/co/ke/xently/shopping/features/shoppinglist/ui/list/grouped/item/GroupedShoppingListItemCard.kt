@@ -20,10 +20,11 @@ import co.ke.xently.shopping.features.ui.shimmerPlaceholder
 import co.ke.xently.shopping.libraries.data.source.GroupedShoppingList
 
 object GroupedShoppingListItemCard {
+    @Stable
     data class MenuItem(
         @StringRes
         val label: Int,
-        val onClick: (ShoppingListGroup) -> Unit,
+        val onClick: (GroupedShoppingList) -> Unit,
     )
 
     @Composable
@@ -91,7 +92,7 @@ object GroupedShoppingListItemCard {
                             for (item in groupMenuItems) {
                                 DropdownMenuItem(
                                     onClick = {
-                                        item.onClick(ShoppingListGroup(groupList.group))
+                                        item.onClick(groupList)
                                         showDropDownMenu = false
                                     },
                                     text = {
