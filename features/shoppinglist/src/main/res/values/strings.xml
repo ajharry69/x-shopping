@@ -21,6 +21,8 @@
     <string name="feature_shoppinglist_content_description_open_drawer">Open navigation drawer</string>
     <string name="button_label_get_recommendations">Recommend</string>
     <string name="update">Update</string>
+    <string name="content_desc_options_menu">More options</string>
+    <string name="menu_item_refresh">Refresh</string>
 
     <plurals name="feature_shoppinglist_group_items_count">
         <item quantity="one">%d item</item>

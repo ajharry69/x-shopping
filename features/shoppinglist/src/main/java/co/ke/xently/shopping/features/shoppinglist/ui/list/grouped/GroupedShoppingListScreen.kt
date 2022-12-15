@@ -2,18 +2,17 @@ package co.ke.xently.shopping.features.shoppinglist.ui.list.grouped
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -155,6 +154,31 @@ object GroupedShoppingListScreen {
                                     imageVector = Icons.Default.Search,
                                     contentDescription = stringResource(R.string.feature_shoppinglist_search_hint),
                                 )
+                            }
+                            Box {
+                                var showMenu by rememberSaveable {
+                                    mutableStateOf(false)
+                                }
+                                IconButton(onClick = { showMenu = true }) {
+                                    Icon(
+                                        Icons.Default.MoreVert,
+                                        contentDescription = stringResource(R.string.content_desc_options_menu),
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = showMenu,
+                                    onDismissRequest = { showMenu = false },
+                                ) {
+                                    DropdownMenuItem(
+                                        text = {
+                                            Text(text = stringResource(R.string.menu_item_refresh))
+                                        },
+                                        onClick = {
+                                            showMenu = false
+                                            items.refresh()
+                                        },
+                                    )
+                                }
                             }
                         },
                     )
