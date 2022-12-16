@@ -67,7 +67,7 @@ object RecommendationRequestScreen {
         CallOnLifecycleEvent {
             if (it == Lifecycle.Event.ON_DESTROY) {
                 viewModel.clean()
-            } else if (it == Lifecycle.Event.ON_START) {
+            } else if (it == Lifecycle.Event.ON_CREATE) {
                 args.items.forEach(viewModel::addSavedShoppingList)
             }
         }
@@ -124,6 +124,29 @@ object RecommendationRequestScreen {
             }
         }
 
+        val showSavedShoppingListUI by remember(
+            savedShoppingList,
+            hasSavedShoppingListItemInTheRecycleBin,
+        ) {
+            derivedStateOf {
+                hasSavedShoppingListItemInTheRecycleBin || savedShoppingList.isNotEmpty()
+            }
+        }
+
+        val showUnsavedShoppingListUI by remember(
+            unsavedShoppingList,
+            hasUnsavedShoppingListItemInTheRecycleBin,
+        ) {
+            derivedStateOf {
+                hasUnsavedShoppingListItemInTheRecycleBin || unsavedShoppingList.isNotEmpty()
+            }
+        }
+
+        val showEmptyListUI by remember(showSavedShoppingListUI, showUnsavedShoppingListUI) {
+            derivedStateOf {
+                !showSavedShoppingListUI && !showUnsavedShoppingListUI
+            }
+        }
         Scaffold(
             topBar = {
                 TopAppBarWithProgressIndicator {
@@ -147,98 +170,106 @@ object RecommendationRequestScreen {
                     .safeContentPadding(),
             ) {
                 stickyHeader {
-                    ElevatedCard(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.background),
-                    ) {
-                        Column(
+                    Column(if (showEmptyListUI) Modifier.fillParentMaxSize() else Modifier) {
+                        ElevatedCard(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
-                                .padding(top = 10.dp, bottom = 4.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                                .padding(horizontal = 16.dp),
+                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.background),
                         ) {
-                            val name = TextFieldConfig<String>(
-                                labelId = R.string.field_label_item_name,
-                                extraErrorChecks = {
-                                    if (itemToBeAddedExistsInUnsavedShoppingList) {
-                                        context.getString(
-                                            R.string.duplicate_unsaved_shopping_list_item,
-                                            it.text.trim(),
-                                        )
-                                    } else null
-                                },
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp)
+                                    .padding(top = 10.dp, bottom = 4.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                            ) {
+                                val name = TextFieldConfig<String>(
+                                    labelId = R.string.field_label_item_name,
+                                    extraErrorChecks = {
+                                        if (itemToBeAddedExistsInUnsavedShoppingList) {
+                                            context.getString(
+                                                R.string.duplicate_unsaved_shopping_list_item,
+                                                it.text.trim(),
+                                            )
+                                        } else null
+                                    },
+                                )
 
-                            val requiredFields = arrayOf(name)
-                            val enableSubmitButton by remember(*requiredFields) {
-                                derivedStateOf {
-                                    requiredFields.all { !it.hasError }
-                                }
-                            }
-
-                            TextField(
-                                modifier = Modifier.fillMaxWidth(),
-                                singleLine = true,
-                                value = name.value,
-                                isError = name.hasError,
-                                onValueChange = {
-                                    name.onValueChange(it)
-                                    lookupItemToBeAdded(it.text.trim())
-                                },
-                                label = {
-                                    Text(name.label)
-                                },
-                                supportingText = {
-                                    SupportingText(
-                                        config = name,
-                                        helpText = stringResource(R.string.help_text_click_to_add_unsaved_item),
-                                    )
-                                },
-                                trailingIcon = {
-                                    IconButton(
-                                        enabled = enableSubmitButton,
-                                        onClick = {
-                                            addUnsavedItem(name.value.text.trim())
-                                            name.onValueChange(TextFieldValue())
-                                        },
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = stringResource(R.string.add_unsaved_item_description),
-                                        )
+                                val requiredFields = arrayOf(name)
+                                val enableSubmitButton by remember(*requiredFields) {
+                                    derivedStateOf {
+                                        requiredFields.all { !it.hasError }
                                     }
-                                },
-                                keyboardActions = KeyboardActions(
-                                    onDone = {
-                                        if (!name.hasError) {
-                                            addUnsavedItem(name.value.text.trim())
-                                            name.onValueChange(TextFieldValue())
+                                }
+
+                                TextField(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true,
+                                    value = name.value,
+                                    isError = name.hasError,
+                                    onValueChange = {
+                                        name.onValueChange(it)
+                                        lookupItemToBeAdded(it.text.trim())
+                                    },
+                                    label = {
+                                        Text(name.label)
+                                    },
+                                    supportingText = {
+                                        SupportingText(
+                                            config = name,
+                                            helpText = stringResource(R.string.help_text_click_to_add_unsaved_item),
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        IconButton(
+                                            enabled = enableSubmitButton,
+                                            onClick = {
+                                                addUnsavedItem(name.value.text.trim())
+                                                name.onValueChange(TextFieldValue())
+                                            },
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = stringResource(R.string.add_unsaved_item_description),
+                                            )
                                         }
                                     },
-                                ),
-                            )
-                            Button(
-                                enabled = enableRecommendButton,
-                                modifier = Modifier.fillMaxWidth(),
-                                onClick = {
-                                    focusManager.clearFocus()
-                                    onRecommendClick()
-                                },
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.button_label_get_recommendations)
-                                        .toUpperCase(Locale.current),
-                                    style = MaterialTheme.typography.labelLarge,
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            if (!name.hasError) {
+                                                addUnsavedItem(name.value.text.trim())
+                                                name.onValueChange(TextFieldValue())
+                                            }
+                                        },
+                                    ),
                                 )
+                                Button(
+                                    enabled = enableRecommendButton,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    onClick = {
+                                        focusManager.clearFocus()
+                                        onRecommendClick()
+                                    },
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.button_label_get_recommendations)
+                                            .toUpperCase(Locale.current),
+                                        style = MaterialTheme.typography.labelLarge,
+                                    )
+                                }
                             }
+                        }
+                        if (showEmptyListUI) {
+                            Fullscreen.EmptyList<String>(
+                                modifier = Modifier.weight(1f),
+                                error = stringResource(R.string.empty_shopping_list),
+                            )
                         }
                     }
                 }
 
-                if (hasUnsavedShoppingListItemInTheRecycleBin || unsavedShoppingList.isNotEmpty()) {
+                if (showUnsavedShoppingListUI) {
                     item {
                         ListItem(
                             headlineText = {
@@ -280,7 +311,7 @@ object RecommendationRequestScreen {
                     }
                 }
 
-                if (hasSavedShoppingListItemInTheRecycleBin || savedShoppingList.isNotEmpty()) {
+                if (showSavedShoppingListUI) {
                     item {
                         ListItem(
                             headlineText = {
