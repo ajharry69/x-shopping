@@ -41,14 +41,21 @@ internal class RecommendationRepository @Inject constructor(
                 items - itemsToRemove
             }
 
-    override fun addSavedShoppingListItem(item: ShoppingListItem) {
+    override fun addSavedShoppingListItem(
+        item: ShoppingListItem,
+        restoreFromRecycleBinIfPresent: Boolean,
+    ) {
         // Restore the item if it was previously flagged as deleted.
         if (item in removedSavedShoppingList.value) {
-            stateHandle[REMOVED_SAVED_SHOPPING_LIST_KEY] = removedSavedShoppingList.value - item
+            if (restoreFromRecycleBinIfPresent) {
+                stateHandle[REMOVED_SAVED_SHOPPING_LIST_KEY] = removedSavedShoppingList.value - item
+            }
         } else {
-            stateHandle[SAVED_SHOPPING_LIST_KEY] =
-                (stateHandle.get<List<ShoppingListItem>>(SAVED_SHOPPING_LIST_KEY)
-                    ?: emptyList()) + item
+            val items =
+                (stateHandle.get<List<ShoppingListItem>>(SAVED_SHOPPING_LIST_KEY) ?: emptyList())
+            if (item !in items) {
+                stateHandle[SAVED_SHOPPING_LIST_KEY] = items + item
+            }
         }
     }
 

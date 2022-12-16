@@ -64,11 +64,16 @@ object RecommendationRequestScreen {
         val hasUnsavedShoppingListItemInTheRecycleBin by viewModel.hasUnsavedShoppingListItemInTheRecycleBin.collectAsState()
         val itemToBeAddedExistsInUnsavedShoppingList by viewModel.itemToBeAddedExistsInUnsavedShoppingList.collectAsState()
 
-        CallOnLifecycleEvent {
-            if (it == Lifecycle.Event.ON_DESTROY) {
+        CallOnLifecycleEvent { event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
                 viewModel.clean()
-            } else if (it == Lifecycle.Event.ON_CREATE) {
-                args.items.forEach(viewModel::addSavedShoppingList)
+            } else if (event == Lifecycle.Event.ON_CREATE) {
+                args.items.forEach {
+                    viewModel.addSavedShoppingList(
+                        item = it,
+                        restoreFromRecycleBinIfPresent = false,
+                    )
+                }
             }
         }
 
