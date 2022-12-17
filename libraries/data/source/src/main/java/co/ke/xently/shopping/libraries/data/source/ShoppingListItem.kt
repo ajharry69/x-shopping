@@ -1,8 +1,11 @@
 package co.ke.xently.shopping.libraries.data.source
 
+import android.os.Parcelable
 import co.ke.xently.shopping.libraries.data.source.local.ShoppingListItemEntity
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
+@Parcelize
 data class ShoppingListItem(
     val id: Long,
     val name: String,
@@ -12,7 +15,7 @@ data class ShoppingListItem(
     val dateAdded: Date,
     val brands: List<Brand>,
     val attributes: List<Attribute>,
-) {
+): Parcelable {
     val asEntity
         get() = ShoppingListItemEntity(
             id = id,
@@ -23,15 +26,17 @@ data class ShoppingListItem(
             dateAdded = dateAdded,
         )
 
+    @Parcelize
     data class Attribute(
         override val name: String,
         override val value: String,
         val values: List<String>? = emptyList(),
-    ) : AbstractAttribute() {
+    ) : AbstractAttribute(), Parcelable {
         override fun toString() = "${name}:${value}"
     }
 
-    data class Brand(override val name: String) : AbstractBrand() {
+    @Parcelize
+    data class Brand(override val name: String) : AbstractBrand(), Parcelable {
         override fun toString() = name
     }
 

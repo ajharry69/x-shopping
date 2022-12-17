@@ -41,14 +41,21 @@ internal class RecommendationRepository @Inject constructor(
                 items - itemsToRemove
             }
 
-    override fun addSavedShoppingListItem(item: ShoppingListItem) {
+    override fun addSavedShoppingListItem(
+        item: ShoppingListItem,
+        restoreFromRecycleBinIfPresent: Boolean,
+    ) {
         // Restore the item if it was previously flagged as deleted.
         if (item in removedSavedShoppingList.value) {
-            stateHandle[REMOVED_SAVED_SHOPPING_LIST_KEY] = removedSavedShoppingList.value - item
+            if (restoreFromRecycleBinIfPresent) {
+                stateHandle[REMOVED_SAVED_SHOPPING_LIST_KEY] = removedSavedShoppingList.value - item
+            }
         } else {
-            stateHandle[SAVED_SHOPPING_LIST_KEY] =
-                (stateHandle.get<List<ShoppingListItem>>(SAVED_SHOPPING_LIST_KEY)
-                    ?: emptyList()) + item
+            val items =
+                (stateHandle.get<List<ShoppingListItem>>(SAVED_SHOPPING_LIST_KEY) ?: emptyList())
+            if (item !in items) {
+                stateHandle[SAVED_SHOPPING_LIST_KEY] = items + item
+            }
         }
     }
 
@@ -61,8 +68,8 @@ internal class RecommendationRepository @Inject constructor(
     }
 
     override fun clearSavedShoppingList() {
-        stateHandle.remove<List<String>>(SAVED_SHOPPING_LIST_KEY)
-        stateHandle.remove<List<String>>(REMOVED_SAVED_SHOPPING_LIST_KEY)
+        stateHandle[SAVED_SHOPPING_LIST_KEY] = emptyList<ShoppingListItem>()
+        stateHandle[REMOVED_SAVED_SHOPPING_LIST_KEY] = emptySet<ShoppingListItem>()
     }
 
     override fun addUnsavedShoppingListItem(item: String) {
@@ -89,8 +96,8 @@ internal class RecommendationRepository @Inject constructor(
     }
 
     override fun clearUnsavedShoppingList() {
-        stateHandle.remove<List<String>>(UNSAVED_SHOPPING_LIST_KEY)
-        stateHandle.remove<List<String>>(REMOVED_UNSAVED_SHOPPING_LIST_KEY)
+        stateHandle[UNSAVED_SHOPPING_LIST_KEY] = emptyList<String>()
+        stateHandle[REMOVED_UNSAVED_SHOPPING_LIST_KEY] = emptySet<String>()
     }
 
     override fun get(request: RecommendationRequest) = Retry().run {

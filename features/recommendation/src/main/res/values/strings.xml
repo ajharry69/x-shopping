@@ -27,6 +27,7 @@
     <string name="save_changes">Save changes</string>
     <string name="request_configuration">Request configuration</string>
     <string name="error_include_numbers_only">Please, include numbers only.</string>
+    <string name="empty_shopping_list">Empty shopping list</string>
 
     <plurals name="recommendations_heading_hits">
         <item quantity="one">Item found</item>

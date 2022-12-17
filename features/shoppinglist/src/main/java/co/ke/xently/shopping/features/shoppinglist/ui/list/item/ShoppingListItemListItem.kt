@@ -43,7 +43,7 @@ object ShoppingListItemListItem {
     @Composable
     internal operator fun invoke(
         modifier: Modifier,
-        shoppingListItem: ShoppingListItem,
+        item: ShoppingListItem,
         showPlaceholder: Boolean,
         menuItems: Set<MenuItem>,
         trailingIcon: (@Composable () -> Unit)? = null,
@@ -58,22 +58,22 @@ object ShoppingListItemListItem {
                 modifier = Modifier.weight(1f),
             ) {
                 Text(
-                    text = shoppingListItem.name,
-                    style = MaterialTheme.typography.titleLarge,
+                    text = item.name,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
                         .wrapContentWidth()
                         .shimmerPlaceholder(showPlaceholder),
                 )
                 Text(
-                    text = "${shoppingListItem.unitQuantity.let(ungroupedNumberFormat::format)} ${shoppingListItem.unit}",
+                    text = "${item.unitQuantity.let(ungroupedNumberFormat::format)} ${item.unit}",
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.shimmerPlaceholder(showPlaceholder),
                 )
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = shoppingListItem.purchaseQuantity.let(ungroupedNumberFormat::format),
-                    style = MaterialTheme.typography.titleLarge,
+                    text = item.purchaseQuantity.let(ungroupedNumberFormat::format),
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.shimmerPlaceholder(showPlaceholder),
                 )
                 if (trailingIcon == null) {
@@ -85,7 +85,7 @@ object ShoppingListItemListItem {
                                 imageVector = Icons.Default.KeyboardArrowRight,
                                 contentDescription = stringResource(
                                     R.string.feature_shoppinglist_list_item_drop_down_menu_content_description,
-                                    shoppingListItem.name,
+                                    item.name,
                                 ),
                                 modifier = Modifier
                                     .shimmerPlaceholder(showPlaceholder)
@@ -99,7 +99,7 @@ object ShoppingListItemListItem {
                             for (menuItem in menuItems) {
                                 DropdownMenuItem(
                                     onClick = {
-                                        menuItem.onClick(shoppingListItem)
+                                        menuItem.onClick(item)
                                         showDropDownMenu = false
                                     },
                                     text = {

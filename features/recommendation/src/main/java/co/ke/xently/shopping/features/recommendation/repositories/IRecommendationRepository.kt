@@ -14,7 +14,10 @@ internal interface IRecommendationRepository {
 
     val unsavedShoppingList: Flow<List<String>>
 
-    fun addSavedShoppingListItem(item: ShoppingListItem)
+    fun addSavedShoppingListItem(
+        item: ShoppingListItem,
+        restoreFromRecycleBinIfPresent: Boolean = false,
+    )
 
     fun removeSavedShoppingListItem(item: ShoppingListItem)
 

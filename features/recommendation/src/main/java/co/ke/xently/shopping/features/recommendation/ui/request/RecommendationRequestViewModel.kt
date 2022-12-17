@@ -49,8 +49,11 @@ internal open class RecommendationRequestViewModel @Inject constructor(
         }
     }
 
-    fun addSavedShoppingList(item: ShoppingListItem) {
-        repository.addSavedShoppingListItem(item)
+    fun addSavedShoppingList(
+        item: ShoppingListItem,
+        restoreFromRecycleBinIfPresent: Boolean = false,
+    ) {
+        repository.addSavedShoppingListItem(item, restoreFromRecycleBinIfPresent)
     }
 
     fun removeSavedShoppingList(item: ShoppingListItem) {

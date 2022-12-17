@@ -9,9 +9,10 @@ import co.ke.xently.shopping.features.shoppinglist.repositories.exceptions.Shopp
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import co.ke.xently.shopping.libraries.data.source.remote.ExceptionUtils.retryCatch
 import co.ke.xently.shopping.libraries.data.source.remote.Http.sendRequest
-import co.ke.xently.shopping.libraries.data.source.utils.DateFormat
 import co.ke.xently.shopping.libraries.data.source.utils.Retry
 import kotlinx.coroutines.flow.*
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -78,7 +79,7 @@ internal class ShoppingListRepository @Inject constructor(
         pagingSourceFactory = {
             if (group != null && group.groupBy == GroupBy.DateAdded) {
                 dependencies.database.shoppingListDao.get(
-                    DateFormat.DEFAULT_SERVER_DATE_FORMAT.parse(group.group.toString())!!,
+                    SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(group.group)!!,
                 )
             } else {
                 dependencies.database.shoppingListDao.get()

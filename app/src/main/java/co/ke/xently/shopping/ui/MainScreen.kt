@@ -16,7 +16,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import co.ke.xently.shopping.MainActivityViewModel
 import co.ke.xently.shopping.MainNavGraph
 import co.ke.xently.shopping.R
@@ -86,7 +85,7 @@ internal fun MainScreen(
     shared: Shared,
     navigator: ShoppingListNavigator,
     viewModel: MainActivityViewModel,
-    gslViewModel: GroupedShoppingListViewModel = hiltViewModel(),
+    gslViewModel: GroupedShoppingListViewModel,
 ) {
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()

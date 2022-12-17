@@ -31,24 +31,29 @@ import co.ke.xently.shopping.features.utils.Shared
 import co.ke.xently.shopping.libraries.data.source.ShoppingListItem
 import com.ramcosta.composedestinations.annotation.Destination
 
-internal object RecommendationRequestScreen {
-    @Stable
-    data class Config(
-        val shared: Shared = Shared(),
-        val onRecommendClick: () -> Unit = {},
-        val addUnsavedItem: (String) -> Unit = {},
-        val removeUnsavedItem: (String) -> Unit = {},
-        val restoreRemovedSavedItems: () -> Unit = {},
-        val lookupItemToBeAdded: (String) -> Unit = {},
-        val restoreRemovedUnsavedItems: () -> Unit = {},
-        val removeSavedItem: (ShoppingListItem) -> Unit = {},
-        val onUpdateSuccess: () -> Unit = shared.onNavigationIconClicked,
-    )
+object RecommendationRequestScreen {
+    data class Args(val items: Array<ShoppingListItem> = emptyArray()) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as Args
+
+            if (!items.contentEquals(other.items)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            return items.contentHashCode()
+        }
+    }
 
     @RecommendationNavGraph(start = true)
-    @Destination
+    @Destination(navArgsDelegate = Args::class)
     @Composable
-    fun RecommendationRequestScreen(
+    internal fun RecommendationRequestScreen(
+        args: Args,
         shared: Shared,
         navigator: RecommendationNavigator,
         viewModel: RecommendationRequestViewModel = hiltViewModel(),
@@ -59,44 +64,55 @@ internal object RecommendationRequestScreen {
         val hasUnsavedShoppingListItemInTheRecycleBin by viewModel.hasUnsavedShoppingListItemInTheRecycleBin.collectAsState()
         val itemToBeAddedExistsInUnsavedShoppingList by viewModel.itemToBeAddedExistsInUnsavedShoppingList.collectAsState()
 
-        CallOnLifecycleEvent {
-            if (it == Lifecycle.Event.ON_DESTROY) {
+        CallOnLifecycleEvent { event: Lifecycle.Event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
                 viewModel.clean()
+            } else if (event == Lifecycle.Event.ON_CREATE) {
+                args.items.forEach {
+                    viewModel.addSavedShoppingList(
+                        item = it,
+                        restoreFromRecycleBinIfPresent = false,
+                    )
+                }
             }
         }
 
         RecommendationRequestScreen(
+            shared = shared,
             modifier = Modifier.fillMaxSize(),
             savedShoppingList = savedShoppingList,
             unsavedShoppingList = unsavedShoppingList,
+            addUnsavedItem = viewModel::addUnsavedShoppingList,
+            removeSavedItem = viewModel::removeSavedShoppingList,
+            lookupItemToBeAdded = viewModel::lookupItemToBeAdded,
+            removeUnsavedItem = viewModel::removeUnsavedShoppingList,
+            restoreRemovedSavedItems = viewModel::restoreRemovedSavedItems,
+            restoreRemovedUnsavedItems = viewModel::restoreRemovedUnsavedItems,
             hasSavedShoppingListItemInTheRecycleBin = hasSavedShoppingListItemInTheRecycleBin,
             itemToBeAddedExistsInUnsavedShoppingList = itemToBeAddedExistsInUnsavedShoppingList,
             hasUnsavedShoppingListItemInTheRecycleBin = hasUnsavedShoppingListItemInTheRecycleBin,
-            config = Config(
-                shared = shared,
-                addUnsavedItem = viewModel::addUnsavedShoppingList,
-                removeSavedItem = viewModel::removeSavedShoppingList,
-                lookupItemToBeAdded = viewModel::lookupItemToBeAdded,
-                removeUnsavedItem = viewModel::removeUnsavedShoppingList,
-                restoreRemovedSavedItems = viewModel::restoreRemovedSavedItems,
-                restoreRemovedUnsavedItems = viewModel::restoreRemovedUnsavedItems,
-                onRecommendClick = {
-                    navigator.navigate(RecommendationScreenDestination()) {
-                        launchSingleTop = true
-                    }
-                },
-            ),
+            onRecommendClick = {
+                navigator.navigate(RecommendationScreenDestination()) {
+                    launchSingleTop = true
+                }
+            },
         )
     }
 
-
     @Composable
     @VisibleForTesting
-    operator fun invoke(
-        config: Config,
+    internal operator fun invoke(
+        shared: Shared,
         modifier: Modifier,
         unsavedShoppingList: List<String>,
         savedShoppingList: List<ShoppingListItem>,
+        onRecommendClick: () -> Unit = {},
+        addUnsavedItem: (String) -> Unit = {},
+        removeUnsavedItem: (String) -> Unit = {},
+        restoreRemovedSavedItems: () -> Unit = {},
+        lookupItemToBeAdded: (String) -> Unit = {},
+        restoreRemovedUnsavedItems: () -> Unit = {},
+        removeSavedItem: (ShoppingListItem) -> Unit = {},
         hasSavedShoppingListItemInTheRecycleBin: Boolean = false,
         itemToBeAddedExistsInUnsavedShoppingList: Boolean = false,
         hasUnsavedShoppingListItemInTheRecycleBin: Boolean = false,
@@ -113,6 +129,29 @@ internal object RecommendationRequestScreen {
             }
         }
 
+        val showSavedShoppingListUI by remember(
+            savedShoppingList,
+            hasSavedShoppingListItemInTheRecycleBin,
+        ) {
+            derivedStateOf {
+                hasSavedShoppingListItemInTheRecycleBin || savedShoppingList.isNotEmpty()
+            }
+        }
+
+        val showUnsavedShoppingListUI by remember(
+            unsavedShoppingList,
+            hasUnsavedShoppingListItemInTheRecycleBin,
+        ) {
+            derivedStateOf {
+                hasUnsavedShoppingListItemInTheRecycleBin || unsavedShoppingList.isNotEmpty()
+            }
+        }
+
+        val showEmptyListUI by remember(showSavedShoppingListUI, showUnsavedShoppingListUI) {
+            derivedStateOf {
+                !showSavedShoppingListUI && !showUnsavedShoppingListUI
+            }
+        }
         Scaffold(
             topBar = {
                 TopAppBarWithProgressIndicator {
@@ -121,13 +160,13 @@ internal object RecommendationRequestScreen {
                             Text(stringResource(R.string.toolbar_title_request_recommendation))
                         },
                         navigationIcon = {
-                            MoveBackNavigationIconButton(config.shared)
+                            MoveBackNavigationIconButton(shared)
                         },
                     )
                 }
             },
             snackbarHost = {
-                SnackbarHost(hostState = config.shared.snackbarHostState)
+                SnackbarHost(hostState = shared.snackbarHostState)
             },
         ) { values: PaddingValues ->
             LazyColumn(
@@ -136,90 +175,106 @@ internal object RecommendationRequestScreen {
                     .safeContentPadding(),
             ) {
                 stickyHeader {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier
-                            .fillMaxWidthHorizontalPadding()
-                            .padding(top = 8.dp),
-                    ) {
-                        val name = TextFieldConfig<String>(
-                            labelId = R.string.field_label_item_name,
-                            extraErrorChecks = {
-                                if (itemToBeAddedExistsInUnsavedShoppingList) {
-                                    context.getString(
-                                        R.string.duplicate_unsaved_shopping_list_item,
-                                        it.text.trim(),
-                                    )
-                                } else null
-                            },
-                        )
-
-                        val requiredFields = arrayOf(name)
-                        val enableSubmitButton by remember(*requiredFields) {
-                            derivedStateOf {
-                                requiredFields.all { !it.hasError }
-                            }
-                        }
-
-                        TextField(
-                            modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            value = name.value,
-                            isError = name.hasError,
-                            onValueChange = {
-                                name.onValueChange(it)
-                                config.lookupItemToBeAdded(it.text.trim())
-                            },
-                            label = {
-                                Text(name.label)
-                            },
-                            supportingText = {
-                                SupportingText(
-                                    config = name,
-                                    helpText = stringResource(R.string.help_text_click_to_add_unsaved_item),
+                    Column(if (showEmptyListUI) Modifier.fillParentMaxSize() else Modifier) {
+                        ElevatedCard(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp),
+                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.background),
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp)
+                                    .padding(top = 10.dp, bottom = 4.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                            ) {
+                                val name = TextFieldConfig<String>(
+                                    labelId = R.string.field_label_item_name,
+                                    extraErrorChecks = {
+                                        if (itemToBeAddedExistsInUnsavedShoppingList) {
+                                            context.getString(
+                                                R.string.duplicate_unsaved_shopping_list_item,
+                                                it.text.trim(),
+                                            )
+                                        } else null
+                                    },
                                 )
-                            },
-                            trailingIcon = {
-                                IconButton(
-                                    enabled = enableSubmitButton,
+
+                                val requiredFields = arrayOf(name)
+                                val enableSubmitButton by remember(*requiredFields) {
+                                    derivedStateOf {
+                                        requiredFields.all { !it.hasError }
+                                    }
+                                }
+
+                                TextField(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    singleLine = true,
+                                    value = name.value,
+                                    isError = name.hasError,
+                                    onValueChange = {
+                                        name.onValueChange(it)
+                                        lookupItemToBeAdded(it.text.trim())
+                                    },
+                                    label = {
+                                        Text(name.label)
+                                    },
+                                    supportingText = {
+                                        SupportingText(
+                                            config = name,
+                                            helpText = stringResource(R.string.help_text_click_to_add_unsaved_item),
+                                        )
+                                    },
+                                    trailingIcon = {
+                                        IconButton(
+                                            enabled = enableSubmitButton,
+                                            onClick = {
+                                                addUnsavedItem(name.value.text.trim())
+                                                name.onValueChange(TextFieldValue())
+                                            },
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = stringResource(R.string.add_unsaved_item_description),
+                                            )
+                                        }
+                                    },
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            if (!name.hasError) {
+                                                addUnsavedItem(name.value.text.trim())
+                                                name.onValueChange(TextFieldValue())
+                                            }
+                                        },
+                                    ),
+                                )
+                                Button(
+                                    enabled = enableRecommendButton,
+                                    modifier = Modifier.fillMaxWidth(),
                                     onClick = {
-                                        config.addUnsavedItem(name.value.text.trim())
-                                        name.onValueChange(TextFieldValue())
+                                        focusManager.clearFocus()
+                                        onRecommendClick()
                                     },
                                 ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Add,
-                                        contentDescription = stringResource(R.string.add_unsaved_item_description),
+                                    Text(
+                                        text = stringResource(R.string.button_label_get_recommendations)
+                                            .toUpperCase(Locale.current),
+                                        style = MaterialTheme.typography.labelLarge,
                                     )
                                 }
-                            },
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    if (!name.hasError) {
-                                        config.addUnsavedItem(name.value.text.trim())
-                                        name.onValueChange(TextFieldValue())
-                                    }
-                                },
-                            ),
-                        )
-                        Button(
-                            enabled = enableRecommendButton,
-                            modifier = Modifier.fillMaxWidth(),
-                            onClick = {
-                                focusManager.clearFocus()
-                                config.onRecommendClick()
-                            },
-                        ) {
-                            Text(
-                                text = stringResource(R.string.button_label_get_recommendations)
-                                    .toUpperCase(Locale.current),
-                                style = MaterialTheme.typography.labelLarge,
+                            }
+                        }
+                        if (showEmptyListUI) {
+                            Fullscreen.EmptyList<String>(
+                                modifier = Modifier.weight(1f),
+                                error = stringResource(R.string.empty_shopping_list),
                             )
                         }
                     }
                 }
 
-                if (hasUnsavedShoppingListItemInTheRecycleBin || unsavedShoppingList.isNotEmpty()) {
+                if (showUnsavedShoppingListUI) {
                     item {
                         ListItem(
                             headlineText = {
@@ -230,7 +285,7 @@ internal object RecommendationRequestScreen {
                             },
                             trailingContent = {
                                 IconButton(
-                                    onClick = config.restoreRemovedUnsavedItems,
+                                    onClick = restoreRemovedUnsavedItems,
                                     enabled = hasUnsavedShoppingListItemInTheRecycleBin,
                                 ) {
                                     Icon(
@@ -247,7 +302,7 @@ internal object RecommendationRequestScreen {
                                 Text(it)
                             },
                             trailingContent = {
-                                IconButton(onClick = { config.removeUnsavedItem(it) }) {
+                                IconButton(onClick = { removeUnsavedItem(it) }) {
                                     Icon(
                                         imageVector = Icons.Default.DeleteForever,
                                         contentDescription = stringResource(
@@ -261,7 +316,7 @@ internal object RecommendationRequestScreen {
                     }
                 }
 
-                if (hasSavedShoppingListItemInTheRecycleBin || savedShoppingList.isNotEmpty()) {
+                if (showSavedShoppingListUI) {
                     item {
                         ListItem(
                             headlineText = {
@@ -272,7 +327,7 @@ internal object RecommendationRequestScreen {
                             },
                             trailingContent = {
                                 IconButton(
-                                    onClick = config.restoreRemovedSavedItems,
+                                    onClick = restoreRemovedSavedItems,
                                     enabled = hasSavedShoppingListItemInTheRecycleBin,
                                 ) {
                                     Icon(
@@ -297,7 +352,7 @@ internal object RecommendationRequestScreen {
                                         it.purchaseQuantity.let(ungroupedNumberFormat::format),
                                         style = MaterialTheme.typography.titleLarge,
                                     )
-                                    IconButton(onClick = { config.removeSavedItem(it) }) {
+                                    IconButton(onClick = { removeSavedItem(it) }) {
                                         Icon(
                                             imageVector = Icons.Default.DeleteForever,
                                             contentDescription = stringResource(
