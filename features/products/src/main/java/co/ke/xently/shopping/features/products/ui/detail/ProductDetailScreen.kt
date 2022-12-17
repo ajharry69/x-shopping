@@ -379,7 +379,7 @@ internal fun ProductDetailScreen(
                 modifier = Modifier.fillMaxWidthHorizontalPadding(),
                 onClick = {
                     focusManager.clearFocus()
-                    val p = (product ?: Product.DEFAULT_INSTANCE).copy(
+                    (product ?: Product.DEFAULT_INSTANCE).copy(
                         shop = selectedShop,
                         brands = selectedBrands.map {
                             if (it is Product.Brand) {
@@ -403,8 +403,7 @@ internal fun ProductDetailScreen(
                         unitPrice = unitPrice.value.text.trim().ifBlank { "1" }
                             .toFloat(),
                         datePurchased = datePurchased!!,
-                    )
-                    viewModel.save(p)
+                    ).let(viewModel::save)
                 },
             ) {
                 Text(
